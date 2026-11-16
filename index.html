@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>학종파이터 | 생기부, 1년 설계도부터 그려요</title>
-<meta name="description" content="과목 선택부터 수행평가·세특, 심화탐구보고서까지. 학종파이터의 3단계 학생부 로드맵.">
+<meta name="description" content="과목 선택부터 수행평가·세특, 심화탐구보고서까지. 학종파이터의 3단계 학생부 로드맵. DM 주시면 세특 작성법 상담과 내신 공부 방법을 무료로 드려요.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="학종파이터 | 생기부, 1년 설계도부터 그려요">
 <meta property="og:description" content="과목 선택부터 수행평가·세특, 심화탐구보고서까지. 실패 없는 대입을 위한 3단계 학생부 로드맵.">
@@ -163,6 +163,152 @@ footer .logo strong{display:block;font-size:20px;font-weight:900;color:var(--yel
 footer .logo small{display:block;font-size:14px;color:#C9D1EC}
 footer a.h{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:12px 0}
 a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+button,a{-webkit-tap-highlight-color:transparent}
+
+/* DM 혜택 */
+.offer{background:#fff;border:2px solid var(--navy);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;max-width:540px}
+.offer-h{font-weight:900;font-size:15px;color:var(--navy)}
+.offer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.offer li{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--muted)}
+.offer li b{display:block;font-size:17px;font-weight:900;color:var(--navy)}
+.offer .ok{flex:none;width:26px;height:26px;border-radius:999px;background:var(--yellow);border:2px solid var(--navy);color:var(--navy);font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.offer.dark{background:#2A3A72;border-color:#4A5A8F}
+.offer.dark .offer-h{color:var(--mint)}
+.offer.dark li{color:#C9D1EC}
+.offer.dark li b{color:#fff}
+.offer.dark .ok{border-color:var(--yellow)}
+
+/* 하단 고정 DM 바 (모바일 전용) */
+.dock{display:none}
+
+/* ================= 모바일 ================= */
+@media (max-width:720px){
+  .wrap{padding-left:20px;padding-right:20px}
+  .row{gap:28px}
+  .pill{font-size:14px;padding:8px 14px}
+  .lead{font-size:16px;line-height:1.7}
+  .btn{min-height:54px;padding:14px 20px;font-size:16px;border-radius:14px}
+  .tip{font-size:15px;padding:16px 18px}
+
+  /* 헤더: 얇게 */
+  nav{padding-top:8px;padding-bottom:8px;flex-wrap:nowrap}
+  .logo img{width:38px;height:38px}
+  .logo span{font-size:20px}
+  .links a.dm{min-height:44px;padding:10px 16px;font-size:15px}
+
+  /* 히어로: 캐릭터를 위로, 첫 화면에 버튼까지 */
+  .hero .row{flex-direction:column;align-items:stretch;padding-top:16px;padding-bottom:40px;gap:20px}
+  .hero .col-text{flex:none !important;gap:16px !important}
+  .hero [data-for]{gap:14px !important}
+  .hero h1{font-size:34px;letter-spacing:-1px}
+  .hero-art{order:-1;flex:none;flex-direction:row;justify-content:space-between;align-items:center;gap:12px}
+  .hero-art img{max-width:120px;width:120px;height:120px}
+  .hero-art .handle{font-size:14px;padding:10px 14px;min-height:44px}
+  .seg button{font-size:14px;padding:0 14px}
+  .hero .buttons{flex-direction:column;gap:10px}
+  .hero .buttons{order:2}
+  .hero .offer{order:1}
+  .hero .btn-ghost{display:none}
+  .hero .col-text>.pill{display:none}
+  .hero .buttons .btn{justify-content:center}
+
+  /* 섹션 여백 줄이기 */
+  .tl .wrap{padding-top:56px;padding-bottom:56px;gap:28px}
+  .tl h2{font-size:26px}
+  .check .row{padding-top:56px;padding-bottom:56px;gap:20px}
+  .check h2{font-size:28px}
+  .check h2 br{display:none}
+  .check .row>div:first-child{flex:1 1 100% !important;gap:10px !important}
+  .check .row>div:first-child p{font-size:15px !important}
+  .score{margin-top:0}
+  .score strong{font-size:40px}
+  .qs{flex:1 1 100%}
+  .intro .wrap{padding-top:56px;padding-bottom:24px;gap:20px}
+  .intro h2{font-size:26px}
+  .s1 .row{padding-top:24px;padding-bottom:48px}
+  .s2 .row,.s3 .row{padding-top:48px;padding-bottom:48px}
+  .s3 .row{padding-bottom:64px}
+  .cta .row{padding-top:56px;padding-bottom:56px;gap:24px}
+  .step h3{font-size:26px}
+  .step .sub{font-size:15px}
+  .cta h2{font-size:30px}
+  .col-text{flex:1 1 100%;gap:16px}
+  .cta .col-text{gap:18px !important}
+
+  /* 타임라인: 한 줄 4칸 유지 */
+  .stages{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  .track::before{display:block;top:23px}
+  .stage{padding:6px 0;gap:8px}
+  .stage .dot{width:20px;height:20px}
+  .stage[aria-pressed="true"] .dot{width:26px;height:26px;margin:-3px 0}
+  .stage strong{font-size:15px;line-height:1.3;text-align:center}
+  .stage .s{font-size:12px;text-align:center;line-height:1.35}
+  .detail{padding:22px;border-radius:20px;gap:16px;margin-top:4px}
+  .detail>div{flex:1 1 100%}
+  .detail strong{font-size:20px}
+  .detail p{font-size:15px}
+  .detail .btn{width:100%;justify-content:center}
+
+  /* 자가 진단 */
+  .q{font-size:15px;padding:14px 16px;min-height:56px;gap:12px;border-radius:14px}
+  .q .box{width:26px;height:26px}
+  .result{padding:22px;border-radius:18px}
+  .result .k{font-size:15px}
+  .result .big{font-size:21px}
+  .result .btn{width:100%;justify-content:center}
+
+  /* 고민 말풍선 */
+  .bubbles{gap:10px}
+  .bubbles span{font-size:15px;padding:12px 16px}
+  .intro p.t{font-size:22px}
+
+  /* STEP 이미지: 캐릭터 부분만 가로로 잘라서 */
+  .step .col-img,.cta .col-img{max-width:none;flex:1 1 100%}
+  .shot{aspect-ratio:4/3;box-shadow:5px 5px 0 var(--navy);border-radius:20px}
+  .s1 .shot{object-position:50% 58%}
+  .s2 .shot{object-position:50% 70%}
+  .s3 .shot{object-position:50% 62%}
+  .cta .shot{object-position:50% 52%;box-shadow:none}
+  .s2 .row{flex-direction:column-reverse;flex-wrap:nowrap}
+
+  /* STEP 내용 촘촘하게 */
+  .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .fields .card{padding:14px;border-radius:14px;gap:4px}
+  .fields strong{font-size:16px}
+  .fields span{font-size:13px;line-height:1.6}
+  .list li{padding:14px 16px;gap:12px;border-radius:14px}
+  .list strong{font-size:16px}
+  .list span.d{font-size:14px}
+  .num,.grid5 .num{width:34px;height:34px;font-size:16px}
+  .grid5{grid-template-columns:1fr}
+  .grid5 li{padding:12px 14px}
+  .grid5 strong{font-size:16px}
+  .grid5 span.d{font-size:13px}
+  .note{font-size:13px}
+
+  /* CTA */
+  .chips li{font-size:14px;padding:10px 14px}
+  .cta p.big{font-size:22px}
+  .cta .buttons{flex-direction:column;gap:10px}
+  .cta .buttons .btn{justify-content:center}
+
+  footer .wrap{padding-top:28px;padding-bottom:96px}
+  .offer{padding:14px 16px;gap:8px;border-radius:16px}
+  .offer-h{font-size:13px}
+  .offer li{font-size:13px;gap:10px}
+  .offer li b{font-size:15px}
+  .offer .ok{width:22px;height:22px;font-size:12px}
+
+  /* 하단 고정 DM 바 */
+  .dock{display:block;position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(243,252,250,.96);border-top:2px solid var(--navy);transform:translateY(110%);transition:transform .25s ease}
+  .dock.show{transform:none}
+  .dock a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:14px;background:var(--yellow);border:2px solid var(--navy);color:var(--navy);font-weight:900;font-size:16px;text-decoration:none}
+}
+@media (max-width:360px){
+  .hero h1{font-size:34px}
+  .hero-art img{width:120px;height:120px}
+  .fields{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -206,6 +352,13 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
         </a>
         <a class="btn btn-ghost" href="#roadmap">3단계 로드맵 보기</a>
       </div>
+      <div class="offer" aria-label="DM 보내면 받는 것">
+        <span class="offer-h">DM 주시면 무료로 드려요</span>
+        <ul>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>세특 작성법 1:1 상담</b>지금보다 1~2단계 높은 대학을 목표로</span></li>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>내신 등급 올리는 공부 방법</b>바로 따라 할 수 있는 방법으로 제공</span></li>
+        </ul>
+      </div>
     </div>
     <div class="hero-art">
       <img src="images/character.jpg" alt="망토를 두르고 복싱 글러브를 낀 연필 캐릭터 학종파이터가 힘차게 날아오르는 모습" width="440" height="440">
@@ -241,7 +394,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
   <div class="wrap row">
     <div style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:16px">
       <span class="pill" style="font-size:15px;padding:8px 16px">SELF CHECK · 자가 진단</span>
-      <h2>스스로<br>체크해 보세요</h2>
+      <h2>스스로 <br>체크해 보세요</h2>
       <p style="font-size:18px;line-height:1.7;color:var(--muted)">자신 있게 "네"라고 답할 수 있는 항목만 눌러 보세요.</p>
       <div class="score"><strong id="count">0</strong><span>/ 5</span></div>
     </div>
@@ -341,6 +494,13 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
         <li><b>3단계</b>심화탐구보고서</li>
       </ol>
       <p class="big">지금 바로 인스타 DM으로<br><em>[설계도]</em>를 보내주세요!</p>
+      <div class="offer dark" aria-label="DM 보내면 받는 것">
+        <span class="offer-h">DM 주시면 무료로 드려요</span>
+        <ul>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>세특 작성법 1:1 상담</b>지금보다 1~2단계 높은 대학을 목표로</span></li>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>내신 등급 올리는 공부 방법</b>바로 따라 할 수 있는 방법으로 제공</span></li>
+        </ul>
+      </div>
       <div class="buttons">
         <a class="btn btn-yellow" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
           <svg class="i" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
@@ -366,8 +526,31 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
   </div>
 </footer>
 
+<div class="dock" id="dock" aria-hidden="true">
+  <a href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener" tabindex="-1">
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
+    인스타 DM으로 [설계도] 받기
+  </a>
+</div>
+
 <script>
 (function () {
+  // 모바일 하단 DM 바: 첫 화면 버튼이 사라지면 보이고, 마지막 CTA 구역에선 숨김
+  var dock = document.getElementById('dock');
+  if ('IntersectionObserver' in window && dock) {
+    var heroBtns = document.querySelector('.hero .buttons');
+    var cta = document.getElementById('cta');
+    var heroVisible = true, ctaVisible = false;
+    var sync = function () {
+      var show = !heroVisible && !ctaVisible;
+      dock.classList.toggle('show', show);
+      dock.setAttribute('aria-hidden', String(!show));
+      dock.querySelector('a').tabIndex = show ? 0 : -1;
+    };
+    new IntersectionObserver(function (e) { heroVisible = e[0].isIntersecting; sync(); }).observe(heroBtns);
+    new IntersectionObserver(function (e) { ctaVisible = e[0].isIntersecting; sync(); }, { threshold: 0.15 }).observe(cta);
+  }
+
   // 학생/학부모 전환
   var segBtns = document.querySelectorAll('.seg button');
   segBtns.forEach(function (b) {
