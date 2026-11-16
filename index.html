@@ -128,7 +128,9 @@ nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between
 .msg{display:flex;align-items:flex-end;gap:8px;max-width:100%}
 .msg p{margin:0;padding:11px 16px;border-radius:22px;font-size:16px;line-height:1.45;max-width:78%}
 .msg.in p{background:#EFF2F7;color:var(--navy);border-bottom-left-radius:6px}
-.msg.out{justify-content:flex-end;margin-top:8px}
+.msg.out{justify-content:flex-end}
+.msg.in+.msg.out{margin-top:6px}
+.replies+.msg.in{margin-top:14px}
 .msg.out p{background:var(--navy);color:#fff;border-bottom-right-radius:6px;font-weight:500}
 .ava{flex:none;width:30px;height:30px;border-radius:999px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
 .ava svg{margin-bottom:-2px}
@@ -142,7 +144,7 @@ nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between
 
 /* 대화 등장: 화면에 들어올 때 한 번 */
 .chat.anim .msg{opacity:0;transform:translateY(10px)}
-.chat.anim.play .msg{opacity:1;transform:none;transition:opacity .35s ease,transform .35s ease;transition-delay:calc(var(--i) * 450ms)}
+.chat.anim.play .msg{opacity:1;transform:none;transition:opacity .35s ease,transform .35s ease;transition-delay:calc(var(--i) * 600ms)}
 @media (prefers-reduced-motion:reduce){.chat.anim .msg{opacity:1;transform:none;transition:none}}
 
 .step h3{font-size:clamp(30px,3.6vw,44px);line-height:1.25}
@@ -472,21 +474,37 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
           <span class="ava a1" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6z"/></svg></span>
           <p>세특 주제, 뭐로 하지 ㅠㅠ</p>
         </li>
-        <li class="msg in" style="--i:1">
+        <li class="msg out" style="--i:1">
+          <p>수행평가에서 시작해 봐! 끝나고 생긴 새 질문이 다음 탐구 주제가 돼.</p>
+        </li>
+        <li class="msg replies" style="--i:2">
+          <a href="#step2"><b>STEP 2</b>세특 주제 잡기</a>
+        </li>
+        <li class="msg in" style="--i:3">
           <span class="ava a2" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6z"/></svg></span>
           <p>고교학점제 과목 뭘 골라야 돼?</p>
         </li>
-        <li class="msg in" style="--i:2">
+        <li class="msg out" style="--i:4">
+          <p>진로 방향부터 정하고, 계열에 맞는 과목을 골라. 고른 ‘이유’만 설명할 수 있으면 돼.</p>
+        </li>
+        <li class="msg replies" style="--i:5">
+          <a href="#step1"><b>STEP 1</b>과목 고르기</a>
+        </li>
+        <li class="msg in" style="--i:6">
           <span class="ava a3" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6z"/></svg></span>
           <p>내 생기부… 이대로 괜찮은 걸까</p>
         </li>
-        <li class="msg out" style="--i:3">
-          <p>셋 다 3단계 로드맵에서 풀어 줄게! 궁금한 것부터 눌러 봐</p>
+        <li class="msg out" style="--i:7">
+          <p>활동들이 한 방향으로 이어지는지가 핵심이야. 심화탐구보고서로 깊이를 더해 보자.</p>
         </li>
-        <li class="msg replies" style="--i:4">
-          <a href="#step1"><b>STEP 1</b>과목 고르기</a>
-          <a href="#step2"><b>STEP 2</b>세특 주제 잡기</a>
+        <li class="msg replies" style="--i:8">
           <a href="#step3"><b>STEP 3</b>탐구보고서 쓰기</a>
+        </li>
+        <li class="msg out" style="--i:9">
+          <p>더 궁금한 건 DM으로 ‘설계도’라고 보내 줘!</p>
+        </li>
+        <li class="msg replies" style="--i:10">
+          <a href="https://www.instagram.com/hakjong_fighter/" data-dm><b>DM</b>설계도 보내기</a>
         </li>
       </ol>
     </div>
@@ -584,7 +602,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 
 <footer>
   <div class="wrap">
-    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v5 (11.16)</small></div></div>
+    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v6 (11.16)</small></div></div>
     <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
       <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
       @hakjong_fighter
