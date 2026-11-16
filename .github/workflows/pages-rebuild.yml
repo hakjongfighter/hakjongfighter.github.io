@@ -1,0 +1,21 @@
+# main에 새 커밋이 올라오면 GitHub Pages 빌드를 다시 요청합니다.
+# (앱/봇 계정으로 push하면 Pages가 자동으로 다시 빌드되지 않는 문제 해결)
+name: Rebuild GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
