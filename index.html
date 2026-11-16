@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학종파이터 | 생기부, 1년 설계도부터 그려요</title>
+<meta name="description" content="과목 선택부터 수행평가·세특, 심화탐구보고서까지. 학종파이터의 3단계 학생부 로드맵.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="학종파이터 | 생기부, 1년 설계도부터 그려요">
+<meta property="og:description" content="과목 선택부터 수행평가·세특, 심화탐구보고서까지. 실패 없는 대입을 위한 3단계 학생부 로드맵.">
+<meta property="og:image" content="https://hakjongfighter.github.io/images/og.jpg">
+<meta property="og:url" content="https://hakjongfighter.github.io/">
+<meta name="theme-color" content="#1C2A5E">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1C2A5E;--navy2:#141F48;--yellow:#FFC72C;--mint:#B8F0E7;--mint2:#6CCFC8;--card:#F3FCFA;--muted:#33447F;--muted2:#22336A}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--card);color:var(--navy);font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;line-height:1.5;word-break:keep-all}
+img{display:block;max-width:100%}
+a{color:var(--navy)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:24px;padding-right:24px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:48px}
+.col-text{flex:1.4 1 480px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.col-img{flex:1 1 320px;min-width:0;max-width:440px;width:100%;margin:0 auto}
+.pill{align-self:flex-start;display:inline-block;background:var(--navy);color:var(--yellow);font-weight:700;font-size:16px;padding:10px 20px;border-radius:999px}
+.pill.mint{background:var(--mint);color:var(--navy)}
+h1,h2,h3{margin:0;font-weight:900;letter-spacing:-1px}
+p{margin:0}
+.lead{font-size:19px;line-height:1.75;color:var(--muted2);max-width:540px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;padding:16px 28px;min-height:60px;border-radius:16px;font-weight:900;font-size:18px;border:2px solid var(--navy);transition:transform .15s,box-shadow .15s}
+.btn-yellow{background:var(--yellow);color:var(--navy);box-shadow:5px 5px 0 var(--navy)}
+.btn-yellow:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--navy)}
+.btn-ghost{background:var(--card);color:var(--navy);font-weight:700}
+.btn-ghost:hover{background:#fff}
+.btn-sm{padding:14px 22px;min-height:52px;font-size:16px;border-radius:14px}
+.card{background:var(--card);border:2px solid var(--navy);border-radius:18px}
+.tip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 22px;font-size:16px;line-height:1.6}
+.tip b{color:var(--yellow);margin-right:8px}
+.shot{width:100%;height:auto;aspect-ratio:896/1200;object-fit:cover;border:2px solid var(--navy);border-radius:24px;box-shadow:8px 8px 0 var(--navy)}
+.num{flex:none;width:44px;height:44px;border-radius:999px;background:var(--yellow);border:2px solid var(--navy);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.list li{display:flex;align-items:center;gap:18px;padding:20px 22px}
+.list strong{display:block;font-size:19px;font-weight:900}
+.list span.d{display:block;font-size:16px;color:var(--muted)}
+svg.i{flex:none}
+
+/* nav */
+header{background:var(--mint);border-bottom:2px solid var(--navy);position:sticky;top:0;z-index:10}
+nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding-top:12px;padding-bottom:12px}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo img{width:46px;height:46px;border-radius:999px;object-fit:cover;background:#fff}
+.logo span{font-weight:900;font-size:24px;letter-spacing:-.5px}
+.links{display:flex;flex-wrap:wrap;align-items:center;gap:4px 28px;font-size:16px;font-weight:700}
+.links a{text-decoration:none;padding:12px 0}
+.links a.dm{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;min-height:48px;background:var(--navy);color:var(--yellow);border-radius:999px}
+@media (max-width:720px){.links a.txt{display:none}header{position:static}}
+
+/* hero */
+.hero{background:linear-gradient(180deg,#B8F0E7 0%,#7FD6CF 100%);border-bottom:2px solid var(--navy)}
+.hero .row{padding-top:64px;padding-bottom:88px;gap:56px}
+.hero h1{font-size:clamp(42px,6vw,74px);line-height:1.12;letter-spacing:-1.5px}
+.seg{display:inline-flex;align-self:flex-start;border:2px solid var(--navy);border-radius:999px;padding:4px;gap:4px;background:var(--card)}
+.seg button{min-height:44px;padding:0 18px;border-radius:999px;border:0;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:transparent;color:var(--navy)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.hero-art{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:18px}
+.hero-art img{width:100%;height:auto;max-width:440px;aspect-ratio:1/1;object-fit:cover;border-radius:999px;background:#fff}
+.handle{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:var(--navy);color:#fff;font-weight:700;font-size:16px;padding:12px 20px;min-height:48px;border-radius:999px}
+.buttons{display:flex;flex-wrap:wrap;gap:14px}
+
+/* timeline */
+.tl{background:var(--navy);color:#fff}
+.tl .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:56px}
+.tl h2{text-align:center;font-size:clamp(30px,4.2vw,52px);line-height:1.3}
+.tl h2 em{font-style:normal;color:var(--yellow)}
+.track{position:relative;max-width:960px;width:100%;margin:0 auto}
+.track::before{content:"";position:absolute;top:27px;left:12.5%;right:12.5%;height:3px;background:#4A5A8F}
+.stages{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:640px){.stages{grid-template-columns:repeat(2,minmax(0,1fr))}.track::before{display:none}}
+.stage{display:flex;flex-direction:column;align-items:center;gap:12px;background:transparent;border:0;cursor:pointer;font-family:inherit;padding:10px 4px;color:#fff}
+.stage .dot{width:24px;height:24px;margin:4px;border-radius:999px;background:var(--navy);border:3px solid #B8C4E8;transition:all .15s}
+.stage strong{font-size:20px;font-weight:900}
+.stage .s{font-size:15px;color:#B8C4E8}
+.stage[aria-pressed="true"] .dot{width:32px;height:32px;margin:0;background:var(--yellow);border:4px solid #fff;box-shadow:0 0 0 6px rgba(255,199,44,.35)}
+.stage[aria-pressed="true"] .s{color:var(--yellow);font-weight:700}
+.detail{max-width:960px;width:100%;margin:12px auto 0;background:var(--card);color:var(--navy);border-radius:24px;padding:32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px}
+.detail>div{flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.detail .pill{font-size:14px;padding:6px 14px}
+.detail strong{font-size:24px;font-weight:900}
+.detail p{font-size:17px;line-height:1.7;color:var(--muted)}
+
+/* check */
+.check{border-bottom:2px solid var(--navy)}
+.check .row{padding-top:96px;padding-bottom:96px;align-items:flex-start}
+.check h2{font-size:clamp(32px,4vw,46px);line-height:1.25}
+.score{display:flex;align-items:baseline;gap:6px;margin-top:8px}
+.score strong{font-size:56px;font-weight:900;line-height:1}
+.score span{font-size:22px;font-weight:700;color:var(--muted)}
+.qs{flex:1.6 1 520px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.q{display:flex;align-items:center;gap:16px;width:100%;text-align:left;font-family:inherit;color:var(--navy);cursor:pointer;padding:18px 20px;min-height:64px;border-radius:16px;border:2px solid var(--navy);background:#fff;font-size:18px;font-weight:500}
+.q .box{flex:none;width:30px;height:30px;border-radius:8px;border:2px solid var(--navy);display:flex;align-items:center;justify-content:center;background:#fff}
+.q .box svg{visibility:hidden}
+.q[aria-pressed="true"]{background:#FFF4D1}
+.q[aria-pressed="true"] .box{background:var(--yellow)}
+.q[aria-pressed="true"] .box svg{visibility:visible}
+.result{margin-top:12px;background:var(--navy);color:#fff;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:10px}
+.result .k{font-size:17px;color:var(--mint);font-weight:700}
+.result .big{font-size:26px;font-weight:900;line-height:1.35}
+.result .big em{font-style:normal;color:var(--yellow)}
+.result .btn{align-self:flex-start;margin-top:8px;border:0;box-shadow:none}
+
+/* roadmap */
+.intro{background:linear-gradient(180deg,#B8F0E7 0%,#9BE2DB 100%)}
+.intro .wrap{padding-top:96px;padding-bottom:40px;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center}
+.intro h2{font-size:clamp(30px,4vw,48px);line-height:1.3}
+.bubbles{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
+.bubbles span{background:#fff;border:2px solid var(--navy);border-radius:20px 20px 20px 4px;padding:16px 22px;font-weight:700;font-size:18px}
+.intro p.t{font-weight:900;font-size:clamp(26px,3.2vw,38px);line-height:1.35}
+.step h3{font-size:clamp(30px,3.6vw,44px);line-height:1.25}
+.step .sub{font-size:17px;color:var(--muted2)}
+.s1{background:linear-gradient(180deg,#9BE2DB 0%,#8ADCD5 100%)}
+.s1 .row{padding-top:48px;padding-bottom:72px}
+.s2{background:linear-gradient(180deg,#8ADCD5 0%,#7BD5CE 100%)}
+.s2 .row{padding-top:72px;padding-bottom:72px;flex-wrap:wrap-reverse}
+.s3{background:linear-gradient(180deg,#7BD5CE 0%,#6CCFC8 100%);border-bottom:2px solid var(--navy)}
+.s3 .row{padding-top:72px;padding-bottom:104px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:520px){.fields{grid-template-columns:1fr}}
+.fields .card{padding:20px 22px;display:flex;flex-direction:column;gap:8px}
+.fields strong{font-size:19px;font-weight:900}
+.fields span{font-size:16px;line-height:1.7}
+.note{font-size:14px;color:var(--muted2)}
+.grid5{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.grid5 li{padding:16px 18px;gap:14px}
+.grid5 .num{width:40px;height:40px;font-size:18px}
+.grid5 strong{font-size:18px}
+.grid5 span.d{font-size:15px}
+
+/* cta */
+.cta{background:var(--navy);color:#fff}
+.cta .row{padding-top:96px;padding-bottom:96px;gap:56px}
+.cta .col-img{max-width:420px}
+.cta .shot{border-color:var(--mint);box-shadow:none}
+.cta h2{font-size:clamp(32px,4.2vw,52px);line-height:1.25}
+.chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.chips li{background:#2A3A72;border:2px solid #4A5A8F;border-radius:14px;padding:12px 18px;font-size:16px}
+.chips b{color:var(--yellow);margin-right:6px}
+.cta p.big{font-size:clamp(22px,2.6vw,30px);font-weight:900;line-height:1.45}
+.cta p.big em{font-style:normal;color:var(--yellow)}
+.cta .btn-yellow{border:0;box-shadow:none}
+.cta .btn-yellow:hover{transform:none;filter:brightness(1.05)}
+.btn-line{background:transparent;color:#fff;border-color:#fff;font-weight:700}
+.btn-line:hover{background:rgba(255,255,255,.08)}
+
+footer{background:var(--navy2);color:#fff}
+footer .wrap{padding-top:40px;padding-bottom:40px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px}
+footer .logo img{width:44px;height:44px}
+footer .logo strong{display:block;font-size:20px;font-weight:900;color:var(--yellow)}
+footer .logo small{display:block;font-size:14px;color:#C9D1EC}
+footer a.h{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:12px 0}
+a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap" aria-label="주요 메뉴">
+    <a class="logo" href="#top"><img src="images/character.jpg" alt=""><span>학종파이터</span></a>
+    <div class="links">
+      <a class="txt" href="#timeline">학년별 흐름</a>
+      <a class="txt" href="#check">자가 진단</a>
+      <a class="txt" href="#roadmap">3단계 로드맵</a>
+      <a class="dm" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
+        <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
+        DM 보내기
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main>
+<section id="top" class="hero">
+  <div class="wrap row">
+    <div class="col-text" style="flex:1 1 520px;gap:26px">
+      <div class="seg" role="group" aria-label="누구를 위한 안내인지 고르기">
+        <button type="button" data-aud="student" aria-pressed="true">고등학생이에요</button>
+        <button type="button" data-aud="parent" aria-pressed="false">학부모예요</button>
+      </div>
+      <span class="pill">실패 없는 대입을 위한 학생부 로드맵</span>
+      <div data-for="student" style="display:flex;flex-direction:column;gap:26px">
+        <h1>생기부,<br>1년 설계도부터<br>그려요</h1>
+        <p class="lead">과목 선택부터 수행평가·세특, 심화탐구보고서까지. 학종파이터의 3단계 로드맵을 따라가면 지금 쌓고 있는 기록이 3학년 때 하나의 이야기가 돼요.</p>
+      </div>
+      <div data-for="parent" hidden style="flex-direction:column;gap:26px">
+        <h1>아이의 생기부,<br>1년 설계도부터<br>함께 그려요</h1>
+        <p class="lead">학생부가 어떻게 만들어지는지, 고교학점제에서 무엇을 챙겨야 하는지. 부모님이 먼저 흐름을 알면 아이에게 더 정확한 방향을 보여줄 수 있어요.</p>
+      </div>
+      <div class="buttons">
+        <a class="btn btn-yellow" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
+          인스타 DM으로 [설계도] 받기
+          <svg class="i" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#roadmap">3단계 로드맵 보기</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <img src="images/character.jpg" alt="망토를 두르고 복싱 글러브를 낀 연필 캐릭터 학종파이터가 힘차게 날아오르는 모습" width="440" height="440">
+      <a class="handle" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
+        <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+        @hakjong_fighter
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="timeline" class="tl">
+  <div class="wrap">
+    <h2>지금 쌓고 있는 학생부,<br>3학년 때 <em>하나의 이야기</em>로<br>만들어지고 있나요?</h2>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span class="pill mint" style="align-self:center">나는 지금 어디쯤? 눌러서 확인해 보세요</span>
+      <div class="track"><div class="stages" id="stages"></div></div>
+      <div class="detail" role="status" aria-live="polite">
+        <div>
+          <span class="pill" id="d-tag"></span>
+          <strong id="d-title"></strong>
+          <p id="d-desc"></p>
+        </div>
+        <a class="btn btn-yellow btn-sm" id="d-link" href="#step1" style="box-shadow:none"><span id="d-linktext"></span>
+          <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="check" class="check">
+  <div class="wrap row">
+    <div style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <span class="pill" style="font-size:15px;padding:8px 16px">SELF CHECK · 자가 진단</span>
+      <h2>스스로<br>체크해 보세요</h2>
+      <p style="font-size:18px;line-height:1.7;color:var(--muted)">자신 있게 "네"라고 답할 수 있는 항목만 눌러 보세요.</p>
+      <div class="score"><strong id="count">0</strong><span>/ 5</span></div>
+    </div>
+    <div class="qs">
+      <div id="qs" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div class="result" aria-live="polite">
+        <span class="k" id="r-k">하나라도 망설여졌다면, 지금 점검이 필요해요.</span>
+        <span class="big" id="r-big">학종은 <em>1년 단위</em>로<br>촘촘하게 봐야 합니다.</span>
+        <a class="btn btn-yellow btn-sm" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">DM으로 [설계도] 보내고 점검받기
+          <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" class="intro">
+  <div class="wrap">
+    <h2>지금 옆자리 친구도<br>똑같은 고민을 하고 있어요</h2>
+    <div class="bubbles">
+      <span>"세특 주제, 뭐로 하지"</span>
+      <span>"고교학점제 과목, 뭘 골라야 돼"</span>
+      <span>"생기부, 이대로 괜찮은 걸까"</span>
+    </div>
+    <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1C2A5E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <span class="pill" style="align-self:center">ROADMAP</span>
+      <p class="t">합격을 부르는 3단계 로드맵으로 풀어요</p>
+    </div>
+  </div>
+</section>
+
+<section id="step1" class="step s1">
+  <div class="wrap row">
+    <div class="col-img"><img class="shot" src="images/step1.jpg" alt="STEP 1. 출발점은 진로 방향! 이공계·인문사회·예체능·상경계 표지판을 가리키는 연필 캐릭터" loading="lazy" width="896" height="1200"></div>
+    <div class="col-text">
+      <span class="pill">STEP 1 · 진로·과목 선택</span>
+      <h3>출발점은 진로 방향!<br>계열별로 이런 과목을 골라요</h3>
+      <p class="sub">2022 개정 교육과정 선택과목 예시</p>
+      <div class="fields">
+        <div class="card"><strong>이공계</strong><span>미적분 II · 기하<br>역학과 에너지 · 전자기와 양자</span></div>
+        <div class="card"><strong>상경계</strong><span>경제 · 경제 수학<br>확률과 통계 · 국제 관계의 이해</span></div>
+        <div class="card"><strong>인문사회</strong><span>주제 탐구 독서 · 윤리와 사상<br>정치 · 법과 사회</span></div>
+        <div class="card"><strong>예체능</strong><span>음악 연주와 창작 · 미술 창작<br>미술 감상과 비평 · 스포츠 과학</span></div>
+      </div>
+      <div class="tip"><b>TIP</b>진로가 바뀌어도 괜찮아요. 과목을 고른 '이유'를 설명할 수 있으면 돼요.</div>
+      <p class="note">학교마다 개설 과목이 달라요. 대학별 권장 과목은 모집요강에서 꼭 확인하세요.</p>
+    </div>
+  </div>
+</section>
+
+<section id="step2" class="step s2">
+  <div class="wrap row">
+    <div class="col-text">
+      <span class="pill">STEP 2 · 수행평가·세특</span>
+      <h3>수행평가를 세특으로<br>잇는 3가지 질문</h3>
+      <p class="sub">수행평가가 끝나면 이 질문에 답해 보세요.</p>
+      <ol class="list">
+        <li class="card"><span class="num" aria-hidden="true">1</span><span><strong>왜 이 주제를 골랐나요?</strong><span class="d">내 진로·관심과 이어지는 고리를 한 문장으로</span></span></li>
+        <li class="card"><span class="num" aria-hidden="true">2</span><span><strong>수업 개념을 어떻게 썼나요?</strong><span class="d">교과서에서 배운 개념을 탐구에 직접 적용</span></span></li>
+        <li class="card"><span class="num" aria-hidden="true">3</span><span><strong>끝나고 생긴 새 질문은?</strong><span class="d">다음 탐구 주제로 이어갈 씨앗</span></span></li>
+      </ol>
+      <div class="tip"><b>TIP</b>세특은 선생님이 관찰한 내용으로 기록돼요. 탐구 과정을 발표나 보고서로 꼭 보여주세요.</div>
+    </div>
+    <div class="col-img"><img class="shot" src="images/step2.jpg" alt="STEP 2. 나만의 특별한 수행평가서 작성 — 펼친 책 위의 연필 캐릭터와 전구, 플라스크" loading="lazy" width="896" height="1200"></div>
+  </div>
+</section>
+
+<section id="step3" class="step s3">
+  <div class="wrap row">
+    <div class="col-img"><img class="shot" src="images/step3.jpg" alt="STEP 3. 완성도 높은 심화탐구보고서 작성 — 빛나는 보고서를 든 연필 캐릭터와 메달" loading="lazy" width="896" height="1200"></div>
+    <div class="col-text">
+      <span class="pill">STEP 3 · 심화탐구</span>
+      <h3>심화탐구보고서,<br>이 틀로 써요</h3>
+      <p class="sub" style="color:var(--navy)">5단계 구성만 지켜도 완성도가 달라져요.</p>
+      <ol class="list grid5" style="gap:12px">
+        <li class="card"><span class="num" aria-hidden="true">1</span><span><strong>탐구 동기</strong><span class="d">수업이나 수행평가에서 생긴 질문</span></span></li>
+        <li class="card"><span class="num" aria-hidden="true">2</span><span><strong>탐구 목표</strong><span class="d">무엇을 알아낼지 한 문장으로</span></span></li>
+        <li class="card"><span class="num" aria-hidden="true">3</span><span><strong>탐구 방법</strong><span class="d">문헌 조사, 실험, 데이터 분석</span></span></li>
+        <li class="card"><span class="num" aria-hidden="true">4</span><span><strong>결과와 해석</strong><span class="d">표·그래프와 함께 내 생각까지</span></span></li>
+        <li class="card"><span class="num" aria-hidden="true">5</span><span><strong>한계와 후속 탐구</strong><span class="d">아쉬운 점과 다음에 풀고 싶은 질문</span></span></li>
+      </ol>
+      <div class="tip"><b>TIP</b>결과보다 과정이 보여야 해요. 참고한 자료의 출처는 꼭 밝혀 주세요.</div>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta">
+  <div class="wrap row">
+    <div class="col-img"><img class="shot" src="images/cta.jpg" alt="합격을 부르는 3단계 로드맵 완성! DM 휴대폰을 든 연필 캐릭터와 1·2·3단계 요약" loading="lazy" width="896" height="1200"></div>
+    <div class="col-text" style="gap:24px">
+      <span class="pill mint">ROADMAP SUMMARY</span>
+      <h2>합격을 부르는<br>3단계 로드맵 완성!</h2>
+      <ol class="chips">
+        <li><b>1단계</b>진로·과목 선택</li>
+        <li><b>2단계</b>수행평가·세특</li>
+        <li><b>3단계</b>심화탐구보고서</li>
+      </ol>
+      <p class="big">지금 바로 인스타 DM으로<br><em>[설계도]</em>를 보내주세요!</p>
+      <div class="buttons">
+        <a class="btn btn-yellow" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
+          <svg class="i" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
+          DM으로 [설계도] 보내기
+        </a>
+        <a class="btn btn-line" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
+          <svg class="i" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>
+          인스타그램 둘러보기
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵</small></div></div>
+    <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
+      <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+      @hakjong_fighter
+    </a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // 학생/학부모 전환
+  var segBtns = document.querySelectorAll('.seg button');
+  segBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var aud = b.getAttribute('data-aud');
+      segBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      document.querySelectorAll('[data-for]').forEach(function (el) {
+        var show = el.getAttribute('data-for') === aud;
+        el.hidden = !show;
+        el.style.display = show ? 'flex' : 'none';
+      });
+    });
+  });
+
+  // 학년별 타임라인
+  var stages = [
+    { label: '고1', sub: '방향 잡기', tag: 'STEP 1과 연결', title: '진로 방향을 먼저 정해요', desc: '희망 계열을 정하고, 그에 맞는 선택과목으로 첫 기록을 시작해요. 과목을 고른 이유를 설명할 수 있으면 충분해요.', href: '#step1', link: 'STEP 1 보기' },
+    { label: '고2', sub: '깊이와 연결', tag: 'STEP 2와 연결', title: '수행평가를 세특으로 이어요', desc: '한 학기의 수행평가에서 생긴 질문이 다음 학기 탐구로 이어지도록, 활동 사이의 연결고리를 만들어요.', href: '#step2', link: 'STEP 2 보기' },
+    { label: '고3 1학기', sub: '기록 마무리', tag: 'STEP 3과 연결', title: '심화탐구로 기록을 완성해요', desc: '잘 만든 수행평가에 깊이를 더한 심화탐구보고서로, 3년의 기록을 하나의 이야기로 정리해요.', href: '#step3', link: 'STEP 3 보기' },
+    { label: '9월', sub: '수시 원서 접수', tag: '최종 점검', title: '하나의 이야기로 지원해요', desc: '쌓아 온 학생부가 지원 학과와 같은 방향을 가리키는지, 원서 접수 전에 마지막으로 점검해요.', href: '#cta', link: '설계도 점검받기' }
+  ];
+  var wrap = document.getElementById('stages');
+  stages.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'stage';
+    b.innerHTML = '<span class="dot" aria-hidden="true"></span><strong></strong><span class="s"></span>';
+    b.querySelector('strong').textContent = s.label;
+    b.querySelector('.s').textContent = s.sub;
+    b.addEventListener('click', function () { pick(i); });
+    wrap.appendChild(b);
+  });
+  function pick(i) {
+    var s = stages[i];
+    wrap.querySelectorAll('.stage').forEach(function (b, j) { b.setAttribute('aria-pressed', String(i === j)); });
+    document.getElementById('d-tag').textContent = s.tag;
+    document.getElementById('d-title').textContent = s.title;
+    document.getElementById('d-desc').textContent = s.desc;
+    document.getElementById('d-link').setAttribute('href', s.href);
+    document.getElementById('d-linktext').textContent = s.link;
+  }
+  pick(0);
+
+  // 자가 진단
+  var qs = [
+    '고3 때 지원할 학과 방향이 정해져 있나요?',
+    '세특 주제들이 하나의 방향으로 이어지고 있나요?',
+    '고교학점제 과목, 진로에 맞춰 골랐나요?',
+    '이번 학기 활동이 다음 학기로 연결되나요?',
+    '학생부를 3년 흐름으로 함께 봐 주는 사람이 있나요?'
+  ];
+  var qWrap = document.getElementById('qs');
+  var check = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1C2A5E" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+  qs.forEach(function (t) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'q';
+    b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<span class="box" aria-hidden="true">' + check + '</span><span></span>';
+    b.lastChild.textContent = t;
+    b.addEventListener('click', function () {
+      b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+      update();
+    });
+    qWrap.appendChild(b);
+  });
+  function update() {
+    var n = qWrap.querySelectorAll('[aria-pressed="true"]').length;
+    document.getElementById('count').textContent = n;
+    var k = document.getElementById('r-k'), big = document.getElementById('r-big');
+    if (n === qs.length) {
+      k.textContent = '다섯 가지 모두 체크했어요!';
+      big.innerHTML = '지금 흐름을 그대로<br>이어가면 돼요.';
+    } else {
+      k.textContent = '하나라도 망설여졌다면, 지금 점검이 필요해요.';
+      big.innerHTML = '학종은 <em>1년 단위</em>로<br>촘촘하게 봐야 합니다.';
+    }
+  }
+})();
+</script>
+</body>
+</html>
