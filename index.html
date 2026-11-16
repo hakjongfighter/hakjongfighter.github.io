@@ -349,6 +349,9 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
   .dock a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:14px;background:var(--yellow);border:2px solid var(--navy);color:var(--navy);font-weight:900;font-size:16px;text-decoration:none}
 }
 @media (max-width:400px){
+  .dock{padding-left:12px;padding-right:12px}
+  .dock a{font-size:clamp(12.5px,4.1vw,15px);gap:6px;letter-spacing:-.4px;white-space:nowrap;padding:0 10px}
+  .dock a svg{width:18px;height:18px}
   .hero-art{justify-content:center}
   .hero-art .handle{display:none}
   .logo span{font-size:18px}
@@ -602,7 +605,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 
 <footer>
   <div class="wrap">
-    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v6 (11.16)</small></div></div>
+    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v7 (11.16)</small></div></div>
     <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
       <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
       @hakjong_fighter
@@ -613,7 +616,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 <div class="dock" id="dock" aria-hidden="true">
   <a href="https://www.instagram.com/hakjong_fighter/" data-dm tabindex="-1">
     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
-    인스타 DM으로 [설계도] 받기
+    인스타 DM으로 [설계도] 보내고 집중상담 받기
   </a>
 </div>
 
