@@ -178,6 +178,20 @@ button,a{-webkit-tap-highlight-color:transparent}
 .offer.dark li b{color:#fff}
 .offer.dark .ok{border-color:var(--yellow)}
 
+/* DM 안내 창 */
+dialog.dm-sheet{border:2px solid var(--navy);border-radius:24px;padding:0;max-width:420px;width:calc(100% - 32px);color:var(--navy);background:var(--card)}
+dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
+.dm-in{padding:28px 24px 22px;display:flex;flex-direction:column;gap:16px;font-family:'Noto Sans KR',system-ui,sans-serif}
+.dm-in h2{font-size:22px;line-height:1.35;letter-spacing:-.5px}
+.dm-in h2 em{font-style:normal;background:var(--yellow);padding:0 4px;border-radius:4px}
+.dm-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.dm-steps li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.55}
+.dm-steps .n{flex:none;width:26px;height:26px;border-radius:999px;background:var(--navy);color:var(--yellow);font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.copied{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-weight:700;font-size:14px;color:var(--navy);background:#fff;border:2px dashed var(--navy);border-radius:10px;padding:6px 12px;cursor:pointer;font-family:inherit}
+.dm-in .btn{width:100%;justify-content:center;box-shadow:none}
+.dm-sub{font-size:14px;text-align:center;color:var(--muted);text-decoration:underline;padding:6px 0}
+.dm-x{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;background:transparent;border-radius:999px;cursor:pointer;color:var(--navy);display:flex;align-items:center;justify-content:center}
+
 /* 하단 고정 DM 바 (모바일 전용) */
 .dock{display:none}
 
@@ -320,7 +334,7 @@ button,a{-webkit-tap-highlight-color:transparent}
       <a class="txt" href="#timeline">학년별 흐름</a>
       <a class="txt" href="#check">자가 진단</a>
       <a class="txt" href="#roadmap">3단계 로드맵</a>
-      <a class="dm" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
+      <a class="dm" href="https://www.instagram.com/hakjong_fighter/" data-dm>
         <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
         DM 보내기
       </a>
@@ -346,7 +360,7 @@ button,a{-webkit-tap-highlight-color:transparent}
         <p class="lead">학생부가 어떻게 만들어지는지, 고교학점제에서 무엇을 챙겨야 하는지. 부모님이 먼저 흐름을 알면 아이에게 더 정확한 방향을 보여줄 수 있어요.</p>
       </div>
       <div class="buttons">
-        <a class="btn btn-yellow" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
+        <a class="btn btn-yellow" href="https://www.instagram.com/hakjong_fighter/" data-dm>
           인스타 DM으로 [설계도] 받기
           <svg class="i" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
         </a>
@@ -403,7 +417,7 @@ button,a{-webkit-tap-highlight-color:transparent}
       <div class="result" aria-live="polite">
         <span class="k" id="r-k">하나라도 망설여졌다면, 지금 점검이 필요해요.</span>
         <span class="big" id="r-big">학종은 <em>1년 단위</em>로<br>촘촘하게 봐야 합니다.</span>
-        <a class="btn btn-yellow btn-sm" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">DM으로 [설계도] 보내고 점검받기
+        <a class="btn btn-yellow btn-sm" href="https://www.instagram.com/hakjong_fighter/" data-dm>DM으로 [설계도] 보내고 점검받기
           <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
         </a>
       </div>
@@ -502,7 +516,7 @@ button,a{-webkit-tap-highlight-color:transparent}
         </ul>
       </div>
       <div class="buttons">
-        <a class="btn btn-yellow" href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener">
+        <a class="btn btn-yellow" href="https://www.instagram.com/hakjong_fighter/" data-dm>
           <svg class="i" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
           DM으로 [설계도] 보내기
         </a>
@@ -518,7 +532,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 
 <footer>
   <div class="wrap">
-    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵</small></div></div>
+    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v3 (11.16)</small></div></div>
     <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
       <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
       @hakjong_fighter
@@ -527,11 +541,64 @@ button,a{-webkit-tap-highlight-color:transparent}
 </footer>
 
 <div class="dock" id="dock" aria-hidden="true">
-  <a href="https://ig.me/m/hakjong_fighter" target="_blank" rel="noopener" tabindex="-1">
+  <a href="https://www.instagram.com/hakjong_fighter/" data-dm tabindex="-1">
     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
     인스타 DM으로 [설계도] 받기
   </a>
 </div>
+
+<dialog class="dm-sheet" id="dmSheet" aria-labelledby="dmTitle">
+  <div class="dm-in">
+    <button type="button" class="dm-x" id="dmClose" aria-label="닫기"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h2 id="dmTitle">인스타 DM으로<br><em>설계도</em>라고 보내주세요</h2>
+    <ol class="dm-steps">
+      <li><span class="n">1</span><span>아래 버튼으로 학종파이터 인스타그램을 열어요.</span></li>
+      <li><span class="n">2</span><span><b>메시지</b> 버튼을 누르고 <b>설계도</b>라고 보내주세요.<br><button type="button" class="copied" id="dmCopy">‘설계도’ 복사하기</button></span></li>
+    </ol>
+    <a class="btn btn-yellow" id="dmOpen" href="https://www.instagram.com/hakjong_fighter/">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>
+      인스타그램 열기
+    </a>
+    <a class="dm-sub" href="https://ig.me/m/hakjong_fighter">메시지 창 바로 열기 (인스타 앱이 있을 때)</a>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  // DM 버튼: 안내 창 열고 '설계도' 복사. 스크립트가 안 돌면 링크대로 인스타 프로필로 이동
+  var sheet = document.getElementById('dmSheet');
+  var copyBtn = document.getElementById('dmCopy');
+  function copyWord() {
+    var word = '설계도';
+    var done = function () { copyBtn.textContent = '✓ ‘설계도’ 복사됐어요. 메시지 창에 붙여넣기만 하세요'; };
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(word).then(done, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+    function fallback() {
+      try {
+        var t = document.createElement('textarea');
+        t.value = word; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
+        document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); done();
+      } catch (e) {}
+    }
+  }
+  if (sheet && typeof sheet.showModal === 'function') {
+    document.querySelectorAll('[data-dm]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        copyBtn.textContent = '‘설계도’ 복사하기';
+        sheet.showModal();
+        copyWord();
+      });
+    });
+    copyBtn.addEventListener('click', copyWord);
+    document.getElementById('dmClose').addEventListener('click', function () { sheet.close(); });
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) sheet.close(); });
+  }
+})();
+</script>
 
 <script>
 (function () {
