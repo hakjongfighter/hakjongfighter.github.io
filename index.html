@@ -245,7 +245,11 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
   .hero [data-for]{gap:14px !important}
   .hero h1{font-size:34px;letter-spacing:-1px}
   .hero-art{order:-1;flex:none;flex-direction:row;justify-content:space-between;align-items:center;gap:12px}
-  .hero-art img{max-width:120px;width:120px;height:120px}
+  .hero-art{justify-content:center}
+  .hero-art img{width:min(72vw,300px);height:auto;max-width:none}
+  .hero-art .handle{display:none}
+  .seg{display:flex;align-self:stretch;width:100%}
+  .seg button{flex:1 1 0;min-height:48px;font-size:15px}
   .hero-art .handle{font-size:14px;padding:10px 14px;min-height:44px}
   .seg button{font-size:14px;padding:0 14px}
   .hero .buttons{flex-direction:column;gap:10px}
@@ -359,7 +363,6 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 }
 @media (max-width:360px){
   .hero h1{font-size:34px}
-  .hero-art img{width:120px;height:120px}
   .fields{grid-template-columns:1fr}
 }
 </style>
@@ -605,7 +608,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 
 <footer>
   <div class="wrap">
-    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v7 (11.16)</small></div></div>
+    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v8 (11.16)</small></div></div>
     <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
       <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
       @hakjong_fighter
