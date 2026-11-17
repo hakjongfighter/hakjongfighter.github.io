@@ -1,0 +1,100 @@
+"""GA4에서 방문 현황 숫자를 받아 stats/data.json으로 저장합니다.
+
+GitHub Actions 배포 때 실행됩니다. 비밀값 GA_SA_KEY(서비스 계정 JSON)가 없으면
+'연결 전' 상태의 파일만 만들고 끝납니다.
+"""
+import json
+import os
+import sys
+from datetime import datetime, timedelta, timezone
+
+PROPERTY_ID = os.environ.get("GA_PROPERTY_ID", "564804538")
+OUT = os.path.join(os.path.dirname(__file__), "..", "..", "stats", "data.json")
+KST = timezone(timedelta(hours=9))
+
+
+def write(payload):
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    with open(OUT, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+
+
+def main():
+    now = datetime.now(KST).strftime("%Y-%m-%d %H:%M")
+    key = os.environ.get("GA_SA_KEY", "").strip()
+    if not key:
+        write({"status": "not_connected", "updated_at": now})
+        print("GA_SA_KEY 비밀값이 없어 연결 전 상태로 저장했습니다.")
+        return
+
+    from google.analytics.data_v1beta import BetaAnalyticsDataClient
+    from google.analytics.data_v1beta.types import (
+        DateRange, Dimension, Metric, OrderBy, RunReportRequest,
+    )
+    from google.oauth2 import service_account
+
+    creds = service_account.Credentials.from_service_account_info(
+        json.loads(key), scopes=["https://www.googleapis.com/auth/analytics.readonly"]
+    )
+    client = BetaAnalyticsDataClient(credentials=creds)
+    prop = f"properties/{PROPERTY_ID}"
+    cur = DateRange(start_date="27daysAgo", end_date="today", name="cur")
+    prev = DateRange(start_date="55daysAgo", end_date="28daysAgo", name="prev")
+
+    def run(dims, mets, ranges=(cur,), order=None, limit=50):
+        req = RunReportRequest(
+            property=prop,
+            dimensions=[Dimension(name=d) for d in dims],
+            metrics=[Metric(name=m) for m in mets],
+            date_ranges=list(ranges),
+            limit=limit,
+        )
+        if order:
+            req.order_bys = [OrderBy(metric=OrderBy.MetricOrderBy(metric_name=order), desc=True)]
+        res = client.run_report(req)
+        dh = [h.name for h in res.dimension_headers]
+        mh = [h.name for h in res.metric_headers]
+        rows = []
+        for r in res.rows:
+            row = {dh[i]: v.value for i, v in enumerate(r.dimension_values)}
+            for i, v in enumerate(r.metric_values):
+                row[mh[i]] = float(v.value) if v.value not in ("", None) else 0.0
+            rows.append(row)
+        return rows
+
+    total_mets = ["activeUsers", "newUsers", "sessions", "screenPageViews",
+                  "engagementRate", "averageSessionDuration"]
+    totals_rows = run(["dateRange"], total_mets, ranges=(cur, prev))
+    totals = {"cur": {}, "prev": {}}
+    for r in totals_rows:
+        totals[r.pop("dateRange")] = r
+
+    events_rows = run(["dateRange", "eventName"], ["eventCount"], ranges=(cur, prev), limit=200)
+    events = {"cur": {}, "prev": {}}
+    for r in events_rows:
+        events[r["dateRange"]][r["eventName"]] = r["eventCount"]
+
+    payload = {
+        "status": "ok",
+        "updated_at": now,
+        "period": {
+            "cur": [(datetime.now(KST) - timedelta(days=27)).strftime("%Y-%m-%d"), datetime.now(KST).strftime("%Y-%m-%d")],
+        },
+        "totals": totals,
+        "events": events,
+        "daily": run(["date"], ["activeUsers"], limit=60),
+        "channels": run(["sessionSourceMedium"], ["sessions"], order="sessions", limit=8),
+        "devices": run(["deviceCategory"], ["activeUsers"], order="activeUsers", limit=5),
+    }
+    payload["daily"].sort(key=lambda r: r["date"])
+    write(payload)
+    print("저장 완료:", OUT)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:  # 배포 자체는 막지 않음
+        write({"status": "error", "message": str(e)[:300],
+               "updated_at": datetime.now(KST).strftime("%Y-%m-%d %H:%M")})
+        print("GA4 불러오기 실패:", e, file=sys.stderr)

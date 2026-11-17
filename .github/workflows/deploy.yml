@@ -5,6 +5,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '17 */3 * * *'   # 3시간마다 방문 현황(stats) 숫자 새로 받기
   workflow_dispatch:
 
 permissions:
@@ -24,6 +26,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: GA4 방문 현황 받기 (stats/data.json)
+        env:
+          GA_SA_KEY: ${{ secrets.GA_SA_KEY }}
+          GA_PROPERTY_ID: '564804538'
+        run: |
+          if [ -n "$GA_SA_KEY" ]; then pip install -q google-analytics-data==0.20.0; fi
+          python .github/scripts/fetch_ga.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

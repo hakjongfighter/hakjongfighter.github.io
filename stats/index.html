@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>학종파이터 방문 현황</title>
+<meta name="theme-color" content="#1C2A5E">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="apple-touch-icon" href="../images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1C2A5E;--navy2:#141F48;--yellow:#FFC72C;--mint:#B8F0E7;--bg:#F3F7F7;--card:#FFFFFF;--line:#DDE4EE;--muted:#5B6688;--up:#1F8A5B;--down:#C2410C;--bar2:#C9D3EA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;line-height:1.5;word-break:keep-all;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+header{background:var(--navy);color:#fff;padding-top:env(safe-area-inset-top)}
+header .wrap{display:flex;align-items:center;gap:12px;padding-block:14px}
+header img{width:40px;height:40px;border-radius:999px;background:#fff;object-fit:cover}
+header h1{margin:0;font-size:19px;font-weight:900;letter-spacing:-.3px}
+header small{display:block;font-size:12px;color:#B9C3E3;font-weight:400}
+header a.site{margin-left:auto;color:var(--yellow);font-size:13px;font-weight:700;text-decoration:none;padding:10px 0;white-space:nowrap}
+main .wrap{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
+.lead{margin:0;font-size:17px;line-height:1.6;font-weight:500}
+.lead b{font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(transparent 62%,var(--yellow) 62%)}
+.when{font-size:12.5px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card h2{margin:0 0 4px;font-size:16px;font-weight:900}
+.card .d{margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.55}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi.main{background:var(--navy);border-color:var(--navy);color:#fff;grid-column:1/-1}
+.kpi .k{font-size:13px;color:var(--muted);font-weight:500}
+.kpi.main .k{color:#C9D3F0}
+.kpi .v{font-size:28px;font-weight:900;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi.main .v{font-size:36px;color:var(--yellow)}
+.kpi .c{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .c.up{color:var(--up)}.kpi .c.down{color:var(--down)}.kpi .c.flat{color:var(--muted);font-weight:500}
+.kpi.main .c.up{color:#7FE3B4}.kpi.main .c.down{color:#FDBA8C}.kpi.main .c.flat{color:#C9D3F0}
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;flex-direction:column;gap:5px}
+.row .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14.5px}
+.row .lbl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .num{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .num small{font-weight:500;color:var(--muted);margin-left:4px;font-size:12px}
+.track{height:10px;border-radius:6px;background:var(--bg);overflow:hidden}
+.fill{height:100%;border-radius:6px;background:var(--navy)}
+.fill.alt{background:var(--bar2)}
+.fill.y{background:var(--yellow)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.chart .tip{position:absolute;top:0;left:0;background:var(--navy);color:#fff;font-size:12.5px;padding:5px 9px;border-radius:8px;pointer-events:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;font-size:13.5px;color:var(--muted);line-height:1.6}
+.notice{background:#FFF6D6;border:1px solid #F2D27A;border-radius:16px;padding:16px;font-size:14px;line-height:1.65}
+.notice b{font-weight:900}
+details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:4px 16px}
+summary{cursor:pointer;font-weight:700;font-size:15px;padding:12px 0;min-height:44px;list-style-position:inside}
+dl{margin:0 0 14px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.6}
+dt{font-weight:700}
+dd{margin:0;color:var(--muted)}
+footer{font-size:12px;color:var(--muted);text-align:center;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+@media (min-width:600px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi.main{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img src="../images/character.jpg" alt="">
+    <h1>방문 현황<small>학종파이터 · 최근 28일</small></h1>
+    <a class="site" href="../">사이트 보기</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <p class="lead" id="lead">숫자를 불러오는 중이에요…</p>
+    <div class="when" id="when"></div>
+
+    <div id="notice" hidden></div>
+
+    <section class="kpis" id="kpis" aria-label="핵심 숫자"></section>
+    <p class="when" style="margin:-4px 0 0">▲▼는 바로 앞 28일과 비교한 변화예요.</p>
+
+    <section class="card">
+      <h2>상담까지 이어진 흐름</h2>
+      <p class="d">방문 → 상담 안내 창 열기 → ‘설계도’ 복사 → 인스타그램 열기. 오른쪽 %는 바로 앞 단계 대비예요.</p>
+      <div id="funnel"></div>
+    </section>
+
+    <section class="card">
+      <h2>날짜별 방문자</h2>
+      <p class="d">막대를 누르면 그날 숫자가 보여요.</p>
+      <div class="chart" id="daily"></div>
+    </section>
+
+    <section class="card">
+      <h2>어디서 들어왔나</h2>
+      <p class="d">방문 수 기준 상위 경로예요. instagram은 인스타그램, (direct)는 주소를 직접 열었거나 앱 안에서 연 경우예요.</p>
+      <div id="channels"></div>
+    </section>
+
+    <section class="card">
+      <h2>어떤 기기로 봤나</h2>
+      <div id="devices"></div>
+    </section>
+
+    <section class="card">
+      <h2>많이 누른 버튼</h2>
+      <div id="buttons"></div>
+    </section>
+
+    <details>
+      <summary>숫자 읽는 법</summary>
+      <dl>
+        <dt>방문자</dt><dd>기간 안에 사이트를 한 번 이상 연 사람 수예요. 같은 사람이 여러 번 와도 한 명이에요.</dd>
+        <dt>상담 안내 창 열기</dt><dd>‘DM으로 [설계도] 보내기’ 버튼을 누른 횟수예요. 상담 의향을 가장 잘 보여 주는 숫자예요.</dd>
+        <dt>인스타그램 열기</dt><dd>안내 창에서 인스타그램이나 메시지 창을 연 횟수예요. 실제로 DM을 보냈는지는 인스타그램에서 확인해야 해요.</dd>
+        <dt>지난 기간 대비</dt><dd>바로 앞 28일과 비교한 변화예요. 지난 기간 숫자가 0이면 ‘새로 생김’으로 보여요.</dd>
+        <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
+        <dt>업데이트 주기</dt><dd>3시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
+      </dl>
+    </details>
+  </div>
+</main>
+<footer>© 2026 대치마스터교육 · 학종파이터</footer>
+
+<script>
+(function () {
+  var nf = new Intl.NumberFormat('ko-KR');
+  var $ = function (id) { return document.getElementById(id); };
+  var el = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  var EMPTY = '아직 집계된 데이터가 없어요.';
+  var dur = function (s) { s = Math.round(+s || 0); var m = Math.floor(s / 60); return m ? m + '분 ' + (s % 60) + '초' : s + '초'; };
+  var pct = function (v) { return Math.round((+v || 0) * 100) + '%'; };
+
+  function empty(id, text) { $(id).replaceChildren(el('div', 'empty', text || EMPTY)); }
+  function change(cur, prev, isRate) {
+    cur = +cur || 0; prev = +prev || 0;
+    if (!prev && !cur) return { cls: 'flat', text: '변화 없음' };
+    if (!prev) return { cls: 'up', text: '새로 생김' };
+    if (isRate) { var dp = Math.round((cur - prev) * 100); return dp === 0 ? { cls: 'flat', text: '변화 없음' } : { cls: dp > 0 ? 'up' : 'down', text: (dp > 0 ? '▲ ' : '▼ ') + Math.abs(dp) + '%p' }; }
+    var r = Math.round((cur - prev) / prev * 100);
+    return r === 0 ? { cls: 'flat', text: '변화 없음' } : { cls: r > 0 ? 'up' : 'down', text: (r > 0 ? '▲ ' : '▼ ') + Math.abs(r) + '%' };
+  }
+
+  function bars(id, rows, opt) {
+    opt = opt || {};
+    if (!rows.length) return empty(id);
+    var max = Math.max.apply(null, rows.map(function (r) { return r.v; })) || 1;
+    var total = rows.reduce(function (a, r) { return a + r.v; }, 0) || 1;
+    var box = el('div', 'rows');
+    rows.forEach(function (r, i) {
+      var row = el('div', 'row');
+      var top = el('div', 'top');
+      var l = el('span', 'lbl', r.label);
+      var n = el('span', 'num', nf.format(r.v) + (opt.unit || ''));
+      var extra = r.extra != null ? r.extra : (opt.share ? pct(r.v / total) : null);
+      if (extra) n.appendChild(el('small', null, extra));
+      top.append(l, n);
+      var t = el('div', 'track'); var f = el('div', 'fill' + (opt.cls ? ' ' + opt.cls(i) : ''));
+      f.style.width = Math.max(2, r.v / max * 100) + '%';
+      t.appendChild(f);
+      row.append(top, t);
+      box.appendChild(row);
+    });
+    $(id).replaceChildren(box);
+  }
+
+  function daily(rows) {
+    var box = $('daily');
+    if (!rows.length || !rows.some(function (r) { return r.activeUsers > 0; })) return empty('daily');
+    var W = Math.max(260, Math.round(box.clientWidth || 320)), H = 190, ml = 30, mb = 24, mt = 10, mr = 4;
+    var max = Math.max.apply(null, rows.map(function (r) { return r.activeUsers; })) || 1;
+    var step = Math.pow(10, Math.floor(Math.log10(max))); var top = Math.ceil(max / step) * step; if (top < 4) top = 4;
+    var bw = (W - ml - mr) / rows.length;
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', '최근 28일 날짜별 방문자 수 막대 그래프');
+    var y = function (v) { return H - mb - (v / top) * (H - mb - mt); };
+    [0, top / 2, top].forEach(function (v) {
+      var ln = document.createElementNS(NS, 'line');
+      ln.setAttribute('x1', ml); ln.setAttribute('x2', W - mr); ln.setAttribute('y1', y(v)); ln.setAttribute('y2', y(v));
+      ln.setAttribute('stroke', '#E3E8F2'); svg.appendChild(ln);
+      var tx = document.createElementNS(NS, 'text'); tx.setAttribute('x', ml - 6); tx.setAttribute('y', y(v) + 4);
+      tx.setAttribute('text-anchor', 'end'); tx.setAttribute('font-size', '12'); tx.setAttribute('fill', '#5B6688'); tx.textContent = nf.format(v); svg.appendChild(tx);
+    });
+    var tip = el('div', 'tip'); tip.hidden = true;
+    var lab = function (d) { return (+d.slice(4, 6)) + '/' + (+d.slice(6, 8)); };
+    var every = Math.ceil(rows.length / Math.max(3, Math.floor((W - ml) / 52)));
+    rows.forEach(function (r, i) {
+      var rc = document.createElementNS(NS, 'rect');
+      var h = Math.max(r.activeUsers ? 2 : 0, y(0) - y(r.activeUsers));
+      rc.setAttribute('x', ml + i * bw + bw * 0.15); rc.setAttribute('width', bw * 0.7);
+      rc.setAttribute('y', y(0) - h); rc.setAttribute('height', h); rc.setAttribute('rx', 2);
+      rc.setAttribute('fill', i === rows.length - 1 ? '#FFC72C' : '#1C2A5E');
+      var hit = document.createElementNS(NS, 'rect');
+      hit.setAttribute('x', ml + i * bw); hit.setAttribute('width', bw); hit.setAttribute('y', mt); hit.setAttribute('height', H - mb - mt); hit.setAttribute('fill', 'transparent');
+      var show = function () {
+        tip.hidden = false;
+        tip.textContent = lab(r.date) + ' · ' + nf.format(r.activeUsers) + '명';
+        var bx = box.getBoundingClientRect().width / W;
+        var left = (ml + i * bw + bw / 2) * bx - tip.offsetWidth / 2;
+        tip.style.left = Math.max(0, Math.min(box.clientWidth - tip.offsetWidth, left)) + 'px';
+        tip.style.top = Math.max(0, (y(r.activeUsers) * bx) - 34) + 'px';
+      };
+      hit.addEventListener('pointerenter', show); hit.addEventListener('click', show);
+      svg.append(rc, hit);
+      if ((i % every === 0 && rows.length - 1 - i >= every * 0.8) || i === rows.length - 1) {
+        var tx = document.createElementNS(NS, 'text'); tx.setAttribute('x', ml + i * bw + bw / 2); tx.setAttribute('y', H - 7);
+        tx.setAttribute('text-anchor', i === rows.length - 1 ? 'end' : (i === 0 ? 'start' : 'middle')); if (i === rows.length - 1) tx.setAttribute('x', W - mr); if (i === 0) tx.setAttribute('x', ml); tx.setAttribute('font-size', '12'); tx.setAttribute('fill', '#5B6688'); tx.textContent = lab(r.date); svg.appendChild(tx);
+      }
+    });
+    svg.addEventListener('pointerleave', function () { tip.hidden = true; });
+    box.replaceChildren(svg, tip);
+  }
+
+  var NAMES = {
+    dm_sheet_open: 'DM으로 [설계도] 보내기', dm_copy: '‘설계도’ 복사', dm_instagram_open: '안내 창 → 인스타그램 열기',
+    dm_direct_open: '안내 창 → 메시지 창 바로 열기', instagram_click: '인스타그램 링크', timeline_click: '학년 타임라인',
+    timeline_link_click: '타임라인 → STEP 보기', selfcheck_toggle: '자가 진단 체크', chat_step_click: 'DM 대화 속 STEP 버튼',
+    audience_switch: '학생 / 학부모 전환', scroll: '페이지 끝까지 스크롤'
+  };
+  var DEV = { mobile: '휴대폰', desktop: 'PC', tablet: '태블릿', smart_tv: 'TV' };
+
+  function render(d) {
+    $('when').textContent = d.updated_at ? '마지막 업데이트 ' + d.updated_at + ' (3시간마다 갱신)' : '';
+    if (d.status !== 'ok') {
+      var n = $('notice'); n.hidden = false; n.className = 'notice';
+      n.replaceChildren();
+      if (d.status === 'not_connected') {
+        n.append(el('b', null, 'GA4 연결을 기다리고 있어요. '), document.createTextNode('구글 서비스 계정 설정이 끝나면 3시간 안에 숫자가 채워져요.'));
+      } else {
+        n.append(el('b', null, '숫자를 불러오지 못했어요. '), document.createTextNode(d.message || ''));
+      }
+      $('lead').textContent = '아직 보여 드릴 숫자가 없어요.';
+      ['funnel', 'daily', 'channels', 'devices', 'buttons'].forEach(function (id) { empty(id); });
+      return;
+    }
+    var cur = d.totals.cur || {}, prev = d.totals.prev || {};
+    var ev = d.events.cur || {}, evp = d.events.prev || {};
+    var users = +cur.activeUsers || 0, dm = +ev.dm_sheet_open || 0;
+
+    var lead = $('lead'); lead.replaceChildren();
+    if (!users) lead.textContent = '최근 28일 동안 집계된 방문이 아직 없어요.';
+    else lead.append('최근 28일 동안 ', el('b', null, nf.format(users) + '명'), '이 방문했고, 상담 안내 창은 ', el('b', null, nf.format(dm) + '번'), ' 열렸어요.');
+
+    var kp = [
+      { k: '상담 안내 창 열기', v: nf.format(dm) + '번', c: change(dm, evp.dm_sheet_open), main: true },
+      { k: '방문자', v: nf.format(users) + '명', c: change(users, prev.activeUsers) },
+      { k: '처음 온 방문자', v: nf.format(+cur.newUsers || 0) + '명', c: change(cur.newUsers, prev.newUsers) },
+      { k: '평균 머문 시간', v: dur(cur.averageSessionDuration), c: change(cur.averageSessionDuration, prev.averageSessionDuration) },
+      { k: '제대로 본 방문', v: pct(cur.engagementRate), c: change(cur.engagementRate, prev.engagementRate, true) }
+    ];
+    var kbox = $('kpis'); kbox.replaceChildren();
+    kp.forEach(function (x) {
+      var c = el('div', 'kpi' + (x.main ? ' main' : ''));
+      c.append(el('span', 'k', x.k), el('span', 'v', x.v), el('span', 'c ' + x.c.cls, x.c.text));
+      kbox.appendChild(c);
+    });
+
+    var steps = [
+      { label: '방문자', v: users },
+      { label: '상담 안내 창 열기', v: dm },
+      { label: '‘설계도’ 복사', v: +ev.dm_copy || 0 },
+      { label: '인스타그램 열기', v: (+ev.dm_instagram_open || 0) + (+ev.dm_direct_open || 0) }
+    ];
+    if (!users) empty('funnel');
+    else bars('funnel', steps.map(function (s, i) { return { label: s.label, v: s.v, extra: i ? (steps[i - 1].v ? pct(s.v / steps[i - 1].v) : '–') : '' }; }), { cls: function (i) { return i === 0 ? '' : 'y'; } });
+
+    daily((d.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; }));
+    bars('channels', (d.channels || []).map(function (r) { return { label: r.sessionSourceMedium, v: +r.sessions || 0 }; }).filter(function (r) { return r.v; }), { share: true, cls: function (i) { return i ? 'alt' : ''; } });
+    bars('devices', (d.devices || []).map(function (r) { return { label: DEV[r.deviceCategory] || r.deviceCategory, v: +r.activeUsers || 0 }; }).filter(function (r) { return r.v; }), { share: true, unit: '명', cls: function (i) { return i ? 'alt' : ''; } });
+    var btn = Object.keys(NAMES).filter(function (k) { return ev[k]; }).map(function (k) { return { label: NAMES[k], v: +ev[k] }; }).sort(function (a, b) { return b.v - a.v; });
+    if (!btn.length) empty('buttons', '아직 눌린 기록이 없어요.'); else bars('buttons', btn, { unit: '번', cls: function (i) { return i ? 'alt' : ''; } });
+  }
+
+  var last = null, rt;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (last && last.status === 'ok') daily((last.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; })); }, 150); });
+  fetch('data.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('data.json ' + r.status); return r.json(); })
+    .then(function (d) { last = d; render(d); })
+    .catch(function () { render({ status: 'error', message: '잠시 뒤 새로고침해 주세요.' }); });
+})();
+</script>
+</body>
+</html>
