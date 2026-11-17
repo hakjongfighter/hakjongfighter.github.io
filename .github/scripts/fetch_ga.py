@@ -14,7 +14,29 @@ KST = timezone(timedelta(hours=9))
 
 
 def write(payload):
+    """숫자가 담긴 결과는 STATS_PASSWORD로 암호화해서만 저장합니다.
+
+    비밀번호가 없으면 숫자는 저장하지 않고 'no_password' 상태만 남깁니다.
+    (페이지 주소를 아는 누구도 숫자를 볼 수 없게)
+    """
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    if payload.get("status") == "ok":
+        pw = os.environ.get("STATS_PASSWORD", "")
+        if not pw:
+            payload = {"status": "no_password", "updated_at": payload.get("updated_at")}
+        else:
+            import base64
+            from cryptography.hazmat.primitives import hashes
+            from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+            from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+            it = 250000
+            salt, iv = os.urandom(16), os.urandom(12)
+            key = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=it).derive(pw.encode("utf-8"))
+            ct = AESGCM(key).encrypt(iv, json.dumps(payload, ensure_ascii=False).encode("utf-8"), None)
+            b64 = lambda b: base64.b64encode(b).decode("ascii")
+            payload = {"status": "locked", "enc": "aes-256-gcm/pbkdf2-sha256", "iter": it,
+                       "salt": b64(salt), "iv": b64(iv), "ct": b64(ct),
+                       "updated_at": payload.get("updated_at")}
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=1)
 

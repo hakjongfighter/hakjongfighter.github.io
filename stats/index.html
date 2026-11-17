@@ -21,7 +21,21 @@ header .wrap{display:flex;align-items:center;gap:12px;padding-block:14px}
 header img{width:40px;height:40px;border-radius:999px;background:#fff;object-fit:cover}
 header h1{margin:0;font-size:19px;font-weight:900;letter-spacing:-.3px}
 header small{display:block;font-size:12px;color:#B9C3E3;font-weight:400}
-header a.site{margin-left:auto;color:var(--yellow);font-size:13px;font-weight:700;text-decoration:none;padding:10px 0;white-space:nowrap}
+header .site{margin-left:auto;color:var(--yellow);font:inherit;font-size:13px;font-weight:700;background:none;border:1px solid rgba(255,199,44,.5);border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer;white-space:nowrap}
+.board{display:flex;flex-direction:column;gap:14px}
+.board[hidden]{display:none}
+.lock{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.lock[hidden]{display:none}
+.lock img{width:88px;height:88px;border-radius:999px;align-self:center}
+.lock h2{margin:4px 0 0;font-size:20px;font-weight:900;text-align:center}
+.lock p{margin:0;font-size:14px;color:var(--muted);text-align:center}
+.lock label[for="pw"]{font-size:14px;font-weight:700;margin-top:8px}
+.lock input[type=password]{font:inherit;font-size:17px;min-height:52px;padding:0 14px;border:2px solid var(--navy);border-radius:12px;background:#fff;color:var(--navy)}
+.lock .remember{display:flex;align-items:center;gap:8px;font-size:14px;min-height:44px}
+.lock .remember input{width:20px;height:20px}
+.lock button{font:inherit;font-size:17px;font-weight:900;min-height:54px;border:0;border-radius:12px;background:var(--yellow);color:var(--navy);cursor:pointer}
+.lock button:disabled{opacity:.6}
+.lock .err{color:var(--down);font-weight:700;min-height:1.5em}
 main .wrap{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
 .lead{margin:0;font-size:17px;line-height:1.6;font-weight:500}
 .lead b{font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(transparent 62%,var(--yellow) 62%)}
@@ -70,12 +84,24 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
   <div class="wrap">
     <img src="../images/character.jpg" alt="">
     <h1>방문 현황<small>학종파이터 · 최근 28일</small></h1>
-    <a class="site" href="../">사이트 보기</a>
+    <button type="button" class="site" id="logout" hidden>잠그기</button>
   </div>
 </header>
 
 <main>
   <div class="wrap">
+    <form class="lock" id="lock" hidden>
+      <img src="../images/character.jpg" alt="" width="88" height="88">
+      <h2>관리자 전용 페이지예요</h2>
+      <p>방문 현황을 보려면 비밀번호를 입력해 주세요.</p>
+      <label for="pw">비밀번호</label>
+      <input id="pw" name="pw" type="password" autocomplete="current-password" required>
+      <label class="remember" for="remember"><input id="remember" type="checkbox"> 이 기기에서 기억하기</label>
+      <button type="submit" id="unlockBtn">숫자 보기</button>
+      <p class="err" id="lockErr" role="alert"></p>
+    </form>
+
+    <div class="board" id="board" hidden>
     <p class="lead" id="lead">숫자를 불러오는 중이에요…</p>
     <div class="when" id="when"></div>
 
@@ -123,6 +149,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
         <dt>업데이트 주기</dt><dd>3시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
       </dl>
     </details>
+    </div>
   </div>
 </main>
 <footer>© 2026 대치마스터교육 · 학종파이터</footer>
@@ -233,6 +260,8 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
       n.replaceChildren();
       if (d.status === 'not_connected') {
         n.append(el('b', null, 'GA4 연결을 기다리고 있어요. '), document.createTextNode('구글 서비스 계정 설정이 끝나면 3시간 안에 숫자가 채워져요.'));
+      } else if (d.status === 'no_password') {
+        n.append(el('b', null, '비밀번호 설정 전이라 숫자를 숨겨 두었어요. '), document.createTextNode('GitHub에 STATS_PASSWORD를 넣으면 비밀번호로 잠긴 채 숫자가 보여요.'));
       } else {
         n.append(el('b', null, '숫자를 불러오지 못했어요. '), document.createTextNode(d.message || ''));
       }
@@ -278,12 +307,49 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     if (!btn.length) empty('buttons', '아직 눌린 기록이 없어요.'); else bars('buttons', btn, { unit: '번', cls: function (i) { return i ? 'alt' : ''; } });
   }
 
-  var last = null, rt;
+  var last = null, rt, locked = null;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (last && last.status === 'ok') daily((last.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; })); }, 150); });
+
+  // 비밀번호로 암호화된 data.json 풀기 (AES-256-GCM, PBKDF2-SHA256)
+  var KEY = 'hf-stats-pw';
+  var b64 = function (s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+  function decrypt(d, pw) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey'])
+      .then(function (base) { return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(d.salt), iterations: d.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']); })
+      .then(function (key) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(d.iv) }, key, b64(d.ct)); })
+      .then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); });
+  }
+  function show(d) { $('lock').hidden = true; $('board').hidden = false; last = d; render(d); }
+  function unlock(pw, remember) {
+    return decrypt(locked, pw).then(function (d) {
+      try { if (remember) localStorage.setItem(KEY, pw); else localStorage.removeItem(KEY); } catch (e) {}
+      $('logout').hidden = false;
+      show(d);
+    });
+  }
+  $('lock').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = $('unlockBtn'); btn.disabled = true; btn.textContent = '확인 중…'; $('lockErr').textContent = '';
+    unlock($('pw').value, $('remember').checked)
+      .catch(function () { $('lockErr').textContent = '비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
+      .then(function () { btn.disabled = false; btn.textContent = '숫자 보기'; });
+  });
+  $('logout').addEventListener('click', function () {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    location.reload();
+  });
+
   fetch('data.json?t=' + Date.now(), { cache: 'no-store' })
     .then(function (r) { if (!r.ok) throw new Error('data.json ' + r.status); return r.json(); })
-    .then(function (d) { last = d; render(d); })
-    .catch(function () { render({ status: 'error', message: '잠시 뒤 새로고침해 주세요.' }); });
+    .then(function (d) {
+      if (d.status !== 'locked') return show(d);
+      locked = d;
+      var saved = null; try { saved = localStorage.getItem(KEY); } catch (e) {}
+      if (saved) return unlock(saved, true).catch(function () { try { localStorage.removeItem(KEY); } catch (e) {} $('lock').hidden = false; });
+      $('lock').hidden = false; $('pw').focus();
+    })
+    .catch(function () { show({ status: 'error', message: '잠시 뒤 새로고침해 주세요.' }); });
 })();
 </script>
 </body>
