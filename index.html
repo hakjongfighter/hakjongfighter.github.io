@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WP2WRX3L');</script>
+<!-- End Google Tag Manager -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>학종파이터 | 생기부, 1년 설계도부터 그려요</title>
@@ -386,6 +393,10 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP2WRX3L"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <header>
   <nav class="wrap" aria-label="주요 메뉴">
@@ -617,7 +628,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
         <div><dt>주소</dt><dd>서울 강남구 테헤란로82길 15, 디아이타워 14층 7호</dd></div>
       </dl>
     </address>
-    <p class="copy">© 2026 대치마스터교육 · 학종파이터 <span class="ver">v11</span></p>
+    <p class="copy">© 2026 대치마스터교육 · 학종파이터 <span class="ver">v12</span></p>
   </div>
 </footer>
 
@@ -645,7 +656,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
   var copyBtn = document.getElementById('dmCopy');
   function copyWord() {
     var word = '설계도';
-    var done = function () { copyBtn.textContent = '✓ ‘설계도’ 복사됐어요. 메시지 창에 붙여넣기만 하세요'; };
+    var done = function () { copyBtn.textContent = '✓ ‘설계도’ 복사됐어요. 메시지 창에 붙여넣기만 하세요'; window.dataLayer.push({ event: 'dm_copy' }); };
     try {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(word).then(done, fallback);
@@ -769,6 +780,28 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
     }, { threshold: 0.35 });
     io.observe(chat);
   }
+})();
+</script>
+<script>
+(function () {
+  // GTM으로 보내는 행동 이벤트 (GTM에서 GA4 이벤트 태그로 연결)
+  window.dataLayer = window.dataLayer || [];
+  function track(name, params) { var o = { event: name }; for (var k in params) o[k] = params[k]; window.dataLayer.push(o); }
+  function sectionOf(el) { var sec = el.closest('section,header,footer'); return sec ? (sec.id || sec.tagName.toLowerCase()) : ''; }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('a,button');
+    if (!el) return;
+    var text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (el.hasAttribute('data-dm')) return track('dm_sheet_open', { cta_location: sectionOf(el), cta_text: text });
+    if (el.id === 'dmOpen') return track('dm_instagram_open', {});
+    if (el.classList.contains('dm-sub')) return track('dm_direct_open', {});
+    if (el.classList.contains('stage')) return track('timeline_click', { stage: el.querySelector('strong').textContent });
+    if (el.classList.contains('q')) return track('selfcheck_toggle', { question: text, checked: el.getAttribute('aria-pressed') === 'true' });
+    if (el.closest('.replies')) return track('chat_step_click', { step: text });
+    if (el.closest('.seg')) return track('audience_switch', { audience: el.getAttribute('data-aud') });
+    if (el.id === 'd-link') return track('timeline_link_click', { target: el.getAttribute('href') });
+    if (el.tagName === 'A' && /instagram\.com/.test(el.href)) return track('instagram_click', { cta_location: sectionOf(el), cta_text: text });
+  });
 })();
 </script>
 </body>
