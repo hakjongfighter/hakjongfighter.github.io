@@ -189,6 +189,17 @@ footer .logo img{width:44px;height:44px}
 footer .logo strong{display:block;font-size:20px;font-weight:900;color:var(--yellow)}
 footer .logo small{display:block;font-size:14px;color:#C9D1EC}
 footer a.h{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:12px 0}
+footer .biz{display:block;padding-top:24px;padding-bottom:40px;border-top:1px solid #2C3A6E}
+footer address{font-style:normal;display:flex;flex-direction:column;gap:10px}
+.biz-name{font-size:15px;font-weight:700;color:#fff}
+footer dl{margin:0;display:flex;flex-wrap:wrap;gap:6px 28px;font-size:14px;line-height:1.6;color:#AEB8D9}
+footer dl>div{display:flex;gap:8px}
+footer dt{color:#7F8BB3;flex:none}
+footer dd{margin:0}
+footer dd a{color:#AEB8D9;text-decoration:none}
+footer dd a:hover{color:#fff;text-decoration:underline}
+footer .copy{margin-top:18px;font-size:13px;color:#7F8BB3}
+footer .ver{opacity:.6}
 a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
 button,a{-webkit-tap-highlight-color:transparent}
 
@@ -345,6 +356,9 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
   .cta .buttons .btn{justify-content:center}
 
   footer .wrap{padding-top:28px;padding-bottom:32px}
+  footer .biz{padding-top:20px;padding-bottom:36px}
+  footer dl{flex-direction:column;gap:6px;font-size:13px}
+  footer dt{width:92px}
   .offer{padding:14px 16px;gap:8px;border-radius:16px}
   .offer-h{font-size:13px}
   .offer li{font-size:13px;gap:10px}
@@ -588,11 +602,22 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
 
 <footer>
   <div class="wrap">
-    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵 · v10 (11.17)</small></div></div>
+    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵</small></div></div>
     <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
       <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
       @hakjong_fighter
     </a>
+  </div>
+  <div class="wrap biz">
+    <address>
+      <strong class="biz-name">대치마스터교육</strong>
+      <dl>
+        <div><dt>전화</dt><dd><a href="tel:025523824">02-552-3824</a></dd></div>
+        <div><dt>사업자등록번호</dt><dd>817-21-01436</dd></div>
+        <div><dt>주소</dt><dd>서울 강남구 테헤란로82길 15, 디아이타워 14층 7호</dd></div>
+      </dl>
+    </address>
+    <p class="copy">© 2026 대치마스터교육 · 학종파이터 <span class="ver">v11</span></p>
   </div>
 </footer>
 
