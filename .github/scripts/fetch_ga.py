@@ -86,15 +86,16 @@ def main():
 
     total_mets = ["activeUsers", "newUsers", "sessions", "screenPageViews",
                   "engagementRate", "averageSessionDuration"]
-    totals_rows = run(["dateRange"], total_mets, ranges=(cur, prev))
+    # 날짜 범위가 둘이면 GA4가 dateRange 열을 자동으로 붙여 줌
+    totals_rows = run([], total_mets, ranges=(cur, prev))
     totals = {"cur": {}, "prev": {}}
     for r in totals_rows:
-        totals[r.pop("dateRange")] = r
+        totals[r.pop("dateRange", "cur")] = r
 
-    events_rows = run(["dateRange", "eventName"], ["eventCount"], ranges=(cur, prev), limit=200)
+    events_rows = run(["eventName"], ["eventCount"], ranges=(cur, prev), limit=200)
     events = {"cur": {}, "prev": {}}
     for r in events_rows:
-        events[r["dateRange"]][r["eventName"]] = r["eventCount"]
+        events[r.get("dateRange", "cur")][r["eventName"]] = r["eventCount"]
 
     payload = {
         "status": "ok",
