@@ -144,6 +144,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
         <dt>방문자</dt><dd>기간 안에 사이트를 한 번 이상 연 사람 수예요. 같은 사람이 여러 번 와도 한 명이에요.</dd>
         <dt>상담 안내 창 열기</dt><dd>‘DM으로 [설계도] 보내기’ 버튼을 누른 횟수예요. 상담 의향을 가장 잘 보여 주는 숫자예요.</dd>
         <dt>인스타그램 열기</dt><dd>안내 창에서 인스타그램이나 메시지 창을 연 횟수예요. 실제로 DM을 보냈는지는 인스타그램에서 확인해야 해요.</dd>
+        <dt>처음 온 방문자</dt><dd>GA4는 같은 사람이 인스타 앱 안과 크롬처럼 다른 브라우저로 들어오면 ‘처음 방문’을 두 번 세요. 그래서 원래 숫자가 방문자보다 클 수 있어, 이 페이지에서는 방문자 수를 넘지 않게 맞춰 보여 줘요.</dd>
         <dt>지난 기간 대비</dt><dd>바로 앞 28일과 비교한 변화예요. 지난 기간 숫자가 0이면 ‘새로 생김’으로 보여요.</dd>
         <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
         <dt>업데이트 주기</dt><dd>3시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
@@ -280,7 +281,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     var kp = [
       { k: '상담 안내 창 열기', v: nf.format(dm) + '번', c: change(dm, evp.dm_sheet_open), main: true },
       { k: '방문자', v: nf.format(users) + '명', c: change(users, prev.activeUsers) },
-      { k: '처음 온 방문자', v: nf.format(+cur.newUsers || 0) + '명', c: change(cur.newUsers, prev.newUsers) },
+      { k: '처음 온 방문자', v: nf.format(Math.min(+cur.newUsers || 0, users)) + '명', c: change(Math.min(+cur.newUsers || 0, users), Math.min(+prev.newUsers || 0, +prev.activeUsers || 0)) },
       { k: '평균 머문 시간', v: dur(cur.averageSessionDuration), c: change(cur.averageSessionDuration, prev.averageSessionDuration) },
       { k: '제대로 본 방문', v: pct(cur.engagementRate), c: change(cur.engagementRate, prev.engagementRate, true) }
     ];
