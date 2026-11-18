@@ -156,7 +156,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
         <dt>지난 기간 대비</dt><dd>바로 앞 28일과 비교한 변화예요. 지난 기간 숫자가 0이면 ‘새로 생김’으로 보여요.</dd>
         <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
         <dt>오늘 · 어제</dt><dd>한국 시간 기준 그날 사이트를 연 사람 수예요. 오늘 숫자는 GA4 집계가 늦어 몇 시간 전까지만 반영돼요.</dd>
-        <dt>업데이트 주기</dt><dd>3시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
+        <dt>업데이트 주기</dt><dd>1시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
       </dl>
     </details>
     </div>
@@ -264,12 +264,12 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
   var DEV = { mobile: '휴대폰', desktop: 'PC', tablet: '태블릿', smart_tv: 'TV' };
 
   function render(d) {
-    $('when').textContent = d.updated_at ? '마지막 업데이트 ' + d.updated_at + ' (3시간마다 갱신)' : '';
+    $('when').textContent = d.updated_at ? '마지막 업데이트 ' + d.updated_at + ' (1시간마다 갱신)' : '';
     if (d.status !== 'ok') {
       var n = $('notice'); n.hidden = false; n.className = 'notice';
       n.replaceChildren();
       if (d.status === 'not_connected') {
-        n.append(el('b', null, 'GA4 연결을 기다리고 있어요. '), document.createTextNode('구글 서비스 계정 설정이 끝나면 3시간 안에 숫자가 채워져요.'));
+        n.append(el('b', null, 'GA4 연결을 기다리고 있어요. '), document.createTextNode('구글 서비스 계정 설정이 끝나면 1시간 안에 숫자가 채워져요.'));
       } else if (d.status === 'no_password') {
         n.append(el('b', null, '비밀번호 설정 전이라 숫자를 숨겨 두었어요. '), document.createTextNode('GitHub에 STATS_PASSWORD를 넣으면 비밀번호로 잠긴 채 숫자가 보여요.'));
       } else {
