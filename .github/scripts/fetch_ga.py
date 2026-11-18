@@ -92,10 +92,39 @@ def main():
     for r in totals_rows:
         totals[r.pop("dateRange", "cur")] = r
 
-    events_rows = run(["eventName"], ["eventCount"], ranges=(cur, prev), limit=200)
+    # 이벤트별 횟수 + 그 행동을 한 사람 수
+    events_rows = run(["eventName"], ["eventCount", "totalUsers"], ranges=(cur, prev), limit=200)
     events = {"cur": {}, "prev": {}}
+    event_users = {"cur": {}, "prev": {}}
     for r in events_rows:
-        events[r.get("dateRange", "cur")][r["eventName"]] = r["eventCount"]
+        dr = r.get("dateRange", "cur")
+        events[dr][r["eventName"]] = r["eventCount"]
+        event_users[dr][r["eventName"]] = r["totalUsers"]
+
+    def optional(fn):
+        """추가 숫자는 실패해도 전체를 막지 않음 (예: 맞춤 측정기준 미등록)."""
+        try:
+            return fn()
+        except Exception as e:  # noqa: BLE001
+            print("추가 숫자 건너뜀:", str(e)[:120], file=sys.stderr)
+            return None
+
+    DM_EVENTS = {"dm_sheet_open", "dm_instagram_open", "dm_direct_open", "instagram_click"}
+
+    def daily_events():
+        out = {}
+        for r in run(["date", "eventName"], ["eventCount"], limit=5000):
+            if r["eventName"] in DM_EVENTS:
+                out.setdefault(r["date"], {})[r["eventName"]] = r["eventCount"]
+        return out
+
+    def channel_events():
+        rows = run(["sessionSourceMedium", "eventName"], ["eventCount"], limit=2000)
+        return [r for r in rows if r["eventName"] in DM_EVENTS]
+
+    def param(name):
+        rows = run(["eventName", f"customEvent:{name}"], ["eventCount"], limit=200)
+        return [r for r in rows if r.get(f"customEvent:{name}") not in ("", "(not set)", None)]
 
     payload = {
         "status": "ok",
@@ -105,7 +134,16 @@ def main():
         },
         "totals": totals,
         "events": events,
-        "daily": run(["date"], ["activeUsers"], limit=60),
+        "event_users": event_users,
+        "daily_events": optional(daily_events),
+        "channel_events": optional(channel_events),
+        # GA4에 맞춤 측정기준으로 등록돼 있을 때만 채워짐
+        "params": {
+            "cta_location": optional(lambda: param("cta_location")),
+            "audience": optional(lambda: param("audience")),
+            "stage": optional(lambda: param("stage")),
+        },
+        "daily":run(["date"], ["activeUsers"], limit=60),
         "channels": run(["sessionSourceMedium"], ["sessions"], order="sessions", limit=8),
         "devices": run(["deviceCategory"], ["activeUsers"], order="activeUsers", limit=5),
     }

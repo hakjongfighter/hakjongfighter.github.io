@@ -17,11 +17,12 @@
 body{margin:0;background:var(--bg);color:var(--navy);font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;line-height:1.5;word-break:keep-all;-webkit-text-size-adjust:100%}
 .wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
 header{background:var(--navy);color:#fff;padding-top:env(safe-area-inset-top)}
-header .wrap{display:flex;align-items:center;gap:12px;padding-block:14px}
+header .wrap{display:flex;align-items:center;gap:10px;padding-block:14px}
 header img{width:40px;height:40px;border-radius:999px;background:#fff;object-fit:cover}
 header h1{margin:0;font-size:19px;font-weight:900;letter-spacing:-.3px}
 header small{display:block;font-size:12px;color:#B9C3E3;font-weight:400}
-header .site{margin-left:auto;color:var(--yellow);font:inherit;font-size:13px;font-weight:700;background:none;border:1px solid rgba(255,199,44,.5);border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer;white-space:nowrap}
+header .acts{margin-left:auto;display:flex;gap:6px}
+header .site{color:var(--yellow);font:inherit;font-size:13px;font-weight:700;background:none;border:1px solid rgba(255,199,44,.5);border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
 .board{display:flex;flex-direction:column;gap:14px}
 .board[hidden]{display:none}
 .lock{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:10px;margin-top:8px}
@@ -41,8 +42,10 @@ main .wrap{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
 .lead b{font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(transparent 62%,var(--yellow) 62%)}
 .when{font-size:12.5px;color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card[hidden]{display:none}
 .card h2{margin:0 0 4px;font-size:16px;font-weight:900}
 .card .d{margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.55}
+.card .foot{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.55}
 .days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .day{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .day.today{background:#FFF6D6;border-color:#F2D27A}
@@ -57,6 +60,7 @@ main .wrap{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
 .kpi.main .k{color:#C9D3F0}
 .kpi .v{font-size:28px;font-weight:900;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.2}
 .kpi.main .v{font-size:36px;color:var(--yellow)}
+.kpi .sub{font-size:13px;color:#C9D3F0;font-variant-numeric:tabular-nums}
 .kpi .c{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
 .kpi .c.up{color:var(--up)}.kpi .c.down{color:var(--down)}.kpi .c.flat{color:var(--muted);font-weight:500}
 .kpi.main .c.up{color:#7FE3B4}.kpi.main .c.down{color:#FDBA8C}.kpi.main .c.flat{color:#C9D3F0}
@@ -64,25 +68,43 @@ main .wrap{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
 .row{display:flex;flex-direction:column;gap:5px}
 .row .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14.5px}
 .row .lbl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .lbl small{color:var(--muted);font-size:12px;margin-left:4px}
 .row .num{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .row .num small{font-weight:500;color:var(--muted);margin-left:4px;font-size:12px}
+.row .why{font-size:12.5px;color:var(--muted);line-height:1.5}
 .track{height:10px;border-radius:6px;background:var(--bg);overflow:hidden}
 .fill{height:100%;border-radius:6px;background:var(--navy)}
 .fill.alt{background:var(--bar2)}
 .fill.y{background:var(--yellow)}
+.drop{font-size:12.5px;color:var(--down);font-weight:700;padding-left:2px;margin-top:-3px}
+.tips{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.tips li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.6}
+.tag{flex:none;font-size:12px;font-weight:900;border-radius:999px;padding:2px 9px;margin-top:2px;white-space:nowrap}
+.tag.warn{background:#FDE6D8;color:var(--down)}
+.tag.good{background:#DDF3E8;color:var(--up)}
+.tag.info{background:#E6EBF7;color:var(--navy)}
+.tips b{font-weight:900}
+.tips .act{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.manual{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:13.5px}
+.manual label{font-weight:700}
+.manual input{font:inherit;font-size:16px;width:90px;min-height:44px;padding:0 10px;border:2px solid var(--navy);border-radius:10px;font-variant-numeric:tabular-nums}
+.manual span{color:var(--muted);font-size:12.5px;flex-basis:100%}
 .chart{position:relative}
 .chart svg{display:block;width:100%;height:auto}
 .chart .tip{position:absolute;top:0;left:0;background:var(--navy);color:#fff;font-size:12.5px;padding:5px 9px;border-radius:8px;pointer-events:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;font-size:13.5px;color:var(--muted);line-height:1.6}
 .notice{background:#FFF6D6;border:1px solid #F2D27A;border-radius:16px;padding:16px;font-size:14px;line-height:1.65}
 .notice b{font-weight:900}
 details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:4px 16px}
 summary{cursor:pointer;font-weight:700;font-size:15px;padding:12px 0;min-height:44px;list-style-position:inside}
+details .rows{margin-bottom:14px}
 dl{margin:0 0 14px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.6}
 dt{font-weight:700}
 dd{margin:0;color:var(--muted)}
 footer{font-size:12px;color:var(--muted);text-align:center;padding-bottom:max(24px,env(safe-area-inset-bottom))}
-a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
 @media (min-width:600px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi.main{grid-column:1/-1}}
 </style>
 </head>
@@ -91,7 +113,10 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
   <div class="wrap">
     <img src="../images/character.jpg" alt="">
     <h1>방문 현황<small>학종파이터 · 최근 28일</small></h1>
-    <button type="button" class="site" id="logout" hidden>잠그기</button>
+    <div class="acts">
+      <a class="site" href="../" target="_blank" rel="noopener">사이트 보기</a>
+      <button type="button" class="site" id="logout" hidden>잠그기</button>
+    </div>
   </div>
 </header>
 
@@ -119,20 +144,50 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     <p class="when" style="margin:-4px 0 0">▲▼는 바로 앞 28일과 비교한 변화예요.</p>
 
     <section class="card">
+      <h2>지금 눈여겨볼 점</h2>
+      <p class="d">아래 숫자를 보고 자동으로 골라 낸 내용이에요.</p>
+      <div id="insights"></div>
+    </section>
+
+    <section class="card">
       <h2>상담까지 이어진 흐름</h2>
-      <p class="d">방문 → 상담 안내 창 열기 → ‘설계도’ 복사 → 인스타그램 열기. 오른쪽 %는 바로 앞 단계 대비예요.</p>
+      <p class="d">랜딩페이지에서 상담 버튼은 맨 아래 ‘3단계 로드맵 요약’에 있어요. 그래서 끝까지 내려온 사람만 상담 안내를 볼 수 있어요. 사람 수 기준이고, 오른쪽 %는 방문자 대비예요.</p>
       <div id="funnel"></div>
+      <div class="manual">
+        <label for="dmGot">인스타에서 받은 ‘설계도’ DM</label>
+        <input id="dmGot" type="number" inputmode="numeric" min="0" placeholder="0">
+        <span>최근 28일 동안 받은 DM 수를 직접 넣으면 마지막 단계로 계산돼요. 이 기기에만 저장돼요.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>페이지 구간별 반응</h2>
+      <p class="d">랜딩페이지 위에서 아래 순서예요. 방문자 중 몇 명이 그 구간에서 버튼을 눌렀는지 보여 줘요.</p>
+      <div id="sections"></div>
+    </section>
+
+    <section class="card" id="paramsCard" hidden>
+      <h2>누가, 어느 학년을 많이 봤나</h2>
+      <div id="params"></div>
+    </section>
+
+    <section class="card">
+      <h2>인스타그램으로 넘어간 경로</h2>
+      <p class="d">누른 횟수 기준이에요. 안내 창을 거친 경우는 ‘설계도’가 복사된 채로 넘어가요.</p>
+      <div id="igpaths"></div>
+      <p class="foot">실제로 DM을 보냈는지는 인스타그램 메시지함에서 ‘설계도’로 검색해 확인하세요.</p>
     </section>
 
     <section class="card">
       <h2>날짜별 방문자</h2>
-      <p class="d">막대를 누르면 그날 숫자가 보여요.</p>
+      <p class="d">막대를 누르면 그날 방문자와 상담 안내 창 숫자가 보여요. 인스타 게시물을 올린 날과 비교해 보세요.</p>
       <div class="chart" id="daily"></div>
+      <div class="legend" id="dailyLegend"></div>
     </section>
 
     <section class="card">
       <h2>어디서 들어왔나</h2>
-      <p class="d">방문 수 기준 상위 경로예요. instagram은 인스타그램, (direct)는 주소를 직접 열었거나 앱 안에서 연 경우예요.</p>
+      <p class="d">방문 수 기준 상위 경로예요. 오른쪽에 그 경로로 온 방문에서 상담 안내 창이 열린 횟수도 함께 보여요.</p>
       <div id="channels"></div>
     </section>
 
@@ -141,20 +196,22 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
       <div id="devices"></div>
     </section>
 
-    <section class="card">
-      <h2>많이 누른 버튼</h2>
+    <details>
+      <summary>버튼별 누른 횟수 전체</summary>
       <div id="buttons"></div>
-    </section>
+    </details>
 
     <details>
       <summary>숫자 읽는 법</summary>
       <dl>
         <dt>방문자</dt><dd>기간 안에 사이트를 한 번 이상 연 사람 수예요. 같은 사람이 여러 번 와도 한 명이에요.</dd>
-        <dt>상담 안내 창 열기</dt><dd>‘DM으로 [설계도] 보내기’ 버튼을 누른 횟수예요. 상담 의향을 가장 잘 보여 주는 숫자예요.</dd>
-        <dt>인스타그램 열기</dt><dd>안내 창에서 인스타그램이나 메시지 창을 연 횟수예요. 실제로 DM을 보냈는지는 인스타그램에서 확인해야 해요.</dd>
+        <dt>상담 영역까지 내려옴</dt><dd>페이지의 90% 넘게 스크롤한 사람이에요(GA4 자동 ‘스크롤’ 기록). 이 지점부터 상담 안내와 버튼이 보여요.</dd>
+        <dt>상담 안내 창 열기</dt><dd>‘DM으로 [설계도] 보내기’ 버튼을 누른 사람이에요. 상담 의향을 가장 잘 보여 주는 숫자예요. 버튼을 누르면 ‘설계도’가 자동으로 복사돼요.</dd>
+        <dt>인스타그램으로 넘어감</dt><dd>안내 창에서 ‘인스타그램 열기’나 ‘메시지 창 바로 열기’를 누른 사람이에요. 두 버튼을 모두 누른 사람은 두 번 세져서 실제보다 조금 많을 수 있어요.</dd>
         <dt>처음 온 방문자</dt><dd>GA4는 같은 사람이 인스타 앱 안과 크롬처럼 다른 브라우저로 들어오면 ‘처음 방문’을 두 번 세요. 그래서 원래 숫자가 방문자보다 클 수 있어, 이 페이지에서는 방문자 수를 넘지 않게 맞춰 보여 줘요.</dd>
         <dt>지난 기간 대비</dt><dd>바로 앞 28일과 비교한 변화예요. 지난 기간 숫자가 0이면 ‘새로 생김’으로 보여요.</dd>
         <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
+        <dt>누가, 어느 학년을 많이 봤나</dt><dd>GA4 관리 → 맞춤 정의에 이벤트 범위 측정기준 audience(학생/학부모), stage(타임라인 학년), cta_location(누른 위치)을 등록하면 다음 갱신부터 나타나요.</dd>
         <dt>오늘 · 어제</dt><dd>한국 시간 기준 그날 사이트를 연 사람 수예요. 오늘 숫자는 GA4 집계가 늦어 몇 시간 전까지만 반영돼요.</dd>
         <dt>업데이트 주기</dt><dd>1시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
       </dl>
@@ -172,6 +229,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
   var EMPTY = '아직 집계된 데이터가 없어요.';
   var dur = function (s) { s = Math.round(+s || 0); var m = Math.floor(s / 60); return m ? m + '분 ' + (s % 60) + '초' : s + '초'; };
   var pct = function (v) { return Math.round((+v || 0) * 100) + '%'; };
+  var ratio = function (a, b) { return b ? a / b : 0; };
 
   function empty(id, text) { $(id).replaceChildren(el('div', 'empty', text || EMPTY)); }
   function change(cur, prev, isRate) {
@@ -183,40 +241,44 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     return r === 0 ? { cls: 'flat', text: '변화 없음' } : { cls: r > 0 ? 'up' : 'down', text: (r > 0 ? '▲ ' : '▼ ') + Math.abs(r) + '%' };
   }
 
+  // rows: {label, sub?, v, extra?, why?, drop?}
   function bars(id, rows, opt) {
     opt = opt || {};
     if (!rows.length) return empty(id);
-    var max = Math.max.apply(null, rows.map(function (r) { return r.v; })) || 1;
+    var max = opt.max || Math.max.apply(null, rows.map(function (r) { return r.v; })) || 1;
     var total = rows.reduce(function (a, r) { return a + r.v; }, 0) || 1;
     var box = el('div', 'rows');
     rows.forEach(function (r, i) {
+      if (r.drop) box.appendChild(el('div', 'drop', r.drop));
       var row = el('div', 'row');
       var top = el('div', 'top');
       var l = el('span', 'lbl', r.label);
+      if (r.sub) l.appendChild(el('small', null, r.sub));
       var n = el('span', 'num', nf.format(r.v) + (opt.unit || ''));
       var extra = r.extra != null ? r.extra : (opt.share ? pct(r.v / total) : null);
       if (extra) n.appendChild(el('small', null, extra));
       top.append(l, n);
       var t = el('div', 'track'); var f = el('div', 'fill' + (opt.cls ? ' ' + opt.cls(i) : ''));
-      f.style.width = Math.max(2, r.v / max * 100) + '%';
+      f.style.width = (r.v ? Math.max(2, Math.min(100, r.v / max * 100)) : 0) + '%';
       t.appendChild(f);
       row.append(top, t);
+      if (r.why) row.appendChild(el('span', 'why', r.why));
       box.appendChild(row);
     });
     $(id).replaceChildren(box);
   }
 
-  function daily(rows) {
+  function daily(rows, dmByDay) {
     var box = $('daily');
-    if (!rows.length || !rows.some(function (r) { return r.activeUsers > 0; })) return empty('daily');
-    var W = Math.max(260, Math.round(box.clientWidth || 320)), H = 190, ml = 30, mb = 24, mt = 10, mr = 4;
+    if (!rows.length || !rows.some(function (r) { return r.activeUsers > 0; })) { $('dailyLegend').replaceChildren(); return empty('daily'); }
+    var W = Math.max(260, Math.round(box.clientWidth || 320)), H = 200, ml = 30, mb = 24, mt = 20, mr = 4;
     var max = Math.max.apply(null, rows.map(function (r) { return r.activeUsers; })) || 1;
     var step = Math.pow(10, Math.floor(Math.log10(max))); var top = Math.ceil(max / step) * step; if (top < 4) top = 4;
     var bw = (W - ml - mr) / rows.length;
     var NS = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', '최근 28일 날짜별 방문자 수 막대 그래프');
+    svg.setAttribute('aria-label', '최근 28일 날짜별 방문자 수 막대 그래프, 상담 안내 창이 열린 날은 노란 점으로 표시');
     var y = function (v) { return H - mb - (v / top) * (H - mb - mt); };
     [0, top / 2, top].forEach(function (v) {
       var ln = document.createElementNS(NS, 'line');
@@ -228,43 +290,93 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     var tip = el('div', 'tip'); tip.hidden = true;
     var lab = function (d) { return (+d.slice(4, 6)) + '/' + (+d.slice(6, 8)); };
     var every = Math.ceil(rows.length / Math.max(3, Math.floor((W - ml) / 52)));
+    var anyDm = false;
     rows.forEach(function (r, i) {
+      var dm = dmByDay ? (dmByDay[r.date] || 0) : 0;
+      var isToday = i === rows.length - 1;
       var rc = document.createElementNS(NS, 'rect');
       var h = Math.max(r.activeUsers ? 2 : 0, y(0) - y(r.activeUsers));
       rc.setAttribute('x', ml + i * bw + bw * 0.15); rc.setAttribute('width', bw * 0.7);
       rc.setAttribute('y', y(0) - h); rc.setAttribute('height', h); rc.setAttribute('rx', 2);
-      rc.setAttribute('fill', i === rows.length - 1 ? '#FFC72C' : '#1C2A5E');
+      rc.setAttribute('fill', isToday ? '#8C99C7' : '#1C2A5E');
+      svg.appendChild(rc);
+      if (dm) {
+        anyDm = true;
+        var c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', ml + i * bw + bw / 2); c.setAttribute('cy', y(0) - h - 8);
+        c.setAttribute('r', Math.max(3.5, Math.min(6, bw * 0.3))); c.setAttribute('fill', '#FFC72C'); c.setAttribute('stroke', '#1C2A5E'); c.setAttribute('stroke-width', '1.5');
+        svg.appendChild(c);
+      }
       var hit = document.createElementNS(NS, 'rect');
-      hit.setAttribute('x', ml + i * bw); hit.setAttribute('width', bw); hit.setAttribute('y', mt); hit.setAttribute('height', H - mb - mt); hit.setAttribute('fill', 'transparent');
+      hit.setAttribute('x', ml + i * bw); hit.setAttribute('width', bw); hit.setAttribute('y', 0); hit.setAttribute('height', H - mb); hit.setAttribute('fill', 'transparent');
       var show = function () {
         tip.hidden = false;
-        tip.textContent = lab(r.date) + ' · ' + nf.format(r.activeUsers) + '명';
+        tip.textContent = lab(r.date) + (isToday ? ' (오늘)' : '') + ' · 방문 ' + nf.format(r.activeUsers) + '명' + (dmByDay ? ' · 상담 창 ' + nf.format(dm) + '번' : '');
         var bx = box.getBoundingClientRect().width / W;
         var left = (ml + i * bw + bw / 2) * bx - tip.offsetWidth / 2;
         tip.style.left = Math.max(0, Math.min(box.clientWidth - tip.offsetWidth, left)) + 'px';
-        tip.style.top = Math.max(0, (y(r.activeUsers) * bx) - 34) + 'px';
+        tip.style.top = Math.max(0, ((y(0) - h - 14) * bx) - 30) + 'px';
       };
       hit.addEventListener('pointerenter', show); hit.addEventListener('click', show);
-      svg.append(rc, hit);
-      if ((i % every === 0 && rows.length - 1 - i >= every * 0.8) || i === rows.length - 1) {
+      svg.appendChild(hit);
+      if ((i % every === 0 && rows.length - 1 - i >= every * 0.8) || isToday) {
         var tx = document.createElementNS(NS, 'text'); tx.setAttribute('x', ml + i * bw + bw / 2); tx.setAttribute('y', H - 7);
-        tx.setAttribute('text-anchor', i === rows.length - 1 ? 'end' : (i === 0 ? 'start' : 'middle')); if (i === rows.length - 1) tx.setAttribute('x', W - mr); if (i === 0) tx.setAttribute('x', ml); tx.setAttribute('font-size', '12'); tx.setAttribute('fill', '#5B6688'); tx.textContent = lab(r.date); svg.appendChild(tx);
+        tx.setAttribute('text-anchor', isToday ? 'end' : (i === 0 ? 'start' : 'middle')); if (isToday) tx.setAttribute('x', W - mr); if (i === 0) tx.setAttribute('x', ml); tx.setAttribute('font-size', '12'); tx.setAttribute('fill', '#5B6688'); tx.textContent = lab(r.date); svg.appendChild(tx);
       }
     });
     svg.addEventListener('pointerleave', function () { tip.hidden = true; });
     box.replaceChildren(svg, tip);
+    var lg = $('dailyLegend'); lg.replaceChildren();
+    var item = function (color, text, round) { var s = el('span'); var i = el('i'); i.style.background = color; if (round) { i.style.borderRadius = '999px'; i.style.border = '1.5px solid #1C2A5E'; } s.append(i, text); lg.appendChild(s); };
+    item('#1C2A5E', '방문자');
+    item('#8C99C7', '오늘 (집계 중)');
+    if (dmByDay) item('#FFC72C', anyDm ? '상담 안내 창이 열린 날' : '상담 안내 창이 열린 날 (아직 없음)', true);
   }
 
   var NAMES = {
-    dm_sheet_open: 'DM으로 [설계도] 보내기', dm_copy: '‘설계도’ 복사', dm_instagram_open: '안내 창 → 인스타그램 열기',
-    dm_direct_open: '안내 창 → 메시지 창 바로 열기', instagram_click: '인스타그램 링크', timeline_click: '학년 타임라인',
-    timeline_link_click: '타임라인 → STEP 보기', selfcheck_toggle: '자가 진단 체크', chat_step_click: 'DM 대화 속 STEP 버튼',
-    audience_switch: '학생 / 학부모 전환', scroll: '페이지 끝까지 스크롤'
+    dm_sheet_open: 'DM으로 [설계도] 보내기', dm_copy: '‘설계도’ 복사 (자동 포함)', dm_instagram_open: '안내 창 → 인스타그램 열기',
+    dm_direct_open: '안내 창 → 메시지 창 바로 열기', instagram_click: '그 밖의 인스타그램 링크', timeline_click: '학년 타임라인',
+    selfcheck_toggle: '자가 진단 체크', audience_switch: '학생 / 학부모 전환', scroll: '페이지 끝까지 스크롤'
   };
   var DEV = { mobile: '휴대폰', desktop: 'PC', tablet: '태블릿', smart_tv: 'TV' };
+  var LOC = { header: '상단 바 인스타 아이콘', top: '첫 화면 @hakjong_fighter', cta: '상담 영역 ‘인스타그램 둘러보기’', footer: '맨 아래 @hakjong_fighter' };
+  var AUD = { student: '고등학생이에요', parent: '학부모예요' };
+
+  function channelName(sm) {
+    var s = String(sm || '').toLowerCase(), src = s.split(' / ')[0];
+    if (/instagram|^ig$|^ig\b/.test(src)) return '인스타그램';
+    if (src === '(direct)') return '직접 방문·앱 안';
+    if (/naver/.test(src)) return '네이버';
+    if (/google/.test(src)) return '구글';
+    if (/kakao|daum/.test(src)) return '카카오·다음';
+    if (/youtube/.test(src)) return '유튜브';
+    if (/facebook|fb/.test(src)) return '페이스북';
+    if (/threads/.test(src)) return '스레드';
+    return sm;
+  }
+
+  var MANUAL_KEY = 'hf-stats-dm-received';
+  var lastFunnel = null;
+
+  function funnel(f) {
+    lastFunnel = f;
+    if (!f.users) { empty('funnel'); return; }
+    var got = null; try { var s = localStorage.getItem(MANUAL_KEY); if (s !== null && s !== '') got = +s; } catch (e) {}
+    var steps = [{ label: '방문자', v: f.users, why: '사이트를 연 사람' }];
+    if (f.hasScroll) steps.push({ label: '상담 영역까지 내려옴', v: f.reach, why: '맨 아래 ‘3단계 로드맵 요약’과 상담 버튼이 보이는 곳' });
+    steps.push({ label: '상담 안내 창 열기', v: f.open, why: '‘DM으로 [설계도] 보내기’를 누름 · ‘설계도’ 자동 복사' });
+    steps.push({ label: '인스타그램으로 넘어감', v: f.ig, why: '안내 창에서 인스타그램이나 메시지 창을 엶' });
+    if (got != null && !isNaN(got)) steps.push({ label: '실제로 받은 DM', sub: '직접 입력', v: got, why: '인스타 메시지함에서 센 숫자' });
+    bars('funnel', steps.map(function (s, i) {
+      var prev = i ? steps[i - 1].v : 0;
+      var drop = i && prev > s.v ? '↓ ' + nf.format(prev - s.v) + f.unit + (f.unit === '명' ? '이' : '') + ' 여기서 멈춤 (앞 단계의 ' + pct(1 - ratio(s.v, prev)) + ')' : '';
+      return { label: s.label, sub: s.sub, v: s.v, extra: i ? pct(ratio(s.v, f.users)) : '', why: s.why, drop: drop };
+    }), { unit: f.unit, max: f.users, cls: function (i) { return i === 0 ? '' : 'y'; } });
+  }
 
   function render(d) {
     $('when').textContent = d.updated_at ? '마지막 업데이트 ' + d.updated_at + ' (1시간마다 갱신)' : '';
+    var all = ['insights', 'funnel', 'sections', 'igpaths', 'daily', 'channels', 'devices', 'buttons'];
     if (d.status !== 'ok') {
       var n = $('notice'); n.hidden = false; n.className = 'notice';
       n.replaceChildren();
@@ -276,34 +388,52 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
         n.append(el('b', null, '숫자를 불러오지 못했어요. '), document.createTextNode(d.message || ''));
       }
       $('lead').textContent = '아직 보여 드릴 숫자가 없어요.';
-      ['funnel', 'daily', 'channels', 'devices', 'buttons'].forEach(function (id) { empty(id); });
+      all.forEach(function (id) { empty(id); });
       return;
     }
     var cur = d.totals.cur || {}, prev = d.totals.prev || {};
     var ev = d.events.cur || {}, evp = d.events.prev || {};
-    var users = +cur.activeUsers || 0, dm = +ev.dm_sheet_open || 0;
+    // 사람 수가 있으면 사람 수, 없으면(이전 형식) 횟수로
+    var hasUsers = !!(d.event_users && d.event_users.cur);
+    var EU = hasUsers ? d.event_users.cur : ev, EUP = hasUsers ? (d.event_users.prev || {}) : evp;
+    var eu = function (k) { return Math.round(+EU[k] || 0); };
+    var users = Math.round(+cur.activeUsers || 0);
+    var cap = function (v) { return Math.min(v, users); };
+    var dmCount = Math.round(+ev.dm_sheet_open || 0);
+    var f = {
+      users: users,
+      hasScroll: ('scroll' in EU) || ('scroll' in ev),
+      reach: cap(eu('scroll')),
+      open: cap(eu('dm_sheet_open')),
+      ig: cap(eu('dm_instagram_open') + eu('dm_direct_open')),
+      unit: hasUsers ? '명' : '번'
+    };
 
     // 오늘·어제 방문자 (한국 시간, 업데이트 시각 기준)
     var ymd = function (dt) { return dt.toISOString().slice(0, 10).replace(/-/g, ''); };
     var base = d.updated_at ? new Date(d.updated_at.slice(0, 10) + 'T00:00:00Z') : null;
     var byDay = {}; (d.daily || []).forEach(function (r) { byDay[r.date] = +r.activeUsers || 0; });
+    var dmByDay = null;
+    if (d.daily_events) { dmByDay = {}; Object.keys(d.daily_events).forEach(function (k) { dmByDay[k] = +d.daily_events[k].dm_sheet_open || 0; }); }
     var dbox = $('days'); dbox.replaceChildren();
     if (base && !isNaN(base)) {
       var yest = new Date(base.getTime() - 86400000);
       [{ k: '오늘', dt: base, cls: 'day today', s: '지금까지 (몇 시간 늦게 반영)' }, { k: '어제', dt: yest, cls: 'day', s: '하루 전체' }].forEach(function (x) {
         var c = el('div', x.cls);
         var k = el('span', 'k', x.k); k.appendChild(el('small', null, (x.dt.getUTCMonth() + 1) + '/' + x.dt.getUTCDate()));
-        c.append(k, el('span', 'v', nf.format(byDay[ymd(x.dt)] || 0) + '명'), el('span', 's', x.s));
+        var s = x.s; if (dmByDay) s = '상담 창 ' + nf.format(dmByDay[ymd(x.dt)] || 0) + '번 · ' + s;
+        c.append(k, el('span', 'v', nf.format(byDay[ymd(x.dt)] || 0) + '명'), el('span', 's', s));
         dbox.appendChild(c);
       });
     }
 
     var lead = $('lead'); lead.replaceChildren();
     if (!users) lead.textContent = '최근 28일 동안 집계된 방문이 아직 없어요.';
-    else lead.append('최근 28일 동안 ', el('b', null, nf.format(users) + '명'), '이 방문했고, 상담 안내 창은 ', el('b', null, nf.format(dm) + '번'), ' 열렸어요.');
+    else lead.append('최근 28일 동안 ', el('b', null, nf.format(users) + '명'), '이 방문했고, 그중 ', el('b', null, nf.format(f.open) + (hasUsers ? '명' : '번')), (hasUsers ? '이' : ''), ' 상담 안내 창을 열었어요.');
 
+    var openPrev = Math.round(+EUP.dm_sheet_open || 0);
     var kp = [
-      { k: '상담 안내 창 열기', v: nf.format(dm) + '번', c: change(dm, evp.dm_sheet_open), main: true },
+      { k: '상담 안내 창을 연 ' + (hasUsers ? '사람' : '횟수'), v: nf.format(f.open) + (hasUsers ? '명' : '번'), sub: users ? '방문자의 ' + pct(ratio(f.open, users)) + (hasUsers ? ' · 총 ' + nf.format(dmCount) + '번 열림' : '') : '', c: change(f.open, openPrev), main: true },
       { k: '방문자', v: nf.format(users) + '명', c: change(users, prev.activeUsers) },
       { k: '처음 온 방문자', v: nf.format(Math.min(+cur.newUsers || 0, users)) + '명', c: change(Math.min(+cur.newUsers || 0, users), Math.min(+prev.newUsers || 0, +prev.activeUsers || 0)) },
       { k: '평균 머문 시간', v: dur(cur.averageSessionDuration), c: change(cur.averageSessionDuration, prev.averageSessionDuration) },
@@ -312,28 +442,153 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     var kbox = $('kpis'); kbox.replaceChildren();
     kp.forEach(function (x) {
       var c = el('div', 'kpi' + (x.main ? ' main' : ''));
-      c.append(el('span', 'k', x.k), el('span', 'v', x.v), el('span', 'c ' + x.c.cls, x.c.text));
+      c.append(el('span', 'k', x.k), el('span', 'v', x.v));
+      if (x.sub) c.appendChild(el('span', 'sub', x.sub));
+      c.appendChild(el('span', 'c ' + x.c.cls, x.c.text));
       kbox.appendChild(c);
     });
 
-    var steps = [
-      { label: '방문자', v: users },
-      { label: '상담 안내 창 열기', v: dm },
-      { label: '‘설계도’ 복사', v: +ev.dm_copy || 0 },
-      { label: '인스타그램 열기', v: (+ev.dm_instagram_open || 0) + (+ev.dm_direct_open || 0) }
-    ];
-    if (!users) empty('funnel');
-    else bars('funnel', steps.map(function (s, i) { return { label: s.label, v: s.v, extra: i ? (steps[i - 1].v ? pct(s.v / steps[i - 1].v) : '–') : '' }; }), { cls: function (i) { return i === 0 ? '' : 'y'; } });
+    funnel(f);
 
-    daily((d.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; }));
-    bars('channels', (d.channels || []).map(function (r) { return { label: r.sessionSourceMedium, v: +r.sessions || 0 }; }).filter(function (r) { return r.v; }), { share: true, cls: function (i) { return i ? 'alt' : ''; } });
-    bars('devices', (d.devices || []).map(function (r) { return { label: DEV[r.deviceCategory] || r.deviceCategory, v: +r.activeUsers || 0 }; }).filter(function (r) { return r.v; }), { share: true, unit: '명', cls: function (i) { return i ? 'alt' : ''; } });
-    var btn = Object.keys(NAMES).filter(function (k) { return ev[k]; }).map(function (k) { return { label: NAMES[k], v: +ev[k] }; }).sort(function (a, b) { return b.v - a.v; });
+    // 구간별 반응 (랜딩 순서)
+    if (!users) empty('sections');
+    else {
+      var secs = [
+        { label: '첫 화면 · 학생/학부모 버튼', k: 'audience_switch' },
+        { label: '학년 타임라인 눌러 봄', k: 'timeline_click' },
+        { label: '자가 진단 체크', k: 'selfcheck_toggle' },
+        { label: '상담 영역까지 내려옴', k: 'scroll', skip: !f.hasScroll },
+        { label: '상담 안내 창 열기', k: 'dm_sheet_open' }
+      ].filter(function (s) { return !s.skip; });
+      bars('sections', secs.map(function (s) { var v = cap(eu(s.k)); return { label: s.label, v: v, extra: pct(ratio(v, users)) }; }),
+        { unit: hasUsers ? '명' : '번', max: users, cls: function () { return 'alt'; } });
+    }
+
+    // 맞춤 측정기준이 있으면: 학생/학부모, 학년
+    var P = d.params || {}, pbox = $('params'); pbox.replaceChildren();
+    var addParam = function (title, rows) {
+      if (!rows || !rows.length) return;
+      pbox.appendChild(el('p', 'd', title));
+      var id = 'p' + pbox.children.length; var div = el('div'); div.id = id; pbox.appendChild(div);
+      bars(id, rows, { unit: '번', share: true, cls: function (i) { return i ? 'alt' : ''; } });
+    };
+    var pick = function (rows, evName, key, names) {
+      return (rows || []).filter(function (r) { return r.eventName === evName; })
+        .map(function (r) { var v = r['customEvent:' + key]; return { label: (names && names[v]) || v, v: Math.round(+r.eventCount || 0) }; })
+        .filter(function (r) { return r.v; }).sort(function (a, b) { return b.v - a.v; });
+    };
+    addParam('학생/학부모 버튼에서 누른 쪽 (처음엔 ‘고등학생’이 선택돼 있어요)', pick(P.audience, 'audience_switch', 'audience', AUD));
+    addParam('학년 타임라인에서 누른 학년', pick(P.stage, 'timeline_click', 'stage'));
+    $('paramsCard').hidden = !pbox.children.length;
+
+    // 인스타그램으로 넘어간 경로
+    var ig = [
+      { label: '안내 창 → 인스타그램 열기', v: Math.round(+ev.dm_instagram_open || 0) },
+      { label: '안내 창 → 메시지 창 바로 열기', v: Math.round(+ev.dm_direct_open || 0) }
+    ];
+    var locRows = pick(P.cta_location, 'instagram_click', 'cta_location', LOC);
+    if (locRows.length) ig = ig.concat(locRows);
+    else ig.push({ label: '그 밖의 인스타그램 링크', sub: '상단 아이콘·첫 화면·둘러보기·맨 아래', v: Math.round(+ev.instagram_click || 0) });
+    ig = ig.filter(function (r, i) { return i < 2 || r.v; });
+    if (!ig.some(function (r) { return r.v; })) empty('igpaths', '아직 인스타그램으로 넘어간 기록이 없어요.');
+    else bars('igpaths', ig, { unit: '번', share: true, cls: function (i) { return i < 2 ? 'y' : 'alt'; } });
+
+    daily((d.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; }), dmByDay);
+
+    // 유입 경로 + 경로별 상담 안내 창
+    var chDm = null;
+    if (d.channel_events) { chDm = {}; d.channel_events.forEach(function (r) { if (r.eventName === 'dm_sheet_open') chDm[r.sessionSourceMedium] = (chDm[r.sessionSourceMedium] || 0) + (+r.eventCount || 0); }); }
+    var chRows = (d.channels || []).map(function (r) { return { raw: r.sessionSourceMedium, v: +r.sessions || 0 }; }).filter(function (r) { return r.v; });
+    var chTotal = chRows.reduce(function (a, r) { return a + r.v; }, 0) || 1;
+    bars('channels', chRows.map(function (r) {
+      var name = channelName(r.raw);
+      return { label: name, sub: name !== r.raw ? r.raw : '', v: r.v, extra: pct(r.v / chTotal) + (chDm ? ' · 상담 창 ' + nf.format(Math.round(chDm[r.raw] || 0)) + '번' : '') };
+    }), { unit: '회', cls: function (i) { return i ? 'alt' : ''; } });
+
+    var devRows = (d.devices || []).map(function (r) { return { label: DEV[r.deviceCategory] || r.deviceCategory, v: +r.activeUsers || 0 }; }).filter(function (r) { return r.v; });
+    bars('devices', devRows, { share: true, unit: '명', cls: function (i) { return i ? 'alt' : ''; } });
+
+    var btn = Object.keys(NAMES).filter(function (k) { return ev[k]; }).map(function (k) { return { label: NAMES[k], v: Math.round(+ev[k]) }; }).sort(function (a, b) { return b.v - a.v; });
     if (!btn.length) empty('buttons', '아직 눌린 기록이 없어요.'); else bars('buttons', btn, { unit: '번', cls: function (i) { return i ? 'alt' : ''; } });
+
+    insights(f, { users: users, chRows: chRows, chDm: chDm, devRows: devRows, openPrev: openPrev, selfcheck: cap(eu('selfcheck_toggle')), hasUsers: hasUsers });
   }
 
+  function insights(f, x) {
+    var box = $('insights');
+    if (!f.users) return empty('insights', '방문이 생기면 여기에 살펴볼 점이 나타나요.');
+    var list = [];
+    var add = function (tone, tag, head, act) { list.push({ tone: tone, tag: tag, head: head, act: act }); };
+    var reachR = ratio(f.reach, f.users), openR = ratio(f.open, f.reach || f.users), igR = ratio(f.ig, f.open);
+
+    if (f.hasScroll && reachR < 0.5) {
+      add('warn', '점검', '방문자 ' + nf.format(f.users) + '명 중 ' + pct(reachR) + '만 상담 영역까지 내려왔어요. 나머지 ' + pct(1 - reachR) + '는 상담 안내를 보지 못하고 나갔어요.',
+        '상담 버튼이 맨 아래 한 곳에만 있어요. 자가 진단 결과 바로 아래나 화면 하단 고정 버튼으로 하나 더 두면 더 많은 사람이 볼 수 있어요.');
+    } else if (!f.hasScroll) {
+      add('info', '참고', '스크롤 기록이 없어 상담 영역까지 내려온 사람 수를 알 수 없어요.', 'GA4 관리 → 데이터 스트림 → 향상된 측정에서 ‘스크롤’이 켜져 있는지 확인해 주세요.');
+    }
+    if (f.reach >= 5 && ratio(f.open, f.reach) < 0.1) {
+      add('warn', '점검', '상담 영역까지 온 ' + nf.format(f.reach) + '명 중 ' + pct(ratio(f.open, f.reach)) + '만 안내 창을 열었어요.',
+        '버튼까지는 봤지만 누르지 않았어요. 상담에서 무엇을 받는지, 비용이 드는지를 한 줄로 더 분명하게 써 볼 만해요.');
+    }
+    if (f.open >= 3 && igR < 0.6) {
+      add('warn', '점검', '안내 창을 연 ' + nf.format(f.open) + '명 중 ' + pct(igR) + '만 인스타그램으로 넘어갔어요.',
+        '안내 창에서 멈추는 사람이 많아요. 창 문구를 줄이거나 ‘인스타그램 열기’ 버튼을 더 눈에 띄게 해 볼 만해요.');
+    } else if (f.open >= 3) {
+      add('good', '좋아요', '안내 창을 연 사람 중 ' + pct(igR) + '가 인스타그램까지 넘어갔어요.', '안내 창은 잘 작동하고 있어요. 더 많은 사람이 안내 창을 열게 하는 쪽에 힘을 쓰면 돼요.');
+    }
+    if (f.open === 0 && f.users >= 10) {
+      add('warn', '점검', '방문자 ' + nf.format(f.users) + '명 중 상담 안내 창을 연 사람이 아직 없어요.', '사이트 보기로 ‘DM으로 [설계도] 보내기’ 버튼이 잘 눌리는지 직접 확인해 보세요.');
+    }
+    if (!x.hasUsers) {
+      add('info', '참고', '지금은 누른 횟수 기준이라 비율이 실제보다 크게 보일 수 있어요.', '다음 갱신(1시간 안)부터 사람 수 기준으로 바뀌어요.');
+    }
+    if (x.hasUsers && x.selfcheck && f.users >= 10) {
+      add('info', '참고', '방문자의 ' + pct(ratio(x.selfcheck, f.users)) + '가 자가 진단을 눌러 봤어요.', '자가 진단은 고민이 가장 커지는 지점이라, 바로 아래에 상담 버튼을 두기 좋은 자리예요.');
+    }
+    if (x.chDm) {
+      var best = x.chRows.filter(function (r) { return r.v >= 5; }).map(function (r) { return { name: channelName(r.raw), rate: ratio(x.chDm[r.raw] || 0, r.v), dm: x.chDm[r.raw] || 0 }; })
+        .filter(function (r) { return r.dm > 0; }).sort(function (a, b) { return b.rate - a.rate; })[0];
+      if (best) add('good', '좋아요', best.name + '에서 온 방문이 상담 안내 창을 가장 많이 열었어요 (방문 100회당 ' + Math.round(best.rate * 100) + '번).', '이 경로에 링크를 더 자주 걸어 보세요.');
+    }
+    var devTotal = x.devRows.reduce(function (a, r) { return a + r.v; }, 0);
+    var mobile = x.devRows.filter(function (r) { return r.label === '휴대폰'; })[0];
+    if (mobile && devTotal && mobile.v / devTotal >= 0.7) {
+      add('info', '참고', '방문자의 ' + pct(mobile.v / devTotal) + '가 휴대폰으로 봤어요.', '사이트를 고칠 땐 휴대폰 화면부터 확인하세요.');
+    }
+    if (f.users < 20) add('info', '참고', '방문자가 아직 ' + nf.format(f.users) + '명이라 비율이 크게 흔들릴 수 있어요.', '20명을 넘기면 위 내용을 더 믿을 수 있어요.');
+    if (!list.length) add('good', '좋아요', '눈에 띄게 막힌 곳 없이 흘러가고 있어요.', '');
+    var order = { warn: 0, good: 1, info: 2 };
+    list.sort(function (a, b) { return order[a.tone] - order[b.tone]; });
+    var ul = el('ul', 'tips');
+    list.slice(0, 5).forEach(function (t) {
+      var li = el('li'); li.appendChild(el('span', 'tag ' + t.tone, t.tag));
+      var body = el('span'); body.appendChild(el('b', null, t.head)); if (t.act) body.appendChild(el('span', 'act', t.act));
+      li.appendChild(body); ul.appendChild(li);
+    });
+    box.replaceChildren(ul);
+  }
+
+  // 직접 입력한 DM 수
+  (function () {
+    var inp = $('dmGot');
+    try { var s = localStorage.getItem(MANUAL_KEY); if (s !== null) inp.value = s; } catch (e) {}
+    inp.addEventListener('input', function () {
+      var v = inp.value.trim();
+      try { if (v === '') localStorage.removeItem(MANUAL_KEY); else localStorage.setItem(MANUAL_KEY, String(Math.max(0, Math.round(+v) || 0))); } catch (e) {}
+      if (lastFunnel) funnel(lastFunnel);
+    });
+  })();
+
   var last = null, rt, locked = null;
-  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (last && last.status === 'ok') daily((last.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; })); }, 150); });
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      if (!last || last.status !== 'ok') return;
+      var dm = null; if (last.daily_events) { dm = {}; Object.keys(last.daily_events).forEach(function (k) { dm[k] = +last.daily_events[k].dm_sheet_open || 0; }); }
+      daily((last.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; }), dm);
+    }, 150);
+  });
 
   // 비밀번호로 암호화된 data.json 풀기 (AES-256-GCM, PBKDF2-SHA256)
   var KEY = 'hf-stats-pw';
