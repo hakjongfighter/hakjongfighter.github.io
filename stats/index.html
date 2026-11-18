@@ -43,6 +43,13 @@ main .wrap{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
 .card h2{margin:0 0 4px;font-size:16px;font-weight:900}
 .card .d{margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.55}
+.days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.day.today{background:#FFF6D6;border-color:#F2D27A}
+.day .k{font-size:13px;color:var(--muted);font-weight:500}
+.day .k small{font-size:12px;margin-left:4px}
+.day .v{font-size:26px;font-weight:900;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.2}
+.day .s{font-size:12px;color:var(--muted)}
 .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .kpi.main{background:var(--navy);border-color:var(--navy);color:#fff;grid-column:1/-1}
@@ -107,6 +114,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
 
     <div id="notice" hidden></div>
 
+    <section class="days" id="days" aria-label="오늘과 어제 방문자"></section>
     <section class="kpis" id="kpis" aria-label="핵심 숫자"></section>
     <p class="when" style="margin:-4px 0 0">▲▼는 바로 앞 28일과 비교한 변화예요.</p>
 
@@ -147,6 +155,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
         <dt>처음 온 방문자</dt><dd>GA4는 같은 사람이 인스타 앱 안과 크롬처럼 다른 브라우저로 들어오면 ‘처음 방문’을 두 번 세요. 그래서 원래 숫자가 방문자보다 클 수 있어, 이 페이지에서는 방문자 수를 넘지 않게 맞춰 보여 줘요.</dd>
         <dt>지난 기간 대비</dt><dd>바로 앞 28일과 비교한 변화예요. 지난 기간 숫자가 0이면 ‘새로 생김’으로 보여요.</dd>
         <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
+        <dt>오늘 · 어제</dt><dd>한국 시간 기준 그날 사이트를 연 사람 수예요. 오늘 숫자는 GA4 집계가 늦어 몇 시간 전까지만 반영돼요.</dd>
         <dt>업데이트 주기</dt><dd>3시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
       </dl>
     </details>
@@ -273,6 +282,21 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-of
     var cur = d.totals.cur || {}, prev = d.totals.prev || {};
     var ev = d.events.cur || {}, evp = d.events.prev || {};
     var users = +cur.activeUsers || 0, dm = +ev.dm_sheet_open || 0;
+
+    // 오늘·어제 방문자 (한국 시간, 업데이트 시각 기준)
+    var ymd = function (dt) { return dt.toISOString().slice(0, 10).replace(/-/g, ''); };
+    var base = d.updated_at ? new Date(d.updated_at.slice(0, 10) + 'T00:00:00Z') : null;
+    var byDay = {}; (d.daily || []).forEach(function (r) { byDay[r.date] = +r.activeUsers || 0; });
+    var dbox = $('days'); dbox.replaceChildren();
+    if (base && !isNaN(base)) {
+      var yest = new Date(base.getTime() - 86400000);
+      [{ k: '오늘', dt: base, cls: 'day today', s: '지금까지 (몇 시간 늦게 반영)' }, { k: '어제', dt: yest, cls: 'day', s: '하루 전체' }].forEach(function (x) {
+        var c = el('div', x.cls);
+        var k = el('span', 'k', x.k); k.appendChild(el('small', null, (x.dt.getUTCMonth() + 1) + '/' + x.dt.getUTCDate()));
+        c.append(k, el('span', 'v', nf.format(byDay[ymd(x.dt)] || 0) + '명'), el('span', 's', x.s));
+        dbox.appendChild(c);
+      });
+    }
 
     var lead = $('lead'); lead.replaceChildren();
     if (!users) lead.textContent = '최근 28일 동안 집계된 방문이 아직 없어요.';
