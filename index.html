@@ -26,7 +26,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="description" content="과목 선택부터 세특, 심화탐구보고서까지. 고등학생을 위한 학종파이터의 3단계 학생부 로드맵.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="학종파이터 | 생기부, 1년 설계도부터 그려요">
-<meta property="og:description" content="과목 선택부터 수행평가·세특, 심화탐구보고서까지. 실패 없는 대입을 위한 3단계 학생부 로드맵.">
+<meta property="og:description" content="과목 선택부터 수행평가·심화탐구·독서로 채우는 세특까지. 3년의 기록을 하나로 잇는 3단계 학생부 로드맵.">
 <meta property="og:image" content="https://hakjongfighter.com/images/og.jpg">
 <meta property="og:url" content="https://hakjongfighter.com/">
 <link rel="canonical" href="https://hakjongfighter.com/">
@@ -64,6 +64,11 @@ p{margin:0}
 @media (prefers-reduced-motion:no-preference){.scroll-hint span{animation:hf-nudge 1.8s ease-in-out infinite}@keyframes hf-nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}}
 .bridge{margin:6px 0 0;font-size:16px;font-weight:700;color:var(--muted2);line-height:1.6}
 .bridge.center{text-align:center}
+.reading{padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.reading-h{align-self:flex-start;background:var(--yellow);color:var(--navy);font-weight:900;font-size:14px;padding:5px 12px;border-radius:999px}
+.reading p{margin:0;font-size:15.5px;line-height:1.65;color:var(--muted2)}
+.reading p b{color:var(--navy)}
+.reading ul{margin:2px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--navy)}
 .tip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 22px;font-size:16px;line-height:1.6}
 .tip b{color:var(--yellow);margin-right:8px}
 .shot{width:100%;height:auto;aspect-ratio:896/1200;object-fit:cover;border:2px solid var(--navy);border-radius:24px;box-shadow:8px 8px 0 var(--navy)}
@@ -434,7 +439,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="pill">실패 없는 대입을 위한 학생부 로드맵</span>
       <div data-for="student" style="display:flex;flex-direction:column;gap:26px">
         <h1>생기부,<br>1년 설계도부터<br>그려요</h1>
-        <p class="lead">과목 선택부터 수행평가·세특, 심화탐구보고서까지. 학종파이터의 3단계 로드맵을 따라가면 지금 쌓고 있는 기록이 3학년 때 하나의 이야기가 돼요.</p>
+        <p class="lead">과목 선택부터 수행평가·심화탐구·독서로 채우는 세특까지. 3년의 기록을 하나로 잇는 방법을 차근차근 알려 드려요.</p>
       </div>
       <div data-for="parent" hidden style="flex-direction:column;gap:26px">
         <h1>아이의 생기부,<br>1년 설계도부터<br>함께 그려요</h1>
@@ -518,6 +523,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <li class="msg out" style="--i:5">
           <p>활동들이 한 방향으로 이어지는지가 핵심이야. 심화탐구보고서로 깊이를 더해 보자.</p>
         </li>
+        <li class="msg in" style="--i:6">
+          <span class="ava a1" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6z"/></svg></span>
+          <p>책 많이 읽으면 생기부에 도움 돼?</p>
+        </li>
+        <li class="msg out" style="--i:7">
+          <p>읽은 책 목록은 이제 대학에 안 가. 수업에서 토론·발표로 이어 가야 세특에 남아!</p>
+        </li>
       </ol>
     </div>
     <p class="bridge center">그럼, 첫 단계부터 차근차근 볼까요?</p>
@@ -546,7 +558,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section id="step2" class="step s2">
   <div class="wrap row">
     <div class="col-text">
-      <span class="pill">STEP 2 · 수행평가·세특</span>
+      <span class="pill">STEP 2 · 수행평가·독서·세특</span>
       <h3>수행평가를 세특으로<br>잇는 3가지 질문</h3>
       <p class="sub">수행평가가 끝나면 이 질문에 답해 보세요.</p>
       <ol class="list">
@@ -554,7 +566,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <li class="card"><span class="num" aria-hidden="true">2</span><span><strong>수업 개념을 어떻게 썼나요?</strong><span class="d">교과서에서 배운 개념을 탐구에 직접 적용</span></span></li>
         <li class="card"><span class="num" aria-hidden="true">3</span><span><strong>끝나고 생긴 새 질문은?</strong><span class="d">다음 탐구 주제로 이어갈 씨앗</span></span></li>
       </ol>
-      <div class="tip"><b>TIP</b>세특은 선생님이 관찰한 내용으로 기록돼요. 탐구 과정을 발표나 보고서로 꼭 보여주세요.</div>
+      <div class="reading card">
+        <span class="reading-h">독서도 세특이 돼요</span>
+        <p>‘독서활동상황’ 칸은 2024학년도 대입부터 대학에 제공되지 않아요. 대신 수업 주제와 이어지는 책을 읽고 <b>토론·발표·탐구</b>로 펼치면, 책 제목과 함께 그 과정이 세특에 담길 수 있어요.</p>
+        <ul>
+          <li>수업에서 생긴 질문 → 관련 책 찾기</li>
+          <li>책에서 얻은 관점을 발표·토론에서 써 보기</li>
+          <li>감상문만 쓰고 끝내지 않기</li>
+        </ul>
+      </div>
+      <div class="tip"><b>TIP</b>세특은 선생님이 관찰한 내용으로 기록돼요. 수행평가·탐구·독서의 과정을 수업 안에서 꼭 보여주세요.</div>
     </div>
     <div class="col-img"><img class="shot" src="images/step2.jpg" alt="STEP 2. 나만의 특별한 수행평가서 작성 — 펼친 책 위의 연필 캐릭터와 전구, 플라스크" loading="lazy" width="896" height="1200"></div>
   </div>
@@ -587,7 +608,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h2>합격을 부르는<br>3단계 로드맵 완성!</h2>
       <ol class="chips">
         <li><b>1단계</b>진로·과목 선택</li>
-        <li><b>2단계</b>수행평가·세특</li>
+        <li><b>2단계</b>수행평가·독서·세특</li>
         <li><b>3단계</b>심화탐구보고서</li>
       </ol>
       <p class="big">인스타 DM으로 <em>[설계도]</em>라고 보내면 <br>전문상담을 해드려요</p>
@@ -630,7 +651,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div><dt>주소</dt><dd>서울 강남구 테헤란로82길 15, 디아이타워 14층 7호</dd></div>
       </dl>
     </address>
-    <p class="copy">© 2026 대치마스터교육 · 학종파이터 <span class="ver">v17</span></p>
+    <p class="copy">© 2026 대치마스터교육 · 학종파이터 <span class="ver">v18</span></p>
   </div>
 </footer>
 
