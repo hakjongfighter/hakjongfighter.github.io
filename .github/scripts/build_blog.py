@@ -119,7 +119,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP2WRX3L" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header><div class="wrap">
  <a class="brand" href="/blog/"><img src="/images/character.jpg" alt="">학종파이터 <i>블로그</i></a>
- <nav class="hnav"><a class="hide" href="/blog/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>전체 글</a><a class="hide" href="/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>학종파이터 홈</a><a class="sub" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'header'}})"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>인스타 팔로우</a></nav>
+ <nav class="hnav"><a class="hide" href="/blog/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>전체 글</a><a class="hide" href="/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>학종파이터 홈</a><a class="sub" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'header'}})"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>instagram</a></nav>
 </div></header>
 """
 
@@ -182,7 +182,7 @@ def build_index(posts):
     out.append(f"""  <aside>
    <div class="who"><img src="/images/character.jpg" alt=""><b>학종파이터</b><p>고등학생과 학부모를 위한 학생부종합전형 기록. 3년의 활동이 한 방향으로 이어지도록 돕습니다.</p></div>
    <div><div class="st">추천 글</div><ol class="pop">{''.join(f'<li><a href="/blog/{p["slug"]}/">{esc(p["title"])}</a></li>' for p in picks)}</ol></div>
-   <div class="letter"><h4 class="serif">새 글 소식 받기</h4><p>새 글이 올라오면 인스타그램에서 가장 먼저 알려 드려요.</p><a class="b" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'sidebar'}})">@hakjong_fighter 팔로우</a></div>
+   <div class="letter"><h4 class="serif">새 글 소식 받기</h4><p>새 글이 올라오면 인스타그램에서 가장 먼저 알려 드려요.</p><a class="b" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'sidebar'}})">instagram</a></div>
    {dm_box('index')}
   </aside>
  </div>
@@ -233,7 +233,7 @@ def build_post(p, posts):
     out.append(f' <div class="prose">\n{p["html"]}\n </div>\n')
     if p["tags"]:
         out.append(' <div class="tags2">' + "".join(f"<span>#{esc(t)}</span>" for t in p["tags"]) + "</div>\n")
-    out.append(f""" <div class="end"><img src="/images/character.jpg" alt=""><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>인스타그램 DM으로 [설계도]라고 보내면 세특 작성법과 내신 공부법을 무료로 상담해 드려요.</p><div class="acts"><a class="d" href="{DM}" target="_blank" rel="noopener" onclick="hfTrack('blog_dm',{{place:'post_end'}})">DM으로 [설계도] 보내기</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">인스타 팔로우</a></div></div></div>
+    out.append(f""" <div class="end"><img src="/images/character.jpg" alt=""><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>인스타그램 DM으로 [설계도]라고 보내면 세특 작성법과 내신 공부법을 무료로 상담해 드려요.</p><div class="acts"><a class="d" href="{DM}" target="_blank" rel="noopener" onclick="hfTrack('blog_dm',{{place:'post_end'}})">DM으로 [설계도] 보내기</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">instagram</a></div></div></div>
 """)
     if newer or older:
         out.append(' <div class="pn">')
