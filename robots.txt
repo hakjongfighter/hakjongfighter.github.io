@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /stats/
+Disallow: /blog/admin/
 
 Sitemap: https://hakjongfighter.com/sitemap.xml

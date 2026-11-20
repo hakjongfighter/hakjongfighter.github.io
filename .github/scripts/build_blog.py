@@ -24,6 +24,8 @@ POSTS = os.path.join(BLOG, "posts")
 SITE = "https://hakjongfighter.com"
 IG = "https://www.instagram.com/hakjong_fighter/"
 DM = "https://ig.me/m/hakjong_fighter"
+# 공감·댓글 서버 주소 (Cloudflare Worker). 비워 두면 공감·댓글 칸이 보이지 않아요.
+BLOG_API = os.environ.get("BLOG_API", "").strip()
 
 # 카테고리 순서 (글의 category 값은 이 중 하나로 쓰세요)
 LANDING_LASTMOD = "2026-11-20"  # 랜딩페이지(index.html)를 고치면 날짜를 바꿔 주세요
@@ -233,6 +235,8 @@ def build_post(p, posts):
     out.append(f' <div class="prose">\n{p["html"]}\n </div>\n')
     if p["tags"]:
         out.append(' <div class="tags2">' + "".join(f"<span>#{esc(t)}</span>" for t in p["tags"]) + "</div>\n")
+    if BLOG_API:
+        out.append(social_box(p))
     out.append(f""" <div class="end"><img src="/images/character.jpg" alt=""><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>인스타그램 DM으로 [설계도]라고 보내면 세특 작성법과 내신 공부법을 무료로 상담해 드려요.</p><div class="acts"><a class="d" href="{DM}" target="_blank" rel="noopener" onclick="hfTrack('blog_dm',{{place:'post_end'}})">DM으로 [설계도] 보내기</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">instagram</a></div></div></div>
 """)
     if newer or older:
@@ -262,6 +266,73 @@ def build_sitemap(posts):
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{body}</urlset>\n'
 
 
+def social_box(p):
+    return f"""<section id="social" data-api="{esc(BLOG_API)}" data-post="{p['slug']}" hidden>
+ <div class="react"><p>이 글이 도움이 됐나요?<small>로그인 없이 한 번 누를 수 있어요.</small></p><button type="button" class="like" aria-pressed="false">❤️ 공감 <b>0</b></button></div>
+ <div class="cmts">
+  <h3>댓글<span class="ccount">0</span></h3>
+  <div class="guide">💬 궁금한 점이나 생각을 남겨 주세요. 댓글은 <b>확인 후 공개</b>돼요.<br>🔒 이름, 학교, 연락처 같은 <b>개인정보는 적지 말아 주세요.</b></div>
+  <form class="cform" autocomplete="off">
+   <input class="nick" name="nick" maxlength="20" placeholder="닉네임" required aria-label="닉네임">
+   <textarea name="body" maxlength="500" placeholder="댓글을 남겨 주세요" required aria-label="댓글 내용"></textarea>
+   <input class="hp" name="website" tabindex="-1" aria-hidden="true">
+   <div class="bot"><span class="len">0 / 500자</span><button type="submit">댓글 남기기</button></div>
+   <p class="cmsg" role="status"></p>
+  </form>
+  <div class="clist"></div>
+ </div>
+</section>
+<script src="/blog/assets/blog-social.js" defer></script>
+"""
+
+
+ADMIN = """<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>댓글 관리 | 학종파이터 블로그</title>
+<link rel="stylesheet" href="/blog/assets/blog.css">
+<style>
+body{{padding:32px 0 80px}} .wrap{{max-width:820px}}
+h1{{font-size:26px;margin:0 0 6px}} .sub{{color:var(--sub);font-size:14px;margin-bottom:20px}}
+.bar{{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}} .bar input{{flex:1;min-width:220px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit}}
+.bar button,.tabs button,.ad-act button{{border:1px solid var(--ink);background:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}}
+.tabs{{display:flex;gap:6px;margin-bottom:14px}} .tabs button[aria-pressed=true]{{background:var(--ink);color:#fff}}
+.ad-item{{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}}
+.ad-meta{{font-size:13px;color:var(--faint)}} .ad-meta a{{color:var(--accent)}} .ad-txt{{margin:8px 0 12px;white-space:pre-wrap;word-break:break-word;font-size:15px}}
+.ad-act{{display:flex;gap:6px;flex-wrap:wrap}} .ad-act .ok{{background:var(--ink);color:#fff}} .ad-act .no{{color:#A0522D;border-color:#A0522D}}
+.ad-reply{{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;min-height:60px}}
+.ad-status{{font-size:14px;color:var(--sub);margin:10px 0}}
+</style></head><body><div class="wrap">
+<h1>댓글 관리</h1><p class="sub">승인한 댓글만 블로그에 보여요. 이 페이지 주소와 관리자 토큰은 다른 사람에게 알려 주지 마세요.</p>
+<div class="bar"><input id="tok" type="password" placeholder="관리자 토큰"><button id="go">불러오기</button></div>
+<div class="tabs"><button data-s="pending" aria-pressed="true">승인 대기</button><button data-s="approved" aria-pressed="false">공개 중</button><button data-s="rejected" aria-pressed="false">거절됨</button></div>
+<p class="ad-status" id="st"></p><div id="list"></div>
+</div>
+<script>
+(function(){{
+var API={api!r}.replace(/[/]$/,''),S='pending',tok=document.getElementById('tok'),list=document.getElementById('list'),st=document.getElementById('st');
+try{{tok.value=sessionStorage.getItem('hf_admin')||''}}catch(e){{}}
+function esc(s){{return String(s==null?'':s).replace(/[&<>"']/g,function(c){{return{{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[c]}})}}
+function call(path,opt){{opt=opt||{{}};opt.headers=Object.assign({{'Content-Type':'application/json','Authorization':'Bearer '+tok.value}},opt.headers||{{}});
+ return fetch(API+path,opt).then(function(r){{if(r.status===401)throw new Error('토큰이 맞지 않아요.');return r.json()}})}}
+function load(){{try{{sessionStorage.setItem('hf_admin',tok.value)}}catch(e){{}}
+ st.textContent='불러오는 중…';
+ call('/api/admin/comments?status='+S).then(function(d){{var cs=d.comments||[];st.textContent=cs.length+'개';
+  list.innerHTML=cs.map(function(c){{var t=new Date(c.created_at*1000).toLocaleString('ko-KR');
+   return '<div class="ad-item" data-id="'+c.id+'"><div class="ad-meta"><b>'+esc(c.nick)+'</b> · '+t+' · <a href="/blog/'+esc(c.post)+'/" target="_blank">'+esc(c.post)+'</a></div><div class="ad-txt">'+esc(c.body)+'</div>'+
+   '<div class="ad-act">'+(S!=='approved'?'<button class="ok" data-a="approve">승인</button>':'')+(S!=='rejected'?'<button class="no" data-a="reject">거절</button>':'')+'<button data-a="delete">삭제</button></div>'+
+   '<textarea class="ad-reply" placeholder="운영자 답글 (비우고 저장하면 답글 삭제)">'+esc(c.reply||'')+'</textarea><div class="ad-act" style="margin-top:6px"><button data-a="reply">답글 저장</button></div></div>'}}).join('')||'<p class="ad-status">비어 있어요.</p>'}}).catch(function(e){{st.textContent=e.message||'불러오지 못했어요.'}})}}
+document.getElementById('go').onclick=load;
+document.querySelectorAll('.tabs button').forEach(function(b){{b.onclick=function(){{S=b.dataset.s;document.querySelectorAll('.tabs button').forEach(function(x){{x.setAttribute('aria-pressed',x===b?'true':'false')}});load()}}}});
+list.addEventListener('click',function(e){{var b=e.target.closest('button[data-a]');if(!b)return;var it=b.closest('.ad-item'),a=b.dataset.a;
+ if(a==='delete'&&!confirm('이 댓글을 완전히 삭제할까요?'))return;
+ var body={{action:a}};if(a==='reply')body.reply=it.querySelector('.ad-reply').value;
+ call('/api/admin/comments/'+it.dataset.id,{{method:'POST',body:JSON.stringify(body)}}).then(function(){{if(a==='reply'){{st.textContent='답글을 저장했어요.'}}else load()}}).catch(function(e){{st.textContent=e.message}})}});
+if(tok.value)load();
+}})();
+</script></body></html>
+"""
+
+
 def main():
     posts = []
     for f in sorted(os.listdir(POSTS)):
@@ -279,6 +350,9 @@ def main():
         os.makedirs(d, exist_ok=True)
         open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(build_post(p, posts))
     open(os.path.join(BLOG, "index.html"), "w", encoding="utf-8").write(build_index(posts))
+    if BLOG_API:
+        os.makedirs(os.path.join(BLOG, "admin"), exist_ok=True)
+        open(os.path.join(BLOG, "admin", "index.html"), "w", encoding="utf-8").write(ADMIN.format(api=BLOG_API))
     open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(build_sitemap(posts))
     print(f"블로그 글 {len(posts)}개를 만들었어요.")
 

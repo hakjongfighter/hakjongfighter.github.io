@@ -1,0 +1,14 @@
+name = "hakjongfighter-blog-api"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://hakjongfighter.com,https://www.hakjongfighter.com"
+
+# Cloudflare에서 D1 데이터베이스를 만든 뒤 나오는 database_id를 아래에 넣어 주세요.
+[[d1_databases]]
+binding = "DB"
+database_name = "hakjongfighter-blog"
+database_id = "여기에-D1-database_id-붙여넣기"
+
+# 비밀값 ADMIN_TOKEN, SALT 는 이 파일에 쓰지 말고 Cloudflare 화면(Settings → Variables and Secrets)에서 넣어요.
