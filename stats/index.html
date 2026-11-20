@@ -106,6 +106,19 @@ dd{margin:0;color:var(--muted)}
 footer{font-size:12px;color:var(--muted);text-align:center;padding-bottom:max(24px,env(safe-area-inset-bottom))}
 a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
 @media (min-width:600px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi.main{grid-column:1/-1}}
+
+#consultCard .cs-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(28,42,94,.1);font-size:15px}
+#consultCard .cs-row:first-child{border-top:0}
+#consultCard .cs-row b{font-weight:700}
+#consultCard .cs-row span{color:#5b6a99;font-size:13.5px;white-space:nowrap}
+#consultCard .cs-st{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;margin-left:8px;background:#FFC72C;color:#1C2A5E}
+#consultCard .cs-st.contacted{background:#B8F0E7}
+#consultCard .cs-st.done{background:#e6e9f2;color:#5b6a99}
+#consultCard .cs-tok{display:flex;gap:8px;margin-top:10px}
+#consultCard .cs-tok[hidden]{display:none}
+#consultCard .cs-tok input{flex:1;min-width:0;border:1px solid rgba(28,42,94,.2);border-radius:10px;padding:10px 12px;font:inherit}
+#consultCard .cs-tok button{border:0;border-radius:10px;background:#1C2A5E;color:#fff;font:inherit;font-weight:700;padding:10px 16px;cursor:pointer}
+#consultCard .cs-link{display:inline-block;margin-top:14px;font-weight:700;color:#1C2A5E;border-bottom:2px solid #FFC72C;text-decoration:none}
 </style>
 </head>
 <body>
@@ -149,15 +162,21 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       <div id="insights"></div>
     </section>
 
+    <section class="card" id="consultCard">
+      <h2>상담 신청</h2>
+      <p class="d">상담 신청 폼으로 들어온 신청이에요. 날짜와 이름만 보여요. 연락처 등 자세한 내용은 관리 페이지에서 확인하세요.</p>
+      <div id="consultList"><div class="empty">불러오는 중이에요…</div></div>
+      <div class="cs-tok" id="consultTok" hidden>
+        <input id="consultTokIn" type="password" placeholder="관리자 토큰 (ADMIN_TOKEN)" autocomplete="off">
+        <button type="button" id="consultTokBtn">불러오기</button>
+      </div>
+      <a class="cs-link" href="../blog/admin/consult/" target="_blank" rel="noopener">상담 신청 관리 페이지 열기 →</a>
+    </section>
+
     <section class="card">
       <h2>상담까지 이어진 흐름</h2>
-      <p class="d">랜딩페이지에서 상담 버튼은 맨 아래 ‘3단계 로드맵 요약’에 있어요. 그래서 끝까지 내려온 사람만 상담 안내를 볼 수 있어요. 사람 수 기준이고, 오른쪽 %는 방문자 대비예요.</p>
+      <p class="d">상담 신청 버튼은 홈페이지 맨 아래 ‘3단계 로드맵 요약’과 블로그 글 하단·사이드바에 있어요. 버튼을 누르면 상담 신청 페이지로 가고, 신청서를 내면 ‘상담 신청 완료’로 세요. 사람 수 기준이고, 오른쪽 %는 방문자 대비예요.</p>
       <div id="funnel"></div>
-      <div class="manual">
-        <label for="dmGot">인스타에서 받은 ‘설계도’ DM</label>
-        <input id="dmGot" type="number" inputmode="numeric" min="0" placeholder="0">
-        <span>최근 28일 동안 받은 DM 수를 직접 넣으면 마지막 단계로 계산돼요. 이 기기에만 저장돼요.</span>
-      </div>
     </section>
 
     <section class="card">
@@ -173,21 +192,20 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 
     <section class="card">
       <h2>인스타그램으로 넘어간 경로</h2>
-      <p class="d">누른 횟수 기준이에요. 안내 창을 거친 경우는 ‘설계도’가 복사된 채로 넘어가요.</p>
+      <p class="d">인스타그램 링크를 누른 횟수 기준이에요.</p>
       <div id="igpaths"></div>
-      <p class="foot">실제로 DM을 보냈는지는 인스타그램 메시지함에서 ‘설계도’로 검색해 확인하세요.</p>
     </section>
 
     <section class="card">
       <h2>날짜별 방문자</h2>
-      <p class="d">막대를 누르면 그날 방문자와 상담 안내 창 숫자가 보여요. 인스타 게시물을 올린 날과 비교해 보세요.</p>
+      <p class="d">막대를 누르면 그날 방문자와 상담 신청 버튼을 누른 숫자가 보여요. 인스타 게시물을 올린 날과 비교해 보세요.</p>
       <div class="chart" id="daily"></div>
       <div class="legend" id="dailyLegend"></div>
     </section>
 
     <section class="card">
       <h2>어디서 들어왔나</h2>
-      <p class="d">방문 수 기준 상위 경로예요. 오른쪽에 그 경로로 온 방문에서 상담 안내 창이 열린 횟수도 함께 보여요.</p>
+      <p class="d">방문 수 기준 상위 경로예요. 오른쪽에 그 경로로 온 방문에서 상담 신청 버튼을 누른 횟수도 함께 보여요.</p>
       <div id="channels"></div>
     </section>
 
@@ -206,8 +224,8 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       <dl>
         <dt>방문자</dt><dd>기간 안에 사이트를 한 번 이상 연 사람 수예요. 같은 사람이 여러 번 와도 한 명이에요.</dd>
         <dt>상담 영역까지 내려옴</dt><dd>페이지의 90% 넘게 스크롤한 사람이에요(GA4 자동 ‘스크롤’ 기록). 이 지점부터 상담 안내와 버튼이 보여요.</dd>
-        <dt>상담 안내 창 열기</dt><dd>‘DM으로 [설계도] 보내기’ 버튼을 누른 사람이에요. 상담 의향을 가장 잘 보여 주는 숫자예요. 버튼을 누르면 ‘설계도’가 자동으로 복사돼요.</dd>
-        <dt>인스타그램으로 넘어감</dt><dd>안내 창에서 ‘인스타그램 열기’나 ‘메시지 창 바로 열기’를 누른 사람이에요. 두 버튼을 모두 누른 사람은 두 번 세져서 실제보다 조금 많을 수 있어요.</dd>
+        <dt>상담 신청 버튼 누름</dt><dd>홈페이지나 블로그에서 ‘전문 상담 신청’ 버튼을 눌러 신청 페이지로 간 사람이에요. 예전 ‘DM으로 [설계도] 보내기’ 버튼 기록도 함께 세요.</dd>
+        <dt>상담 신청 완료</dt><dd>신청서를 끝까지 내서 접수된 사람이에요. 실제 신청 목록은 위 ‘상담 신청’ 카드와 관리 페이지에서 볼 수 있어요.</dd>
         <dt>처음 온 방문자</dt><dd>GA4는 같은 사람이 인스타 앱 안과 크롬처럼 다른 브라우저로 들어오면 ‘처음 방문’을 두 번 세요. 그래서 원래 숫자가 방문자보다 클 수 있어, 이 페이지에서는 방문자 수를 넘지 않게 맞춰 보여 줘요.</dd>
         <dt>지난 기간 대비</dt><dd>바로 앞 28일과 비교한 변화예요. 지난 기간 숫자가 0이면 ‘새로 생김’으로 보여요.</dd>
         <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
@@ -278,7 +296,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var NS = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', '최근 28일 날짜별 방문자 수 막대 그래프, 상담 안내 창이 열린 날은 노란 점으로 표시');
+    svg.setAttribute('aria-label', '최근 28일 날짜별 방문자 수 막대 그래프, 상담 신청 버튼이 눌린 날은 노란 점으로 표시');
     var y = function (v) { return H - mb - (v / top) * (H - mb - mt); };
     [0, top / 2, top].forEach(function (v) {
       var ln = document.createElementNS(NS, 'line');
@@ -311,7 +329,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       hit.setAttribute('x', ml + i * bw); hit.setAttribute('width', bw); hit.setAttribute('y', 0); hit.setAttribute('height', H - mb); hit.setAttribute('fill', 'transparent');
       var show = function () {
         tip.hidden = false;
-        tip.textContent = lab(r.date) + (isToday ? ' (오늘)' : '') + ' · 방문 ' + nf.format(r.activeUsers) + '명' + (dmByDay ? ' · 상담 창 ' + nf.format(dm) + '번' : '');
+        tip.textContent = lab(r.date) + (isToday ? ' (오늘)' : '') + ' · 방문 ' + nf.format(r.activeUsers) + '명' + (dmByDay ? ' · 상담 버튼 ' + nf.format(dm) + '번' : '');
         var bx = box.getBoundingClientRect().width / W;
         var left = (ml + i * bw + bw / 2) * bx - tip.offsetWidth / 2;
         tip.style.left = Math.max(0, Math.min(box.clientWidth - tip.offsetWidth, left)) + 'px';
@@ -330,11 +348,13 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var item = function (color, text, round) { var s = el('span'); var i = el('i'); i.style.background = color; if (round) { i.style.borderRadius = '999px'; i.style.border = '1.5px solid #1C2A5E'; } s.append(i, text); lg.appendChild(s); };
     item('#1C2A5E', '방문자');
     item('#8C99C7', '오늘 (집계 중)');
-    if (dmByDay) item('#FFC72C', anyDm ? '상담 안내 창이 열린 날' : '상담 안내 창이 열린 날 (아직 없음)', true);
+    if (dmByDay) item('#FFC72C', anyDm ? '상담 신청 버튼이 눌린 날' : '상담 신청 버튼이 눌린 날 (아직 없음)', true);
   }
 
   var NAMES = {
-    dm_sheet_open: 'DM으로 [설계도] 보내기', dm_copy: '‘설계도’ 복사 (자동 포함)', dm_instagram_open: '안내 창 → 인스타그램 열기',
+    consult_click: '홈페이지 → 전문 상담 신청하기', blog_consult_click: '블로그 → 전문 상담 신청', consult_submit: '상담 신청 완료',
+    blog_like: '블로그 공감', blog_comment: '블로그 댓글 남기기', blog_follow: '블로그 → instagram',
+    dm_sheet_open: '(예전) DM으로 [설계도] 보내기', dm_copy: '‘설계도’ 복사 (자동 포함)', dm_instagram_open: '안내 창 → 인스타그램 열기',
     dm_direct_open: '안내 창 → 메시지 창 바로 열기', instagram_click: '그 밖의 인스타그램 링크', timeline_click: '학년 타임라인',
     selfcheck_toggle: '자가 진단 체크', audience_switch: '학생 / 학부모 전환', scroll: '페이지 끝까지 스크롤'
   };
@@ -361,12 +381,10 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
   function funnel(f) {
     lastFunnel = f;
     if (!f.users) { empty('funnel'); return; }
-    var got = null; try { var s = localStorage.getItem(MANUAL_KEY); if (s !== null && s !== '') got = +s; } catch (e) {}
     var steps = [{ label: '방문자', v: f.users, why: '사이트를 연 사람' }];
-    if (f.hasScroll) steps.push({ label: '상담 영역까지 내려옴', v: f.reach, why: '맨 아래 ‘3단계 로드맵 요약’과 상담 버튼이 보이는 곳' });
-    steps.push({ label: '상담 안내 창 열기', v: f.open, why: '‘DM으로 [설계도] 보내기’를 누름 · ‘설계도’ 자동 복사' });
-    steps.push({ label: '인스타그램으로 넘어감', v: f.ig, why: '안내 창에서 인스타그램이나 메시지 창을 엶' });
-    if (got != null && !isNaN(got)) steps.push({ label: '실제로 받은 DM', sub: '직접 입력', v: got, why: '인스타 메시지함에서 센 숫자' });
+    if (f.hasScroll) steps.push({ label: '상담 영역까지 내려옴', v: f.reach, why: '홈페이지 맨 아래 ‘3단계 로드맵 요약’과 상담 버튼이 보이는 곳' });
+    steps.push({ label: '상담 신청 버튼 누름', v: f.open, why: '홈페이지·블로그의 ‘전문 상담 신청’ 버튼 (예전 DM 버튼 포함)' });
+    steps.push({ label: '상담 신청 완료', v: f.done, why: '신청서를 끝까지 내서 접수됨' });
     bars('funnel', steps.map(function (s, i) {
       var prev = i ? steps[i - 1].v : 0;
       var drop = i && prev > s.v ? '↓ ' + nf.format(prev - s.v) + f.unit + (f.unit === '명' ? '이' : '') + ' 여기서 멈춤 (앞 단계의 ' + pct(1 - ratio(s.v, prev)) + ')' : '';
@@ -399,13 +417,15 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var eu = function (k) { return Math.round(+EU[k] || 0); };
     var users = Math.round(+cur.activeUsers || 0);
     var cap = function (v) { return Math.min(v, users); };
-    var dmCount = Math.round(+ev.dm_sheet_open || 0);
+    var OPEN = ['consult_click', 'blog_consult_click', 'dm_sheet_open'];
+    var sumOf = function (obj, keys) { return keys.reduce(function (a, k) { return a + Math.round(+(obj || {})[k] || 0); }, 0); };
+    var dmCount = sumOf(ev, OPEN);
     var f = {
       users: users,
       hasScroll: ('scroll' in EU) || ('scroll' in ev),
       reach: cap(eu('scroll')),
-      open: cap(eu('dm_sheet_open')),
-      ig: cap(eu('dm_instagram_open') + eu('dm_direct_open')),
+      open: cap(sumOf(EU, OPEN)),
+      done: cap(eu('consult_submit')),
       unit: hasUsers ? '명' : '번'
     };
 
@@ -414,14 +434,14 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var base = d.updated_at ? new Date(d.updated_at.slice(0, 10) + 'T00:00:00Z') : null;
     var byDay = {}; (d.daily || []).forEach(function (r) { byDay[r.date] = +r.activeUsers || 0; });
     var dmByDay = null;
-    if (d.daily_events) { dmByDay = {}; Object.keys(d.daily_events).forEach(function (k) { dmByDay[k] = +d.daily_events[k].dm_sheet_open || 0; }); }
+    if (d.daily_events) { dmByDay = {}; Object.keys(d.daily_events).forEach(function (k) { dmByDay[k] = sumOf(d.daily_events[k], OPEN); }); }
     var dbox = $('days'); dbox.replaceChildren();
     if (base && !isNaN(base)) {
       var yest = new Date(base.getTime() - 86400000);
       [{ k: '오늘', dt: base, cls: 'day today', s: '지금까지 (몇 시간 늦게 반영)' }, { k: '어제', dt: yest, cls: 'day', s: '하루 전체' }].forEach(function (x) {
         var c = el('div', x.cls);
         var k = el('span', 'k', x.k); k.appendChild(el('small', null, (x.dt.getUTCMonth() + 1) + '/' + x.dt.getUTCDate()));
-        var s = x.s; if (dmByDay) s = '상담 창 ' + nf.format(dmByDay[ymd(x.dt)] || 0) + '번 · ' + s;
+        var s = x.s; if (dmByDay) s = '상담 버튼 ' + nf.format(dmByDay[ymd(x.dt)] || 0) + '번 · ' + s;
         c.append(k, el('span', 'v', nf.format(byDay[ymd(x.dt)] || 0) + '명'), el('span', 's', s));
         dbox.appendChild(c);
       });
@@ -429,11 +449,11 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 
     var lead = $('lead'); lead.replaceChildren();
     if (!users) lead.textContent = '최근 28일 동안 집계된 방문이 아직 없어요.';
-    else lead.append('최근 28일 동안 ', el('b', null, nf.format(users) + '명'), '이 방문했고, 그중 ', el('b', null, nf.format(f.open) + (hasUsers ? '명' : '번')), (hasUsers ? '이' : ''), ' 상담 안내 창을 열었어요.');
+    else lead.append('최근 28일 동안 ', el('b', null, nf.format(users) + '명'), '이 방문했고, 그중 ', el('b', null, nf.format(f.open) + (hasUsers ? '명' : '번')), (hasUsers ? '이' : ''), ' 상담 신청 버튼을 눌렀어요. 신청 완료는 ', el('b', null, nf.format(f.done) + (hasUsers ? '명' : '번')), '이에요.');
 
-    var openPrev = Math.round(+EUP.dm_sheet_open || 0);
+    var openPrev = sumOf(EUP, OPEN);
     var kp = [
-      { k: '상담 안내 창을 연 ' + (hasUsers ? '사람' : '횟수'), v: nf.format(f.open) + (hasUsers ? '명' : '번'), sub: users ? '방문자의 ' + pct(ratio(f.open, users)) + (hasUsers ? ' · 총 ' + nf.format(dmCount) + '번 열림' : '') : '', c: change(f.open, openPrev), main: true },
+      { k: '상담 신청 버튼을 누른 ' + (hasUsers ? '사람' : '횟수'), v: nf.format(f.open) + (hasUsers ? '명' : '번'), sub: users ? '방문자의 ' + pct(ratio(f.open, users)) + ' · 신청 완료 ' + nf.format(f.done) + (hasUsers ? '명' : '번') : '', c: change(f.open, openPrev), main: true },
       { k: '방문자', v: nf.format(users) + '명', c: change(users, prev.activeUsers) },
       { k: '처음 온 방문자', v: nf.format(Math.min(+cur.newUsers || 0, users)) + '명', c: change(Math.min(+cur.newUsers || 0, users), Math.min(+prev.newUsers || 0, +prev.activeUsers || 0)) },
       { k: '평균 머문 시간', v: dur(cur.averageSessionDuration), c: change(cur.averageSessionDuration, prev.averageSessionDuration) },
@@ -458,9 +478,9 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         { label: '학년 타임라인 눌러 봄', k: 'timeline_click' },
         { label: '자가 진단 체크', k: 'selfcheck_toggle' },
         { label: '상담 영역까지 내려옴', k: 'scroll', skip: !f.hasScroll },
-        { label: '상담 안내 창 열기', k: 'dm_sheet_open' }
+        { label: '상담 신청 버튼 누름', keys: OPEN }
       ].filter(function (s) { return !s.skip; });
-      bars('sections', secs.map(function (s) { var v = cap(eu(s.k)); return { label: s.label, v: v, extra: pct(ratio(v, users)) }; }),
+      bars('sections', secs.map(function (s) { var v = cap(s.keys ? sumOf(EU, s.keys) : eu(s.k)); return { label: s.label, v: v, extra: pct(ratio(v, users)) }; }),
         { unit: hasUsers ? '명' : '번', max: users, cls: function () { return 'alt'; } });
     }
 
@@ -482,22 +502,19 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     $('paramsCard').hidden = !pbox.children.length;
 
     // 인스타그램으로 넘어간 경로
-    var ig = [
-      { label: '안내 창 → 인스타그램 열기', v: Math.round(+ev.dm_instagram_open || 0) },
-      { label: '안내 창 → 메시지 창 바로 열기', v: Math.round(+ev.dm_direct_open || 0) }
-    ];
+    var ig = [];
     var locRows = pick(P.cta_location, 'instagram_click', 'cta_location', LOC);
     if (locRows.length) ig = ig.concat(locRows);
     else ig.push({ label: '그 밖의 인스타그램 링크', sub: '상단 아이콘·첫 화면·둘러보기·맨 아래', v: Math.round(+ev.instagram_click || 0) });
-    ig = ig.filter(function (r, i) { return i < 2 || r.v; });
+    ig = ig.filter(function (r) { return r.v; });
     if (!ig.some(function (r) { return r.v; })) empty('igpaths', '아직 인스타그램으로 넘어간 기록이 없어요.');
-    else bars('igpaths', ig, { unit: '번', share: true, cls: function (i) { return i < 2 ? 'y' : 'alt'; } });
+    else bars('igpaths', ig, { unit: '번', share: true, cls: function (i) { return i ? 'alt' : 'y'; } });
 
     daily((d.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; }), dmByDay);
 
     // 유입 경로 + 경로별 상담 안내 창
     var chDm = null;
-    if (d.channel_events) { chDm = {}; d.channel_events.forEach(function (r) { if (r.eventName === 'dm_sheet_open') chDm[r.sessionSourceMedium] = (chDm[r.sessionSourceMedium] || 0) + (+r.eventCount || 0); }); }
+    if (d.channel_events) { chDm = {}; d.channel_events.forEach(function (r) { if (OPEN.indexOf(r.eventName) >= 0) chDm[r.sessionSourceMedium] = (chDm[r.sessionSourceMedium] || 0) + (+r.eventCount || 0); }); }
     var chRows = (d.channels || []).map(function (r) { return { raw: r.sessionSourceMedium, v: +r.sessions || 0 }; }).filter(function (r) { return r.v; });
     var chTotal = chRows.reduce(function (a, r) { return a + r.v; }, 0) || 1;
     bars('channels', chRows.map(function (r) {
@@ -519,7 +536,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     if (!f.users) return empty('insights', '방문이 생기면 여기에 살펴볼 점이 나타나요.');
     var list = [];
     var add = function (tone, tag, head, act) { list.push({ tone: tone, tag: tag, head: head, act: act }); };
-    var reachR = ratio(f.reach, f.users), openR = ratio(f.open, f.reach || f.users), igR = ratio(f.ig, f.open);
+    var reachR = ratio(f.reach, f.users), openR = ratio(f.open, f.reach || f.users), doneR = ratio(f.done, f.open);
 
     if (f.hasScroll && reachR < 0.5) {
       add('warn', '점검', '방문자 ' + nf.format(f.users) + '명 중 ' + pct(reachR) + '만 상담 영역까지 내려왔어요. 나머지 ' + pct(1 - reachR) + '는 상담 안내를 보지 못하고 나갔어요.',
@@ -528,17 +545,17 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       add('info', '참고', '스크롤 기록이 없어 상담 영역까지 내려온 사람 수를 알 수 없어요.', 'GA4 관리 → 데이터 스트림 → 향상된 측정에서 ‘스크롤’이 켜져 있는지 확인해 주세요.');
     }
     if (f.reach >= 5 && ratio(f.open, f.reach) < 0.1) {
-      add('warn', '점검', '상담 영역까지 온 ' + nf.format(f.reach) + '명 중 ' + pct(ratio(f.open, f.reach)) + '만 안내 창을 열었어요.',
-        '버튼까지는 봤지만 누르지 않았어요. 상담에서 무엇을 받는지, 비용이 드는지를 한 줄로 더 분명하게 써 볼 만해요.');
+      add('warn', '점검', '상담 영역까지 온 ' + nf.format(f.reach) + '명 중 ' + pct(ratio(f.open, f.reach)) + '만 상담 신청 버튼을 눌렀어요.',
+        '버튼까지는 봤지만 누르지 않았어요. 상담에서 무엇을 받는지 한 줄로 더 분명하게 써 볼 만해요.');
     }
-    if (f.open >= 3 && igR < 0.6) {
-      add('warn', '점검', '안내 창을 연 ' + nf.format(f.open) + '명 중 ' + pct(igR) + '만 인스타그램으로 넘어갔어요.',
-        '안내 창에서 멈추는 사람이 많아요. 창 문구를 줄이거나 ‘인스타그램 열기’ 버튼을 더 눈에 띄게 해 볼 만해요.');
+    if (f.open >= 3 && doneR < 0.3) {
+      add('warn', '점검', '신청 페이지에 온 ' + nf.format(f.open) + '명 중 ' + pct(doneR) + '만 신청서를 냈어요.',
+        '신청서에서 멈추는 사람이 많아요. 필수 칸을 줄이거나 신청서 위 안내를 더 짧게 해 볼 만해요.');
     } else if (f.open >= 3) {
-      add('good', '좋아요', '안내 창을 연 사람 중 ' + pct(igR) + '가 인스타그램까지 넘어갔어요.', '안내 창은 잘 작동하고 있어요. 더 많은 사람이 안내 창을 열게 하는 쪽에 힘을 쓰면 돼요.');
+      add('good', '좋아요', '신청 페이지에 온 사람 중 ' + pct(doneR) + '가 신청서를 냈어요.', '신청서는 잘 작동하고 있어요. 더 많은 사람이 버튼을 누르게 하는 쪽에 힘을 쓰면 돼요.');
     }
     if (f.open === 0 && f.users >= 10) {
-      add('warn', '점검', '방문자 ' + nf.format(f.users) + '명 중 상담 안내 창을 연 사람이 아직 없어요.', '사이트 보기로 ‘DM으로 [설계도] 보내기’ 버튼이 잘 눌리는지 직접 확인해 보세요.');
+      add('warn', '점검', '방문자 ' + nf.format(f.users) + '명 중 상담 신청 버튼을 누른 사람이 아직 없어요.', '사이트 보기로 ‘전문 상담 신청하기’ 버튼이 잘 눌리는지 직접 확인해 보세요.');
     }
     if (!x.hasUsers) {
       add('info', '참고', '지금은 누른 횟수 기준이라 비율이 실제보다 크게 보일 수 있어요.', '다음 갱신(1시간 안)부터 사람 수 기준으로 바뀌어요.');
@@ -549,7 +566,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     if (x.chDm) {
       var best = x.chRows.filter(function (r) { return r.v >= 5; }).map(function (r) { return { name: channelName(r.raw), rate: ratio(x.chDm[r.raw] || 0, r.v), dm: x.chDm[r.raw] || 0 }; })
         .filter(function (r) { return r.dm > 0; }).sort(function (a, b) { return b.rate - a.rate; })[0];
-      if (best) add('good', '좋아요', best.name + '에서 온 방문이 상담 안내 창을 가장 많이 열었어요 (방문 100회당 ' + Math.round(best.rate * 100) + '번).', '이 경로에 링크를 더 자주 걸어 보세요.');
+      if (best) add('good', '좋아요', best.name + '에서 온 방문이 상담 신청 버튼을 가장 많이 눌렀어요 (방문 100회당 ' + Math.round(best.rate * 100) + '번).', '이 경로에 링크를 더 자주 걸어 보세요.');
     }
     var devTotal = x.devRows.reduce(function (a, r) { return a + r.v; }, 0);
     var mobile = x.devRows.filter(function (r) { return r.label === '휴대폰'; })[0];
@@ -569,23 +586,12 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     box.replaceChildren(ul);
   }
 
-  // 직접 입력한 DM 수
-  (function () {
-    var inp = $('dmGot');
-    try { var s = localStorage.getItem(MANUAL_KEY); if (s !== null) inp.value = s; } catch (e) {}
-    inp.addEventListener('input', function () {
-      var v = inp.value.trim();
-      try { if (v === '') localStorage.removeItem(MANUAL_KEY); else localStorage.setItem(MANUAL_KEY, String(Math.max(0, Math.round(+v) || 0))); } catch (e) {}
-      if (lastFunnel) funnel(lastFunnel);
-    });
-  })();
-
   var last = null, rt, locked = null;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
     rt = setTimeout(function () {
       if (!last || last.status !== 'ok') return;
-      var dm = null; if (last.daily_events) { dm = {}; Object.keys(last.daily_events).forEach(function (k) { dm[k] = +last.daily_events[k].dm_sheet_open || 0; }); }
+      var dm = null; if (last.daily_events) { dm = {}; Object.keys(last.daily_events).forEach(function (k) { dm[k] = ['consult_click', 'blog_consult_click', 'dm_sheet_open'].reduce(function (a, e) { return a + Math.round(+last.daily_events[k][e] || 0); }, 0); }); }
       daily((last.daily || []).map(function (r) { return { date: r.date, activeUsers: +r.activeUsers || 0 }; }), dm);
     }, 150);
   });
@@ -630,6 +636,50 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       $('lock').hidden = false; $('pw').focus();
     })
     .catch(function () { show({ status: 'error', message: '잠시 뒤 새로고침해 주세요.' }); });
+})();
+</script>
+
+<script>
+(function () {
+  // 상담 신청: 날짜와 이름만 (관리자 토큰 필요)
+  var API = 'https://hakjongfighter-blog-api.avecvalse.workers.dev';
+  var list = document.getElementById('consultList'), tokBox = document.getElementById('consultTok');
+  var tokIn = document.getElementById('consultTokIn'), tokBtn = document.getElementById('consultTokBtn');
+  var LBL = { 'new': '새 신청', contacted: '연락함', done: '완료' };
+  function getTok() { try { return sessionStorage.getItem('hf_admin') || localStorage.getItem('hf_admin_stats') || ''; } catch (e) { return ''; } }
+  function msg(t) { list.innerHTML = ''; var d = document.createElement('div'); d.className = 'empty'; d.textContent = t; list.appendChild(d); }
+  function load(tok) {
+    if (!tok) { msg('관리자 토큰을 넣으면 신청 목록이 보여요.'); tokBox.hidden = false; return; }
+    msg('불러오는 중이에요…');
+    var h = { headers: { Authorization: 'Bearer ' + tok } };
+    Promise.all(['new', 'contacted', 'done'].map(function (st) {
+      return fetch(API + '/api/admin/consults?status=' + st, h).then(function (r) {
+        if (r.status === 401) throw new Error('auth'); return r.json();
+      }).then(function (d) { return (d.consults || []).map(function (c) { c._s = st; return c; }); });
+    })).then(function (all) {
+      try { sessionStorage.setItem('hf_admin', tok); localStorage.setItem('hf_admin_stats', tok); } catch (e) {}
+      tokBox.hidden = true;
+      var cs = [].concat.apply([], all).sort(function (a, b) { return b.created_at - a.created_at; }).slice(0, 30);
+      if (!cs.length) return msg('아직 들어온 상담 신청이 없어요.');
+      list.innerHTML = '';
+      cs.forEach(function (c) {
+        var d = new Date(c.created_at * 1000);
+        var row = document.createElement('div'); row.className = 'cs-row';
+        var left = document.createElement('div');
+        var name = document.createElement('b'); name.textContent = c.name; left.appendChild(name);
+        var st = document.createElement('i'); st.className = 'cs-st ' + c._s; st.style.fontStyle = 'normal'; st.textContent = LBL[c._s]; left.appendChild(st);
+        var when = document.createElement('span');
+        when.textContent = d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        row.appendChild(left); row.appendChild(when); list.appendChild(row);
+      });
+    }).catch(function (e) {
+      if (e.message === 'auth') { try { localStorage.removeItem('hf_admin_stats'); } catch (x) {} msg('토큰이 맞지 않아요. 다시 넣어 주세요.'); tokBox.hidden = false; }
+      else msg('신청 목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.');
+    });
+  }
+  tokBtn.addEventListener('click', function () { load(tokIn.value.trim()); });
+  tokIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') load(tokIn.value.trim()); });
+  load(getTok());
 })();
 </script>
 </body>

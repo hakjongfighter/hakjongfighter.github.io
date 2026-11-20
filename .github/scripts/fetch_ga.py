@@ -109,7 +109,7 @@ def main():
             print("추가 숫자 건너뜀:", str(e)[:120], file=sys.stderr)
             return None
 
-    DM_EVENTS = {"dm_sheet_open", "dm_instagram_open", "dm_direct_open", "instagram_click"}
+    DM_EVENTS = {"dm_sheet_open", "dm_instagram_open", "dm_direct_open", "instagram_click", "consult_click", "blog_consult_click", "consult_submit"}
 
     def daily_events():
         out = {}
