@@ -3,8 +3,7 @@ title: 세특이 뭐길래? 뜻부터 채우는 방법까지 한 번에
 date: 2026-11-20
 category: 수행평가·세특
 summary: 세특은 선생님이 수업 속 내 모습을 과목마다 기록하는 칸이에요. 수행평가, 탐구, 독서 중 어디에 힘을 줘야 하는지 2026년 기재 기준으로 정리했어요.
-thumbnail: /images/cover.jpg
-caption: 생기부, 1년 설계도부터
+thumbnail: /images/blog/seteuk-basics.jpg
 tags: 세특, 학생부, 수행평가, 탐구보고서, 독서
 featured: true
 pick: true

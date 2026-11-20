@@ -3,8 +3,7 @@ title: 수행평가가 끝난 뒤, 세특으로 잇는 3가지 질문
 date: 2026-11-20
 category: 수행평가·세특
 summary: 수행평가는 점수를 받는 순간 끝나는 게 아니에요. 끝나고 남은 질문이 다음 탐구의 씨앗이 되고, 그 연결이 세특의 깊이를 만듭니다.
-thumbnail: /images/step2.jpg
-caption: STEP 2 · 수행평가·독서활동
+thumbnail: /images/blog/seteuk-3-questions.jpg
 tags: 세특, 수행평가, 탐구주제, 고교학점제
 featured: false
 pick: true
