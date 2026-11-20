@@ -84,6 +84,9 @@ header.hdr{background:#fff;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 r
 .hdr-name small{font-size:11.5px;font-weight:500;color:var(--muted)}
 .hdr-ig{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--navy);border-radius:999px;flex:none}
 .hdr-ig:hover{background:#F1F4F9}
+.hdr-right{display:flex;align-items:center;gap:2px;flex:none}
+.hdr-blog{display:flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;font-size:15px;font-weight:700;color:var(--navy);text-decoration:none}
+.hdr-blog:hover{background:#F1F4F9}
 .hdr-tabs{border-top:1px solid #EEF1F5}
 .hdr-tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .hdr-tabs .wrap::-webkit-scrollbar{display:none}
@@ -419,7 +422,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header class="hdr">
   <nav class="wrap hdr-top" aria-label="사이트">
     <a class="logo hdr-logo" href="#top"><img src="images/character.jpg" alt=""><span class="hdr-name"><b>학종파이터</b><small>학생부 1년 설계도</small></span></a>
-    <a class="hdr-ig" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener" aria-label="인스타그램 @hakjong_fighter"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg></a>
+    <div class="hdr-right">
+      <a class="hdr-blog" href="/blog/" onclick="window.hfTrack&&hfTrack('nav_blog_click')">블로그</a>
+      <a class="hdr-ig" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener" aria-label="인스타그램 @hakjong_fighter"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg></a>
+    </div>
   </nav>
 </header>
 
@@ -630,7 +636,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div><dt>주소</dt><dd>서울 강남구 밤고개로1길 10 수서현대벤쳐빌 1324호</dd></div>
       </dl>
     </address>
-    <p class="copy">© 2026 강남에듀플랜 · 학종파이터 <span class="ver">v19</span></p>
+    <p class="copy">© 2026 강남에듀플랜 · 학종파이터 <span class="ver">v20</span></p>
   </div>
 </footer>
 
