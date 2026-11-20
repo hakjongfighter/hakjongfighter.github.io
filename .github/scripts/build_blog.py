@@ -148,13 +148,13 @@ def build_index(posts):
     used = [c for c in CATEGORIES if any(p["category"] == c for p in posts)]
     used += sorted({p["category"] for p in posts} - set(used))
     out = [head("학종파이터 블로그 | 생기부를 하나의 이야기로 잇는 기록",
-                "세특, 과목 선택, 심화탐구까지. 고등학생과 학부모를 위한 학종파이터의 학생부 기록.",
+                "과목 선택부터 수행평가, 심화탐구까지. 고등학생과 학부모를 위한 학종파이터의 학생부 기록.",
                 f"{SITE}/blog/", f"{SITE}/images/og.jpg")]
     out.append("""<div class="wrap">
  <section class="intro">
   <div class="k">HAKJONG FIGHTER JOURNAL</div>
   <h1 class="serif">3년의 생기부를<br><mark>하나의 이야기</mark>로 잇는 기록</h1>
-  <p>세특, 과목 선택, 심화탐구까지. 매주 한 편씩 차근차근 씁니다.</p>
+  <p>과목 선택부터 수행평가, 심화탐구까지. 매주 한 편씩 차근차근 씁니다.</p>
  </section>
 """)
     out.append(' <div class="cats" role="group" aria-label="카테고리"><button type="button" data-cat="" aria-pressed="true">전체</button>' +
