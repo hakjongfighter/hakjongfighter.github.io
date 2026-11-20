@@ -1,2 +1,7 @@
 stats/data.json
 __pycache__/
+# 블로그 페이지는 배포 때 자동 생성 (글 원본은 blog/posts)
+/blog/*
+!/blog/posts/
+!/blog/assets/
+!/blog/README.md

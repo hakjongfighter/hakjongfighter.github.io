@@ -37,6 +37,10 @@ jobs:
         run: |
           if [ -n "$GA_SA_KEY" ]; then pip install -q google-analytics-data==0.20.0 cryptography==44.0.0; fi
           python .github/scripts/fetch_ga.py
+      - name: 블로그 페이지 만들기 (blog/posts → blog/)
+        run: |
+          pip install -q markdown==3.7
+          python .github/scripts/build_blog.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
