@@ -44,7 +44,10 @@ def parse_post(path):
         if not line.strip() or line.strip().startswith("#"):
             continue
         k, _, v = line.partition(":")
-        meta[k.strip()] = v.strip().strip('"').strip("'")
+        v = v.strip()
+        if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+            v = v[1:-1]  # 양 끝이 같은 따옴표로 감싸진 경우만 벗김
+        meta[k.strip()] = v
     for need in ("title", "date", "category"):
         if not meta.get(need):
             raise ValueError(f"{path}: '{need}' 항목이 비어 있어요")
