@@ -5,3 +5,4 @@ __pycache__/
 !/blog/posts/
 !/blog/assets/
 !/blog/README.md
+/.thumb_tmp.html
