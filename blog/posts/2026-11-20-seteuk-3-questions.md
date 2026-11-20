@@ -6,7 +6,7 @@ summary: 수행평가는 점수를 받는 순간 끝나는 게 아니에요. 끝
 thumbnail: /images/step2.jpg
 caption: STEP 2 · 수행평가·독서활동
 tags: 세특, 수행평가, 탐구주제, 고교학점제
-featured: true
+featured: false
 pick: true
 ---
 
