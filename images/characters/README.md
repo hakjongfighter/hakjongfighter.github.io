@@ -13,7 +13,7 @@
 | present-book.png | 책 옆에서 설명하는 손짓 | 개념 설명, 기초 안내 | seteuk-basics |
 | idea.png | 전구를 들고 달림 | 탐구 주제, 아이디어, 질문 | seteuk-3-questions |
 | thinking.png | 턱 괴고 고민 | 고민 상담, Q&A, 헷갈리는 것 | |
-| thinking-smile.png | 턱 괴고 미소 | 선택 가이드, 비교 | report-why-what-how |
+| thinking-smile.png | 턱 괴고 미소 | 선택 가이드, 비교 | |
 | point-you.png | 화면을 가리킴 (망토 펼침) | "너도 할 수 있어", 체크리스트 | |
 | point-left.png | 왼쪽을 가리킴 | 안내, 다음 단계, 공지 | |
 | cheer.png | 주먹 들고 화이팅 | 응원, 시험 기간 | |
