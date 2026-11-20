@@ -21,3 +21,24 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE INDEX IF NOT EXISTS idx_comments_post   ON comments (post, status);
 CREATE INDEX IF NOT EXISTS idx_comments_ip     ON comments (ip_hash, created_at);
 CREATE INDEX IF NOT EXISTS idx_comments_status ON comments (status, id);
+
+-- 상담 신청 (보관 기간이 지나면 자동 삭제)
+CREATE TABLE IF NOT EXISTS consults (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  who        TEXT    NOT NULL,   -- 학생 / 학부모
+  name       TEXT    NOT NULL,
+  grade      TEXT    NOT NULL,
+  track      TEXT,
+  topics     TEXT,
+  question   TEXT,
+  method     TEXT    NOT NULL,   -- 전화 / 문자 / 카카오톡
+  contact    TEXT    NOT NULL,
+  time_pref  TEXT,
+  status     TEXT    NOT NULL DEFAULT 'new',  -- new(새 신청) / contacted(연락함) / done(완료)
+  memo       TEXT,               -- 운영자 메모
+  ip_hash    TEXT    NOT NULL,
+  consent_at INTEGER NOT NULL,   -- 개인정보 동의 시각
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_consults_status ON consults (status, id);
+CREATE INDEX IF NOT EXISTS idx_consults_ip     ON consults (ip_hash, created_at);

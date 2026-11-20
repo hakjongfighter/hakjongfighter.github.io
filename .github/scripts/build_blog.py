@@ -15,6 +15,7 @@ import re
 import sys
 from datetime import date
 
+sys.path.insert(0, os.path.dirname(__file__))
 import markdown
 from markdown.extensions.toc import slugify_unicode
 
@@ -26,6 +27,8 @@ IG = "https://www.instagram.com/hakjong_fighter/"
 DM = "https://ig.me/m/hakjong_fighter"
 # 공감·댓글 서버 주소 (Cloudflare Worker). 비워 두면 공감·댓글 칸이 보이지 않아요.
 BLOG_API = os.environ.get("BLOG_API", "").strip()
+# 상담 신청 페이지 (서버가 있을 때만 생김). 없으면 인스타그램으로 연결
+CONSULT = "/consult/" if BLOG_API else IG
 
 # 카테고리 순서 (글의 category 값은 이 중 하나로 쓰세요)
 LANDING_LASTMOD = "2026-11-20"  # 랜딩페이지(index.html)를 고치면 날짜를 바꿔 주세요
@@ -143,7 +146,7 @@ def fmt_date(d, full=False):
 
 
 def dm_box(place):
-    return f"""<div class="dm"><div class="st">1:1 상담</div>인스타그램 DM으로 <b>[설계도]</b>라고 보내면 세특 작성법과 내신 공부법을 무료로 상담해 드려요.<br><a href="{DM}" target="_blank" rel="noopener" onclick="hfTrack('blog_dm',{{place:'{place}'}})">@hakjong_fighter →</a></div>"""
+    return f"""<div class="dm"><div class="st">1:1 전문 상담</div>학종 전문 선생님이 지금 학생부를 함께 보고, 세특 설계와 내신 공부법을 1:1로 상담해 드려요.<br><a href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'{place}'}})">전문 상담 신청 →</a></div>"""
 
 
 def build_index(posts):
@@ -237,7 +240,7 @@ def build_post(p, posts):
         out.append(' <div class="tags2">' + "".join(f"<span>#{esc(t)}</span>" for t in p["tags"]) + "</div>\n")
     if BLOG_API:
         out.append(social_box(p))
-    out.append(f""" <div class="end"><img src="/images/character.jpg" alt=""><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>인스타그램 DM으로 [설계도]라고 보내면 세특 작성법과 내신 공부법을 무료로 상담해 드려요.</p><div class="acts"><a class="d" href="{DM}" target="_blank" rel="noopener" onclick="hfTrack('blog_dm',{{place:'post_end'}})">DM으로 [설계도] 보내기</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">instagram</a></div></div></div>
+    out.append(f""" <div class="end"><img src="/images/character.jpg" alt=""><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>학종 전문 선생님이 지금 학생부를 함께 보고, 다음 학기에 무엇을 할지 1:1로 정리해 드려요.</p><div class="acts"><a class="d" href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'post_end'}})">전문 상담 신청</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">instagram</a></div></div></div>
 """)
     if newer or older:
         out.append(' <div class="pn">')
@@ -302,7 +305,7 @@ h1{{font-size:26px;margin:0 0 6px}} .sub{{color:var(--sub);font-size:14px;margin
 .ad-reply{{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;min-height:60px}}
 .ad-status{{font-size:14px;color:var(--sub);margin:10px 0}}
 </style></head><body><div class="wrap">
-<h1>댓글 관리</h1><p class="sub">승인한 댓글만 블로그에 보여요. 이 페이지 주소와 관리자 토큰은 다른 사람에게 알려 주지 마세요.</p>
+<div style="display:flex;gap:14px;font-size:14px;margin-bottom:14px"><b>댓글 관리</b><span>·</span><a href="/blog/admin/consult/" style="color:var(--accent);font-weight:700">상담 신청 관리</a></div><h1>댓글 관리</h1><p class="sub">승인한 댓글만 블로그에 보여요. 이 페이지 주소와 관리자 토큰은 다른 사람에게 알려 주지 마세요.</p>
 <div class="bar"><input id="tok" type="password" placeholder="관리자 토큰"><button id="go">불러오기</button></div>
 <div class="tabs"><button data-s="pending" aria-pressed="true">승인 대기</button><button data-s="approved" aria-pressed="false">공개 중</button><button data-s="rejected" aria-pressed="false">거절됨</button></div>
 <p class="ad-status" id="st"></p><div id="list"></div>
@@ -351,6 +354,13 @@ def main():
         open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(build_post(p, posts))
     open(os.path.join(BLOG, "index.html"), "w", encoding="utf-8").write(build_index(posts))
     if BLOG_API:
+        import consult_page as cp
+        cdir = os.path.join(ROOT, "consult")
+        os.makedirs(cdir, exist_ok=True)
+        h = head("전문 상담 신청 | 학종파이터", "학종 전문 선생님이 세특 설계부터 내신 공부법까지 1:1로 상담해 드려요.", f"{SITE}/consult/", f"{SITE}/images/og.jpg")
+        open(os.path.join(cdir, "index.html"), "w", encoding="utf-8").write(cp.consult_page(h, FOOT.format(y=date.today().year), BLOG_API, SITE))
+        os.makedirs(os.path.join(BLOG, "admin", "consult"), exist_ok=True)
+        open(os.path.join(BLOG, "admin", "consult", "index.html"), "w", encoding="utf-8").write(cp.CONSULT_ADMIN.format(api=BLOG_API))
         os.makedirs(os.path.join(BLOG, "admin"), exist_ok=True)
         open(os.path.join(BLOG, "admin", "index.html"), "w", encoding="utf-8").write(ADMIN.format(api=BLOG_API))
     open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(build_sitemap(posts))
