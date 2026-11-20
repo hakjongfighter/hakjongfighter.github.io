@@ -119,7 +119,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP2WRX3L" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header><div class="wrap">
  <a class="brand" href="/blog/"><img src="/images/character.jpg" alt="">학종파이터 <i>블로그</i></a>
- <nav class="hnav"><a class="hide" href="/blog/">전체 글</a><a class="hide" href="/">학종파이터 홈</a><a class="sub" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'header'}})">인스타 팔로우</a></nav>
+ <nav class="hnav"><a class="hide" href="/blog/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>전체 글</a><a class="hide" href="/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>학종파이터 홈</a><a class="sub" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'header'}})"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>인스타 팔로우</a></nav>
 </div></header>
 """
 
