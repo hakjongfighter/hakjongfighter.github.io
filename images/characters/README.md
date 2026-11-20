@@ -5,7 +5,7 @@
 
 | 파일 | 포즈 | 어울리는 글 | 사용한 글 |
 |---|---|---|---|
-| blueprint.png | 빛나는 설계도를 펼쳐 봄 | 학생부 설계, 로드맵, 1년 계획 | snu-eecs-subjects |
+| blueprint.png | 빛나는 설계도를 펼쳐 봄 | 학생부 설계, 로드맵, 1년 계획 | |
 | books-thumbsup.png | 책 더미 + 엄지척 | 독서, 추천 도서 | |
 | books-thumbsup-2.png | 책 더미 + 엄지척 (웃는 얼굴) | 독서, 탐구 자료 | |
 | reading-heart.png | 앉아서 하트 책 읽기 | 독서활동, 인문 계열 | |
@@ -18,7 +18,7 @@
 | point-left.png | 왼쪽을 가리킴 | 안내, 다음 단계, 공지 | |
 | cheer.png | 주먹 들고 화이팅 | 응원, 시험 기간 | |
 | cheer-2.png | 주먹 들고 화이팅 (다른 각도) | 응원, 동기부여 | |
-| boxing.png | 권투 자세 | 내신 대비, 도전 | kaist-2028 |
+| boxing.png | 권투 자세 | 내신 대비, 도전 | |
 | salute.png | 경례 | 시작, 다짐, 새 학기 | |
 | trophy.png | 트로피 들고 점프 | 합격 후기, 성과 | |
 | diploma.png | 졸업장 두루마리 | 졸업 요건, 고교학점제, 합격 | credit-system-192 |
