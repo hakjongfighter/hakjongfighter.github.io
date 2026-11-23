@@ -130,6 +130,24 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 .cmp td.fin small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
 .cmp .chk{color:var(--down);font-weight:700}
 .cmp .ok{color:var(--up)}
+.ld{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 20px;text-align:center;margin-top:8px}
+.ld[hidden]{display:none}
+.ld img{width:128px;height:128px;animation:ldthink 1.2s ease-in-out infinite alternate}
+@keyframes ldthink{to{transform:translateY(-8px)}}
+.ld h2{margin:10px 0 4px;font-size:19px;font-weight:900}
+.ld p{margin:0;font-size:14px;color:var(--muted);line-height:1.6}
+.ldsteps{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;text-align:left}
+.ldsteps li{display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;background:var(--bg);border-radius:12px;padding:11px 12px;color:var(--muted)}
+.ldsteps i{flex:none;width:22px;height:22px;border-radius:999px;border:2.5px solid var(--bar2);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:900;line-height:1}
+.ldsteps .done{color:var(--navy)}
+.ldsteps .done i{background:var(--up);border-color:var(--up);color:#fff}
+.ldsteps .done i::before{content:'✓'}
+.ldsteps .now{color:var(--navy);background:#FFF6D6}
+.ldsteps .now i{border-color:var(--yellow);border-top-color:var(--navy);animation:ldspin .8s linear infinite}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+.ldbar{height:8px;border-radius:6px;background:#E6EBF7;margin-top:14px;overflow:hidden}
+.ldbar b{display:block;height:100%;width:0;background:var(--yellow);border-radius:6px;transition:width .35s ease}
+@media (prefers-reduced-motion:reduce){.ld img,.ldsteps .now i{animation:none}.ldbar b{transition:none}}
 .mini{font:inherit;font-size:12.5px;font-weight:700;color:var(--navy);background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer;margin-left:6px}
 #consultCard .cs-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(28,42,94,.1);font-size:15px}
 #consultCard .cs-row:first-child{border-top:0}
@@ -169,6 +187,19 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       <button type="submit" id="unlockBtn">숫자 보기</button>
       <p class="err" id="lockErr" role="alert"></p>
     </form>
+
+    <div class="ld" id="loading" hidden role="status" aria-live="polite">
+      <img src="../images/characters/thinking.png" alt="" width="128" height="128">
+      <h2>숫자를 맞춰 보는 중이에요</h2>
+      <p>잠깐이면 돼요. 지금 하는 일을 보여 드릴게요.</p>
+      <ul class="ldsteps" id="ldSteps">
+        <li data-k="ga"><i></i>GA4 숫자 받기</li>
+        <li data-k="own"><i></i>자체 집계 받기</li>
+        <li data-k="cmp"><i></i>두 집계 대조하기</li>
+        <li data-k="pick"><i></i>특이사항 고르기</li>
+      </ul>
+      <div class="ldbar"><b id="ldBar"></b></div>
+    </div>
 
     <div class="board" id="board" hidden>
     <p class="lead" id="lead">숫자를 불러오는 중이에요…</p>
@@ -960,6 +991,29 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     box.appendChild(ul);
   }
 
+  // 로딩 화면: 실제로 진행 중인 단계를 보여 줌
+  var LD = ['ga', 'own', 'cmp', 'pick'];
+  function loading(on) {
+    $('loading').hidden = !on;
+    if (!on) return;
+    $('lock').hidden = true; $('board').hidden = true;
+    [].forEach.call($('ldSteps').children, function (li) { li.className = ''; });
+    $('ldBar').style.width = '4%';
+  }
+  function step(k) {   // k 단계를 '진행 중'으로, 그 앞 단계는 모두 '완료'로
+    var at = LD.indexOf(k);
+    [].forEach.call($('ldSteps').children, function (li, i) { li.className = i < at ? 'done' : i === at ? 'now' : ''; });
+    $('ldBar').style.width = Math.round((at + 0.5) / LD.length * 100) + '%';
+  }
+  var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  // 받아 온 뒤: 대조 → 특이사항 → 화면 표시 (단계가 눈에 보이도록 아주 잠깐씩 멈춤)
+  function finish() {
+    step('cmp');
+    return wait(260).then(function () { step('pick'); return wait(260); })
+      .then(function () { $('ldBar').style.width = '100%'; return wait(140); })
+      .then(function () { loading(false); show(); });
+  }
+
   function show() {
     last = merge(st.own, st.ga);
     $('lock').hidden = true; $('board').hidden = false; $('logout').hidden = false;
@@ -972,11 +1026,13 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 
   // 비밀번호 하나로 GA4(data.json 복호화)와 자체 집계(서버 인증)를 함께 엶. 관리자 토큰을 넣어도 열려요.
   function open(value) {
+    step('ga');
     return gaReady.then(function (raw) {
       var gaP = raw.status === 'locked'
         ? decrypt(raw, value).then(function (d) { st.ga = d; return true; }, function () { return false; })
         : Promise.resolve((st.ga = raw, false));
       return gaP.then(function (pwOk) {
+        step('own');
         var asPw = shaHex(value).then(function (h) { return fetchOwn('sp_' + h); });
         var asTok = function () { return /^[\x21-\x7e]+$/.test(value) ? fetchOwn(value).then(function (d) { ss(TOK_S, value); if (window.hfConsultLoad) window.hfConsultLoad(value); return d; }) : Promise.reject(new Error('auth')); };
         return asPw.catch(function (er) { return er.message === 'auth' ? asTok() : Promise.reject(er); })
@@ -994,8 +1050,9 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     e.preventDefault();
     var btn = $('unlockBtn'), v = $('pw').value, rem = $('remember').checked;
     btn.disabled = true; btn.textContent = '확인 중…'; $('lockErr').textContent = '';
-    open(v).then(function () { ss(PW_KEY, v); if (rem) ls(PW_KEY, v); show(); })
-      .catch(function (er) { $('lockErr').textContent = er && er.message === 'needpw' ? '관리자 토큰이 아니라 방문 현황 비밀번호를 넣어 주세요.' : '비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
+    loading(true);
+    open(v).then(function () { ss(PW_KEY, v); if (rem) ls(PW_KEY, v); return finish(); })
+      .catch(function (er) { loading(false); $('lock').hidden = false; $('lockErr').textContent = er && er.message === 'needpw' ? '관리자 토큰이 아니라 방문 현황 비밀번호를 넣어 주세요.' : '비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
       .then(function () { btn.disabled = false; btn.textContent = '숫자 보기'; });
   });
   $('logout').addEventListener('click', function () { ls(PW_KEY, null); ss(PW_KEY, null); ls(TOK_L, null); ss(TOK_S, null); location.reload(); });
@@ -1003,8 +1060,8 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
   // 처음 열 때: 저장된 비밀번호(또는 토큰)로 바로 열고, 없거나 틀리면 잠금 화면
   // (관리자 토큰은 상담 신청 이름 목록에만 쓰고, 이 화면은 방문 현황 비밀번호로만 열어요.)
   var saved = ss(PW_KEY) || ls(PW_KEY);
-  var lockUp = function () { $('board').hidden = true; $('lock').hidden = false; $('pw').focus(); };
-  if (saved) open(saved).then(show, function () { ls(PW_KEY, null); ss(PW_KEY, null); lockUp(); });
+  var lockUp = function () { loading(false); $('board').hidden = true; $('lock').hidden = false; $('pw').focus(); };
+  if (saved) { loading(true); open(saved).then(finish).catch(function () { ls(PW_KEY, null); ss(PW_KEY, null); lockUp(); }); }
   else gaReady.then(function (raw) { if (raw.status === 'locked') return lockUp(); st.ga = raw; show(); });
 })();
 </script>
