@@ -148,7 +148,7 @@ def fmt_date(d, full=False):
 
 
 def dm_box(place):
-    return f"""<div class="dm"><div class="st">1:1 전문 상담</div>학종 전문 선생님이 지금 학생부를 함께 보고, 세특 설계와 내신 공부법을 1:1로 상담해 드려요.<br><a href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'{place}'}})">전문 상담 신청 →</a></div>"""
+    return f"""<div class="dm"><div class="st">1:1 전문 상담</div>학종 전문 선생님이 지금 학생부를 함께 보고, 과목 선택·수행평가부터 내신 공부 방법, 면접 대비까지 1:1로 상담해 드려요.<br><a href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'{place}'}})">전문 상담 신청 →</a></div>"""
 
 
 def build_index(posts):
@@ -359,8 +359,7 @@ def main():
         import consult_page as cp
         cdir = os.path.join(ROOT, "consult")
         os.makedirs(cdir, exist_ok=True)
-        h = head("전문 상담 신청 | 학종파이터", "학종 전문 선생님이 세특 설계부터 내신 공부법까지 1:1로 상담해 드려요.", f"{SITE}/consult/", f"{SITE}/images/og.jpg")
-        open(os.path.join(cdir, "index.html"), "w", encoding="utf-8").write(cp.consult_page(h, FOOT.format(y=date.today().year), BLOG_API, SITE))
+        open(os.path.join(cdir, "index.html"), "w", encoding="utf-8").write(cp.consult_page(BLOG_API, SITE, date.today().year))
         os.makedirs(os.path.join(BLOG, "admin", "consult"), exist_ok=True)
         open(os.path.join(BLOG, "admin", "consult", "index.html"), "w", encoding="utf-8").write(cp.CONSULT_ADMIN.format(api=BLOG_API))
         os.makedirs(os.path.join(BLOG, "admin"), exist_ok=True)

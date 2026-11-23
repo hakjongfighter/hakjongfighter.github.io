@@ -8,6 +8,10 @@ keep_vars = true
 [vars]
 ALLOWED_ORIGINS = "https://hakjongfighter.com,https://www.hakjongfighter.com"
 
+# 매일 새벽 3시 17분(한국 시간)에 오래된 기록 정리
+[triggers]
+crons = ["17 18 * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "hakjongfighter-blog"

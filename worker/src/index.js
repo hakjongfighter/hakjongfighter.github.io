@@ -18,10 +18,14 @@
 const MAX_NICK = 20;
 const MAX_BODY = 500;
 const COMMENTS_PER_HOUR = 5;
-const CONSULTS_PER_DAY = 3;
+const CONSULTS_PER_DAY = 10;   // 같은 곳(학교·학원 와이파이 등)에서 여러 명이 신청해도 막히지 않게 넉넉히
 const SLUG_RE = /^[a-z0-9-]{1,80}$/;
 
 export default {
+  // 하루 한 번: 보관 기간이 지난 상담 신청·방문 기록을 지워요 (관리 화면을 열지 않아도)
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(purgeOld(env));
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin") || "";
@@ -100,7 +104,9 @@ async function route(request, env, url) {
     const name = clean(d.name, 20);
     const grade = pick(d.grade, ["중3", "고1", "고2", "고3", "N수", "기타"]);
     const track = pick(d.track, ["인문·사회", "상경", "자연·공학", "의약", "예체능", "아직 모르겠어요", ""]);
-    const topics = (Array.isArray(d.topics) ? d.topics : []).filter(t => ["세특 작성법", "내신 공부법", "수행평가", "과목 선택", "대학·전형", "기타"].includes(t)).slice(0, 6).join(", ");
+    // 예전 항목(세특 작성법·수행평가)도 받아 둬요: 열려 있던 옛 화면에서 보낸 신청이 버려지지 않게
+    const TOPICS = ["과목 선택", "수행평가·세특", "내신 공부법", "면접 대비", "대학·전형", "기타", "세특 작성법", "수행평가"];
+    const topics = (Array.isArray(d.topics) ? d.topics : []).filter(t => TOPICS.includes(t)).slice(0, 8).join(", ");
     const question = clean(d.question, MAX_BODY, true);
     const method = pick(d.method, ["전화", "문자", "카카오톡"]);
     const contact = clean(d.contact, 40);
@@ -114,8 +120,14 @@ async function route(request, env, url) {
     if (d.agree_privacy !== true) throw err(400, "개인정보 수집·이용에 동의해 주세요.");
     if (d.agree_age !== true) throw err(400, "만 14세 이상인지 확인해 주세요.");
     const ip = await ipHash(request, env);
+    // 같은 연락처로 하루 안에 다시 보내면 새로 저장하지 않고 '이미 접수됨'으로 알려요
+    const digits = contact.replace(/\D/g, "");
+    const dup = await env.DB.prepare(
+      "SELECT id FROM consults WHERE created_at > ? AND (contact = ? OR (? <> '' AND REPLACE(REPLACE(REPLACE(contact,'-',''),' ',''),'+','') = ?)) LIMIT 1"
+    ).bind(now() - 86400, contact, digits.length >= 9 ? digits : "", digits).first();
+    if (dup) return json({ ok: true, duplicate: true });
     const { n } = await env.DB.prepare("SELECT COUNT(*) AS n FROM consults WHERE ip_hash=? AND created_at > ?").bind(ip, now() - 86400).first();
-    if (n >= CONSULTS_PER_DAY) throw err(429, "이미 신청이 접수됐어요. 곧 연락드릴게요.");
+    if (n >= CONSULTS_PER_DAY) throw err(429, "지금은 같은 곳에서 신청이 많아 잠시 막혀 있어요. 02-459-4945로 전화 주시면 바로 도와드릴게요.");
     await env.DB.prepare(
       "INSERT INTO consults (who, name, grade, track, topics, question, method, contact, time_pref, status, ip_hash, consent_at, created_at) VALUES (?,?,?,?,?,?,?,?,?, 'new', ?, ?, ?)"
     ).bind(who, name, grade, track, topics, question, method, contact, timePref, ip, now(), now()).run();
