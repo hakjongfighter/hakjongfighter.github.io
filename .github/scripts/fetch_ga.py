@@ -173,6 +173,29 @@ def main():
                                     flt=both(KR, begins("landingPage", "/blog/"))),
         }
 
+    def periods():
+        """랜딩페이지·블로그 방문을 오늘/어제/이번 주/이번 달/저번 달로 (한국 시간 기준)."""
+        today = datetime.now(KST).date()
+        week0 = today - timedelta(days=today.weekday())          # 이번 주 월요일
+        month0 = today.replace(day=1)
+        last1 = month0 - timedelta(days=1)
+        spans = {"today": (today, today), "yesterday": (today - timedelta(days=1),) * 2,
+                 "week": (week0, today), "month": (month0, today), "last_month": (last1.replace(day=1), last1)}
+        home = FilterExpression(filter=Filter(field_name="pagePath",
+                                              in_list_filter=Filter.InListFilter(values=["/", "/index.html"])))
+        out = {"ranges": {k: [a.strftime("%Y%m%d"), b.strftime("%Y%m%d")] for k, (a, b) in spans.items()}}
+        keys = list(spans)
+        for name, flt in (("home", both(KR, home)), ("blog", BLOG)):
+            got = {k: {"users": 0, "views": 0} for k in keys}
+            for chunk in (keys[:4], keys[4:]):                   # GA4는 한 번에 날짜 범위 4개까지
+                rngs = [DateRange(start_date=str(spans[k][0]), end_date=str(spans[k][1]), name=k) for k in chunk]
+                for r in run([], ["activeUsers", "screenPageViews"], ranges=rngs, flt=flt):
+                    k = r.get("dateRange", chunk[0])
+                    if k in got:
+                        got[k] = {"users": r.get("activeUsers", 0), "views": r.get("screenPageViews", 0)}
+            out[name] = got
+        return out
+
     PAGE_EVENTS = {"scroll", "form_start", "consult_click", "blog_consult_click", "consult_submit",
                    "blog_like", "blog_comment", "blog_follow", "blog_dm"}
 
@@ -221,6 +244,7 @@ def main():
         "updated_at": now,
         "scope": "KR",
         "search": optional(search_queries),
+        "periods": optional(periods),
         "all": optional(everyone),
         "blog": optional(blog),
         "pages": optional(lambda: run(["pagePath", "pageTitle"],

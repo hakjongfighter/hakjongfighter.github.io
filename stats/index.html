@@ -148,6 +148,15 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 .ldbar{height:8px;border-radius:6px;background:#E6EBF7;margin-top:14px;overflow:hidden}
 .ldbar b{display:block;height:100%;width:0;background:var(--yellow);border-radius:6px;transition:width .35s ease}
 @media (prefers-reduced-motion:reduce){.ld img,.ldsteps .now i{animation:none}.ldbar b{transition:none}}
+.ptab{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ptab th,.ptab td{padding:10px 4px;border-top:1px solid var(--line);text-align:right;vertical-align:baseline}
+.ptab thead th{border-top:0;font-size:13px;color:var(--muted);font-weight:700}
+.ptab th:first-child,.ptab td:first-child{text-align:left}
+.ptab td:first-child{font-size:14.5px;font-weight:700;white-space:nowrap}
+.ptab td:first-child small{display:block;font-size:11.5px;font-weight:400;color:var(--muted)}
+.ptab td b{font-size:19px;font-weight:900}
+.ptab td span{display:block;font-size:12px;color:var(--muted)}
+.ptab tr.hl td{background:#FFF6D6}
 .mini{font:inherit;font-size:12.5px;font-weight:700;color:var(--navy);background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer;margin-left:6px}
 #consultCard .cs-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(28,42,94,.1);font-size:15px}
 #consultCard .cs-row:first-child{border-top:0}
@@ -211,6 +220,12 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     <section class="days" id="days" aria-label="오늘과 어제 방문자"></section>
     <section class="kpis" id="kpis" aria-label="핵심 숫자"></section>
     <p class="when" style="margin:-4px 0 0">▲▼는 바로 앞 28일과 비교한 변화예요.</p>
+
+    <section class="card" id="periodCard" hidden>
+      <h2>랜딩페이지 · 블로그 방문</h2>
+      <p class="d">기간별 방문자 수예요. 아래 작은 숫자는 페이지를 연 횟수예요. 이번 주는 월요일부터 세요.</p>
+      <div id="periods"></div>
+    </section>
 
     <section class="card">
       <h2>지금 눈여겨볼 점</h2>
@@ -629,6 +644,31 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 
     funnel(f);
 
+    // ---------- 랜딩페이지·블로그 기간별 방문 ----------
+    var PR = d.periods || null;
+    $('periodCard').hidden = !PR;
+    if (PR) {
+      var PL = [['today', '오늘'], ['yesterday', '어제'], ['week', '이번 주'], ['month', '이번 달'], ['last_month', '저번 달']];
+      var rng = function (k) { var r = (PR.ranges || {})[k]; if (!r) return ''; var a = (+r[0].slice(4, 6)) + '/' + (+r[0].slice(6, 8)), b = (+r[1].slice(4, 6)) + '/' + (+r[1].slice(6, 8)); return a === b ? a : a + '~' + b; };
+      var tb = el('table', 'ptab'), th = el('thead'), hr = el('tr');
+      ['기간', '랜딩페이지', '블로그'].forEach(function (x) { hr.appendChild(el('th', null, x)); });
+      th.appendChild(hr); tb.appendChild(th);
+      var body = el('tbody');
+      PL.forEach(function (p) {
+        var tr = el('tr', p[0] === 'today' ? 'hl' : '');
+        var c0 = el('td', null, p[1]); c0.appendChild(el('small', null, rng(p[0]))); tr.appendChild(c0);
+        ['home', 'blog'].forEach(function (g) {
+          var v = ((PR[g] || {})[p[0]]) || { users: 0, views: 0 };
+          var td = el('td'); td.append(el('b', null, nf.format(Math.round(+v.users || 0)) + '명'), el('span', null, '열람 ' + nf.format(Math.round(+v.views || 0)) + '번'));
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+      tb.appendChild(body);
+      var pbx = $('periods'); pbx.replaceChildren(tb);
+      if (PR.note) pbx.appendChild(el('p', 'foot', PR.note));
+    }
+
     // ---------- 블로그 ----------
     var blogPages = pages.filter(function (r) { return isBlog(r.path); });
     var posts = blogPages.filter(function (r) { return r.path !== '/blog/'; });
@@ -916,14 +956,35 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
   var far = function (a, b) { return Math.abs(a - b) >= 3 && Math.abs(a - b) / Math.max(a, b, 1) >= 0.3; };
   var md = function (x) { return (+x.slice(4, 6)) + '/' + (+x.slice(6, 8)); };
 
+  // 기간별 방문: 자체 집계가 그 기간 전체를 덮으면 자체 집계, 아니면 GA4
+  function mergePeriods(o, g) {
+    var po = o && o.periods, pg = g && g.periods, first = o && o.first_day;
+    if (!po || !pg) return po || pg || null;
+    var out = { ranges: po.ranges, home: {}, blog: {} }, fromGa = [];
+    var NM = { today: '오늘', yesterday: '어제', week: '이번 주', month: '이번 달', last_month: '저번 달' };
+    Object.keys(po.ranges).forEach(function (k) {
+      var own = !!first && first <= po.ranges[k][0];
+      if (!own) fromGa.push(NM[k] || k);
+      ['home', 'blog'].forEach(function (grp) { out[grp][k] = (own ? po : pg)[grp][k] || { users: 0, views: 0 }; });
+    });
+    if (!own_all(fromGa)) out.note = (first ? '자체 집계가 ' + md(first) + '부터 쌓여서, ' : '자체 집계가 아직 비어 있어서, ') + fromGa.join('·') + ' 기간은 GA4 값이에요. GA4는 몇 시간 늦게 반영돼요.';
+    return out;
+  }
+  function own_all(list) { return !list.length; }
+
   // 두 집계를 대조해 화면에 쓸 최종 숫자 한 벌을 만듦
   function merge(o, g) {
+    var d = merge0(o, g);
+    if (d && d.status === 'ok') { var pr = mergePeriods(o && o.status === 'ok' ? o : null, g && g.status === 'ok' ? g : null); if (pr) d.periods = pr; }
+    return d;
+  }
+  function merge0(o, g) {
     var okO = o && o.status === 'ok', okG = g && g.status === 'ok';
     if (!okO && !okG) return g || o || { status: 'error', message: '잠시 뒤 새로고침해 주세요.' };
     if (!okG) return o;
     if (!okO) return g;
     var od = daysOf(o);
-    if (od.n >= 28) return o;                       // 자체 집계가 기간을 다 채웠으면 자체 집계가 최종값
+    if (od.n >= 28) return JSON.parse(JSON.stringify(o));   // 자체 집계가 기간을 다 채웠으면 자체 집계가 최종값
     var d = JSON.parse(JSON.stringify(g));          // 그 전에는 GA4 기준 + 자체 집계가 가진 부분으로 채움
     d.ownDays = od.n;
     d.consults = o.consults;
@@ -965,6 +1026,17 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         ].forEach(function (m) {
           var a = 0, b = 0; try { a = Math.round(+m[1](o) || 0); b = Math.round(+m[1](g) || 0); } catch (e) {}
           if (far(a, b)) add('warn', '점검', m[0] + ': 자체 ' + nf.format(a) + ' · GA4 ' + nf.format(b) + '로 크게 달라요.', '화면에는 자체 집계 값(' + nf.format(a) + ')을 썼어요.');
+        });
+      }
+      // 기간별 방문: 두 집계가 모두 그 기간을 덮을 때만 비교
+      if (o.periods && g.periods && o.first_day) {
+        var PN = { yesterday: '어제', week: '이번 주', month: '이번 달', last_month: '저번 달' }, GN = { home: '랜딩페이지', blog: '블로그' };
+        Object.keys(PN).forEach(function (k) {
+          if (!(o.first_day <= o.periods.ranges[k][0])) return;
+          ['home', 'blog'].forEach(function (grp) {
+            var a = Math.round(+((o.periods[grp][k] || {}).users) || 0), b = Math.round(+((g.periods[grp][k] || {}).users) || 0);
+            if (far(a, b)) add('info', '참고', PN[k] + ' ' + GN[grp] + ' 방문자: 자체 ' + a + '명 · GA4 ' + b + '명으로 달라요.', '화면에는 자체 집계 값을 썼어요.');
+          });
         });
       }
       if (!g.scope) add('info', '참고', 'GA4 숫자에 아직 해외 자동 접속이 섞여 있어요.', '다음 갱신(1시간 안) 뒤부터 한국 방문만 세요.');

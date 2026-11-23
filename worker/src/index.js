@@ -335,6 +335,25 @@ async function stats(env, days) {
     }
   } catch (e) { console.error("consults", e); }
 
+  // 랜딩페이지·블로그 방문을 오늘/어제/이번 주/이번 달/저번 달로 (한국 시간 기준)
+  const kd0 = new Date((t + 32400) * 1000);
+  const ymd = d => d.toISOString().slice(0, 10).replace(/-/g, "");
+  const at = (y, mo, da) => new Date(Date.UTC(y, mo, da));
+  const Y = kd0.getUTCFullYear(), Mo = kd0.getUTCMonth(), Da = kd0.getUTCDate();
+  const spans = {
+    today: [at(Y, Mo, Da), at(Y, Mo, Da)], yesterday: [at(Y, Mo, Da - 1), at(Y, Mo, Da - 1)],
+    week: [at(Y, Mo, Da - ((kd0.getUTCDay() + 6) % 7)), at(Y, Mo, Da)],   // 이번 주 월요일부터
+    month: [at(Y, Mo, 1), at(Y, Mo, Da)], last_month: [at(Y, Mo - 1, 1), at(Y, Mo, 0)],
+  };
+  const periods = { ranges: {}, home: {}, blog: {} };
+  for (const [k, [a, b]] of Object.entries(spans)) {
+    periods.ranges[k] = [ymd(a), ymd(b)];
+    for (const [g, cond] of [["home", "path IN ('/', '/index.html')"], ["blog", "path LIKE '/blog/%'"]]) {
+      const [r] = await q(`SELECT COUNT(DISTINCT vid) u, SUM(type='pv') pv FROM hits WHERE ${KR} AND day BETWEEN ? AND ? AND ${cond}`, ymd(a), ymd(b));
+      periods[g][k] = { users: r.u || 0, views: r.pv || 0 };
+    }
+  }
+
   const [first] = await q("SELECT MIN(day) d, COUNT(*) n FROM hits");
   const [allT] = await q("SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ?", c0, c1);
   const kd = new Date((t + 32400) * 1000).toISOString();
@@ -343,6 +362,7 @@ async function stats(env, days) {
     status: "ok", source: "own", scope: "KR",
     updated_at: kd.slice(0, 10) + " " + kd.slice(11, 16),
     first_day: first.d || null,
+    periods,
     consults,
     period: { cur: [c0, c1] },
     totals: { cur: await totals(c0, c1), prev: await totals(p0, p1) },
