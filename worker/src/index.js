@@ -11,7 +11,7 @@
 //   POST /api/admin/comments/<id>  {action: approve|reject|delete|reply, reply}
 //   GET  /api/admin/consults?status=new|contacted|done
 //   POST /api/admin/consults/<id>  {action: new|contacted|done|memo|delete, memo}
-//   GET  /api/admin/stats?days=28   자체 방문 집계 요약 (방문 현황 페이지용)
+//   GET  /api/admin/stats?days=28   자체 방문 집계 요약 (방문 현황 페이지용 · STATS_PASSWORD 해시로도 열림)
 //
 // 환경 변수: ADMIN_TOKEN(비밀), SALT(비밀), ALLOWED_ORIGINS(쉼표 구분), RETENTION_DAYS(선택, 기본 180)
 
@@ -122,6 +122,14 @@ async function route(request, env, url) {
     return json({ ok: true });
   }
 
+  // 방문 현황 요약: 관리자 토큰 또는 방문 현황 비밀번호(STATS_PASSWORD)의 해시로 열려요. 숫자만 주고 신청자 정보는 주지 않아요.
+  if (m === "GET" && p === "/api/admin/stats") {
+    await requireStats(request, env);
+    const days = Math.max(1, Math.min(90, Number(url.searchParams.get("days")) || 28));
+    try { return json(await stats(env, days)); }
+    catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; await ensureHits(env); return json(await stats(env, days)); }
+  }
+
   if (p.startsWith("/api/admin/")) {
     requireAdmin(request, env);
     if (m === "GET" && p === "/api/admin/consults") {
@@ -145,11 +153,6 @@ async function route(request, env, url) {
         await env.DB.prepare("DELETE FROM consults WHERE id=?").bind(id).run();
       } else throw err(400, "bad_action");
       return json({ ok: true });
-    }
-    if (m === "GET" && p === "/api/admin/stats") {
-      const days = Math.max(1, Math.min(90, Number(url.searchParams.get("days")) || 28));
-      try { return json(await stats(env, days)); }
-      catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; await ensureHits(env); return json(await stats(env, days)); }
     }
     if (m === "GET" && p === "/api/admin/comments") {
       const status = url.searchParams.get("status") || "pending";
@@ -318,6 +321,18 @@ async function stats(env, days) {
     .concat((await q(`SELECT path, COUNT(DISTINCT sid) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${W} GROUP BY path`, c0, c1)).map(r => ({ ...r, name: "scroll" })))
     .map(r => ({ pagePath: r.path, eventName: r.name, eventCount: r.c, totalUsers: r.u }));
 
+  const consults = { total: 0, total28: 0, status: {}, who: {}, grade: {}, topics: {} };
+  try {
+    for (const r of await q("SELECT status, who, grade, topics, created_at FROM consults")) {
+      consults.total++;
+      if (r.created_at >= t - days * 86400) consults.total28++;
+      consults.status[r.status] = (consults.status[r.status] || 0) + 1;
+      consults.who[r.who] = (consults.who[r.who] || 0) + 1;
+      consults.grade[r.grade] = (consults.grade[r.grade] || 0) + 1;
+      for (const tp of String(r.topics || "").split(",").map(x => x.trim()).filter(Boolean)) consults.topics[tp] = (consults.topics[tp] || 0) + 1;
+    }
+  } catch (e) { console.error("consults", e); }
+
   const [first] = await q("SELECT MIN(day) d, COUNT(*) n FROM hits");
   const [allT] = await q("SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ?", c0, c1);
   const kd = new Date((t + 32400) * 1000).toISOString();
@@ -326,6 +341,7 @@ async function stats(env, days) {
     status: "ok", source: "own", scope: "KR",
     updated_at: kd.slice(0, 10) + " " + kd.slice(11, 16),
     first_day: first.d || null,
+    consults,
     period: { cur: [c0, c1] },
     totals: { cur: await totals(c0, c1), prev: await totals(p0, p1) },
     events: { cur: evC, prev: evP },
@@ -382,6 +398,15 @@ function corsHeaders(origin, env) {
 function requireAdmin(request, env) {
   const got = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/, "");
   if (!env.ADMIN_TOKEN || got.length !== env.ADMIN_TOKEN.length || !safeEqual(got, env.ADMIN_TOKEN)) throw err(401, "unauthorized");
+}
+async function requireStats(request, env) {
+  const got = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/, "");
+  if (env.ADMIN_TOKEN && got.length === env.ADMIN_TOKEN.length && safeEqual(got, env.ADMIN_TOKEN)) return;
+  if (env.STATS_PASSWORD && got.startsWith("sp_")) {
+    const want = "sp_" + await sha256("hf-stats|" + env.STATS_PASSWORD);
+    if (got.length === want.length && safeEqual(got, want)) return;
+  }
+  throw err(401, "unauthorized");
 }
 function safeEqual(a, b) { let r = 0; for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i); return r === 0; }
 async function sha256(s) {

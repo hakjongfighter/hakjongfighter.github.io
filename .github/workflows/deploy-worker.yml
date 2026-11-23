@@ -43,3 +43,15 @@ jobs:
         if: steps.check.outputs.ready == 'yes'
         working-directory: worker
         run: npx --yes wrangler@4 deploy
+      # 방문 현황 페이지가 비밀번호 하나로 열리도록, 같은 비밀번호를 Worker에도 알려 줘요.
+      - name: 방문 현황 비밀번호를 Worker에 전달
+        if: steps.check.outputs.ready == 'yes'
+        working-directory: worker
+        env:
+          STATS_PASSWORD: ${{ secrets.STATS_PASSWORD }}
+        run: |
+          if [ -n "$STATS_PASSWORD" ]; then
+            printf '%s' "$STATS_PASSWORD" | npx --yes wrangler@4 secret put STATS_PASSWORD
+          else
+            echo "::warning::STATS_PASSWORD 비밀값이 없어 건너뛰었어요."
+          fi
