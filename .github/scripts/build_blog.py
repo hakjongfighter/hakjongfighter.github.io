@@ -87,8 +87,10 @@ def head(title, desc, url, image, extra=""):
     return f"""<!doctype html>
 <html lang="ko">
 <head>
+<!-- 운영자 기기(방문 현황 페이지를 연 브라우저)는 GA4·GTM에 기록을 보내지 않음 -->
+<script>try{{if(localStorage.getItem('hf_internal')==='1'){{window.hfInternal=true;window['ga-disable-G-4G2NGCPVXG']=true;}}}}catch(e){{}}</script>
 <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':
+<script>(function(w,d,s,l,i){{if(w.hfInternal)return;w[l]=w[l]||[];w[l].push({{'gtm.start':
 new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
