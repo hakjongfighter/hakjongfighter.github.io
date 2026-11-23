@@ -1032,13 +1032,30 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
   }
   // 이름 목록을 열지 않아도, 서버가 준 건수 요약은 보여 줌
   window.hfConsultSummary = function (c) {
-    if (loaded || !c) return;
+    if (loaded) return;
+    if (!c) { msg('신청 목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.'); return; }
     var join = function (m) { return Object.keys(m || {}).sort(function (a, b) { return m[b] - m[a]; }).map(function (k) { return k + ' ' + m[k]; }).join(' · '); };
     var by = c.status || {};
     rowsOut([['최근 28일 신청', c.total28 + '건 (전체 ' + c.total + '건)'],
       ['처리 상태', c.total ? ['new', 'contacted', 'done'].map(function (k) { return LBL[k] + ' ' + (by[k] || 0); }).join(' · ') : ''],
       ['신청한 사람', join(c.who)], ['학년', join(c.grade)], ['궁금한 주제', join(c.topics)]]);
+    // 이름·날짜 목록도 비밀번호만으로 보여 줌 (관리자 토큰 필요 없음)
+    if (Array.isArray(c.list)) {
+      tokBox.hidden = true;
+      if (!c.list.length) { list.innerHTML = ''; var e = document.createElement('div'); e.className = 'empty'; e.textContent = '아직 들어온 상담 신청이 없어요.'; list.appendChild(e); }
+      else { list.innerHTML = ''; c.list.forEach(function (x) { x._s = x.status; rowOut(x); }); }
+    }
   };
+  function rowOut(c) {
+    var d = new Date(c.created_at * 1000);
+    var row = document.createElement('div'); row.className = 'cs-row';
+    var left = document.createElement('div');
+    var name = document.createElement('b'); name.textContent = c.name; left.appendChild(name);
+    var st = document.createElement('i'); st.className = 'cs-st ' + c._s; st.style.fontStyle = 'normal'; st.textContent = LBL[c._s] || c._s; left.appendChild(st);
+    var when = document.createElement('span');
+    when.textContent = d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    row.appendChild(left); row.appendChild(when); list.appendChild(row);
+  }
   function tally(cs, key, split) {
     var m = {};
     cs.forEach(function (c) { String(c[key] || '').split(split || /$^/).forEach(function (v) { v = v.trim(); if (v) m[v] = (m[v] || 0) + 1; }); });
@@ -1053,7 +1070,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     ]);
   }
   function load(tok) {
-    if (!tok) { msg('신청자 이름 목록은 관리자 토큰을 넣으면 보여요.'); tokBox.hidden = false; return; }
+    if (!tok) { msg('불러오는 중이에요…'); return; }
     msg('불러오는 중이에요…');
     var h = { headers: { Authorization: 'Bearer ' + tok } };
     Promise.all(['new', 'contacted', 'done'].map(function (st) {
@@ -1069,19 +1086,11 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       if (!cs.length) return msg('아직 들어온 상담 신청이 없어요.');
       list.innerHTML = '';
       summary(every);
-      cs.forEach(function (c) {
-        var d = new Date(c.created_at * 1000);
-        var row = document.createElement('div'); row.className = 'cs-row';
-        var left = document.createElement('div');
-        var name = document.createElement('b'); name.textContent = c.name; left.appendChild(name);
-        var st = document.createElement('i'); st.className = 'cs-st ' + c._s; st.style.fontStyle = 'normal'; st.textContent = LBL[c._s]; left.appendChild(st);
-        var when = document.createElement('span');
-        when.textContent = d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-        row.appendChild(left); row.appendChild(when); list.appendChild(row);
-      });
+      cs.forEach(rowOut);
     }).catch(function (e) {
-      if (e.message === 'auth') { msg('토큰이 맞지 않아요. 다시 넣어 주세요.'); tokBox.hidden = false; }
-      else msg('신청 목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.');
+      // 저장된 토큰이 틀렸거나 서버가 잠시 안 되면, 비밀번호로 받은 목록을 그대로 둠
+      if (e.message === 'auth') { try { sessionStorage.removeItem('hf_admin'); localStorage.removeItem('hf_admin_stats'); } catch (x) {} }
+      if (!sum.children.length) msg('신청 목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.');
     });
   }
   window.hfConsultLoad = load;

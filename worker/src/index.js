@@ -122,7 +122,7 @@ async function route(request, env, url) {
     return json({ ok: true });
   }
 
-  // 방문 현황 요약: 관리자 토큰 또는 방문 현황 비밀번호(STATS_PASSWORD)의 해시로 열려요. 숫자만 주고 신청자 정보는 주지 않아요.
+  // 방문 현황 요약: 관리자 토큰 또는 방문 현황 비밀번호(STATS_PASSWORD)의 해시로 열려요. 신청자는 이름·날짜·상태만 주고 연락처는 주지 않아요.
   if (m === "GET" && p === "/api/admin/stats") {
     await requireStats(request, env);
     const days = Math.max(1, Math.min(90, Number(url.searchParams.get("days")) || 28));
@@ -321,10 +321,12 @@ async function stats(env, days) {
     .concat((await q(`SELECT path, COUNT(DISTINCT sid) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${W} GROUP BY path`, c0, c1)).map(r => ({ ...r, name: "scroll" })))
     .map(r => ({ pagePath: r.path, eventName: r.name, eventCount: r.c, totalUsers: r.u }));
 
-  const consults = { total: 0, total28: 0, status: {}, who: {}, grade: {}, topics: {} };
+  // 신청 요약 + 최근 신청자 이름·날짜 (연락처·질문 내용은 주지 않아요. 자세한 내용은 관리 페이지에서)
+  const consults = { total: 0, total28: 0, status: {}, who: {}, grade: {}, topics: {}, list: [] };
   try {
-    for (const r of await q("SELECT status, who, grade, topics, created_at FROM consults")) {
+    for (const r of await q("SELECT name, status, who, grade, topics, created_at FROM consults ORDER BY id DESC")) {
       consults.total++;
+      if (consults.list.length < 30) consults.list.push({ name: r.name, status: r.status, created_at: r.created_at });
       if (r.created_at >= t - days * 86400) consults.total28++;
       consults.status[r.status] = (consults.status[r.status] || 0) + 1;
       consults.who[r.who] = (consults.who[r.who] || 0) + 1;
