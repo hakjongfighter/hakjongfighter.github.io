@@ -53,7 +53,8 @@ Worker 화면 → **Settings**
 사이트 모든 페이지의 `assets/hf-track.js`가 방문 기록을 이 서버(`POST /api/t`)로 보내고,
 방문 현황 페이지(`/stats/`)가 `GET /api/admin/stats`로 요약을 받아 보여 줘요.
 
-- **켜는 방법**: 2번과 같은 방법으로 Worker의 **Edit code**에 새 `src/index.js` 내용을 붙여 넣고 **Deploy** 하면 끝이에요.
+- **켜는 방법**: `worker/` 폴더가 바뀌어 main에 올라오면 GitHub Actions(`Deploy Cloudflare Worker`)가 자동으로 배포해요.
+  처음 한 번만 Cloudflare API 토큰(“Edit Cloudflare Workers” 템플릿)을 발급해 저장소 비밀값 `CLOUDFLARE_API_TOKEN`에 넣어 주세요.
   방문 기록 표(`hits`)는 첫 기록이 들어올 때 자동으로 만들어져요. D1 콘솔에서 따로 실행할 것은 없어요.
 - **보는 방법**: `https://hakjongfighter.com/stats/` 에서 `ADMIN_TOKEN`을 넣으면 ‘자체 집계’ 탭이 열려요.
 - **무엇을 남기나**: 본 페이지, 누른 버튼, 머문 시간·스크롤 위치, 들어온 경로(검색어 포함), 기기 종류, 접속 국가.
