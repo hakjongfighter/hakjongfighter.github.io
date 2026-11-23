@@ -352,7 +352,6 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         <dt>최종값을 정하는 방법</dt><dd>이 페이지는 우리 서버에 직접 쌓는 ‘자체 집계’와 구글 애널리틱스(GA4)를 함께 받아 대조한 뒤 한 가지 숫자만 보여 줘요. 자체 집계가 28일을 다 채우기 전에는 GA4를 기준으로 하고, 날짜별 방문자·검색어·시간대처럼 자체 집계가 이미 가진 부분은 자체 집계로 채워요. 28일이 차면 자동으로 자체 집계 기준으로 바뀌어요. 신청 완료 건수는 언제나 실제 신청 목록 건수예요.</dd>
         <dt>특이사항</dt><dd>두 집계의 값이 30% 넘게(3 이상) 벌어지거나, 추적 기록과 실제 신청 목록이 다를 때만 ‘특이사항’ 카드에 따로 나와요. 광고 차단 프로그램은 GA4를 더 자주 막기 때문에 자체 집계가 조금 더 많이 나오는 것이 보통이에요.</dd>
         <dt>한국 방문 기준</dt><dd>해외 데이터센터에서 오는 자동 수집 프로그램이 방문자 수를 크게 부풀려서, 모든 숫자는 한국에서 접속한 방문만 세요. 뺀 접속은 맨 아래 ‘집계에서 뺀 해외 접속’에서 볼 수 있어요.</dd>
-        <dt>내 방문 빼기</dt><dd>이 페이지를 연 기기는 자체 집계에서 자동으로 빠져요. <span id="internalState"></span><button type="button" class="mini" id="internalBtn"></button></dd>
         <dt>검색어</dt><dd>네이버·다음처럼 검색어를 넘겨주는 검색엔진만 잡을 수 있어요. 구글 검색어는 Google Search Console에 사이트를 등록하고 서비스 계정에 권한을 주면 함께 나타나요.</dd>
         <dt>방문자</dt><dd>기간 안에 사이트를 한 번 이상 연 사람 수예요. 같은 사람이 여러 번 와도 한 명이에요.</dd>
         <dt>상담 영역까지 내려옴</dt><dd>홈페이지를 90% 넘게 스크롤한 사람이에요. 이 지점부터 상담 안내와 버튼이 보여요. 블로그 글의 스크롤은 ‘끝까지 읽음’으로 따로 세요.</dd>
@@ -842,7 +841,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     // 같은 사람이 아주 여러 번 들어온 경우: 운영자 본인 접속이 섞였을 가능성
     if (!x.isOwn && x.sessions >= 10 && ratio(x.sessions, f.users) >= 2.5) {
       add('warn', '점검', '방문자 한 명이 평균 ' + (Math.round(ratio(x.sessions, f.users) * 10) / 10) + '번씩 들어왔어요. 운영자 본인 접속이 섞였을 가능성이 커요.',
-        '자체 집계는 이 기기의 방문을 자동으로 빼요. GA4에서도 빼려면 관리 → 데이터 스트림 → 태그 설정에서 내부 트래픽(사무실 IP)을 등록하세요.');
+        '이 화면을 연 기기의 방문은 이제 집계에서 빠져요. 이미 쌓인 기록은 28일이 지나면 사라져요.');
     }
     // 블로그
     var bg = x.blog || {};
@@ -955,13 +954,6 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     .then(function (r) { if (!r.ok) throw new Error('data.json ' + r.status); return r.json(); })
     .catch(function () { return { status: 'error', message: '잠시 뒤 새로고침해 주세요.' }; });
 
-  function internalUi() {
-    var on = ls(INTERNAL) === '1';
-    $('internalState').textContent = on ? '지금 이 기기는 빠져 있어요.' : '지금 이 기기도 방문자로 세고 있어요.';
-    $('internalBtn').textContent = on ? '이 기기도 세기' : '이 기기 빼기';
-  }
-  $('internalBtn').addEventListener('click', function () { ls(INTERNAL, ls(INTERNAL) === '1' ? '0' : '1'); internalUi(); });
-
   function daysOf(d) {
     var fd = d.first_day || ((d.daily || []).filter(function (r) { return +r.activeUsers > 0; })[0] || {}).date;
     if (!fd || !d.updated_at) return { first: fd || null, n: 0 };
@@ -1025,7 +1017,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var list = [], add = function (tone, tag, head, act) { list.push({ tone: tone, tag: tag, head: head, act: act }); };
     if (!okO) add('warn', '점검', st.ownErr === 'auth' ? '자체 집계 서버가 이 비밀번호를 아직 모르고 있어요.' : '자체 집계 서버에서 숫자를 받지 못했어요.', '지금은 GA4 숫자만으로 보여 드려요. 서버 설정이 반영되면 자동으로 함께 대조해요.');
     if (!okG) add('info', '참고', 'GA4 숫자를 받지 못해 자체 집계만으로 보여 드려요.', (g && g.message) || '');
-    if (okO && !o.first_day) add('info', '참고', '자체 집계에 아직 방문 기록이 없어요.', '운영자 기기는 자동으로 빠지기 때문에, 다른 사람의 첫 방문이 들어오면 쌓이기 시작해요.');
+    if (okO && !o.first_day) add('info', '참고', '자체 집계에 아직 방문 기록이 없어요.', '첫 방문이 들어오면 쌓이기 시작해요.');
     if (okO && okG) {
       var od = daysOf(o), gd = {}; (g.daily || []).forEach(function (r) { gd[r.date] = +r.activeUsers || 0; });
       var today = (o.daily || []).length ? o.daily[o.daily.length - 1].date : '';
@@ -1123,8 +1115,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
   function show() {
     last = merge(st.own, st.ga);
     $('lock').hidden = true; $('board').hidden = false; $('logout').hidden = false;
-    if (ls(INTERNAL) === null) ls(INTERNAL, '1');   // 관리자 기기는 자체 집계에서 자동 제외
-    internalUi();
+    ls(INTERNAL, '1');   // 이 화면을 연 기기의 방문은 집계에서 항상 제외
     render(last);
     if (last.status === 'ok') anomalies(last); else { $('cmpCard').hidden = true; badge('bdIssues', 0); }
     badge('bdConsult', last.consults && last.consults.status ? (last.consults.status['new'] || 0) : 0);
