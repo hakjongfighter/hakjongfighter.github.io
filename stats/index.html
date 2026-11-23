@@ -157,6 +157,15 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 .ptab td b{font-size:19px;font-weight:900}
 .ptab td span{display:block;font-size:12px;color:var(--muted)}
 .ptab tr.hl td{background:#FFF6D6}
+.tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--bg);padding:8px 0 6px;margin:-4px 0 -4px}
+.tabs button{position:relative;font:inherit;font-size:14px;font-weight:700;color:var(--muted);background:#E6EBF7;border:0;border-radius:12px;min-height:46px;padding:0 4px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{background:var(--navy);color:#fff}
+.tabs .badge{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:999px;background:var(--down);color:#fff;font-size:11.5px;font-weight:900;line-height:18px;vertical-align:1px}
+.tabs .badge[hidden]{display:none}
+.board[data-tab=home]>[data-tab]:not([data-tab=home]):not([data-tab=all]),
+.board[data-tab=blog]>[data-tab]:not([data-tab=blog]):not([data-tab=all]),
+.board[data-tab=consult]>[data-tab]:not([data-tab=consult]):not([data-tab=all]),
+.board[data-tab=issues]>[data-tab]:not([data-tab=issues]):not([data-tab=all]){display:none}
 .mini{font:inherit;font-size:12.5px;font-weight:700;color:var(--navy);background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer;margin-left:6px}
 #consultCard .cs-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(28,42,94,.1);font-size:15px}
 #consultCard .cs-row:first-child{border-top:0}
@@ -210,9 +219,15 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       <div class="ldbar"><b id="ldBar"></b></div>
     </div>
 
-    <div class="board" id="board" hidden>
+    <div class="board" id="board" data-tab="home" hidden>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="방문 현황 메뉴" data-tab="all">
+      <button type="button" role="tab" data-go="home" aria-selected="true">홈페이지</button>
+      <button type="button" role="tab" data-go="blog" aria-selected="false">블로그</button>
+      <button type="button" role="tab" data-go="consult" aria-selected="false">상담신청<span class="badge" id="bdConsult" hidden></span></button>
+      <button type="button" role="tab" data-go="issues" aria-selected="false">특이사항<span class="badge" id="bdIssues" hidden></span></button>
+    </nav>
     <p class="lead" id="lead">숫자를 불러오는 중이에요…</p>
-    <div class="when" id="when"></div>
+    <div class="when" id="when" data-tab="all"></div>
 
     <div id="notice" hidden></div>
     <div class="scope" id="scope" hidden></div>
@@ -1051,6 +1066,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       if (diff.length) add('warn', '점검', '신청 완료: 실제 신청 목록은 ' + db + '건인데 ' + diff.map(function (t) { return t[0] + ' 기록은 ' + t[1] + '건'; }).join(', ') + '이에요.',
         '화면에는 실제 신청 목록 건수(' + db + '건)를 썼어요. 추적 기록이 더 많으면 테스트 신청을 지웠거나 보관 기간이 지난 경우, 더 적으면 광고 차단으로 기록이 빠진 경우예요.');
     }
+    badge('bdIssues', list.filter(function (t) { return t.tone === 'warn'; }).length);
     if (!list.length) add('good', '이상 없음', '두 집계와 신청 목록이 서로 잘 맞아요.', '');
     var order = { warn: 0, info: 1, good: 2 };
     list.sort(function (a, b) { return order[a.tone] - order[b.tone]; });
@@ -1062,6 +1078,24 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     });
     box.appendChild(ul);
   }
+
+  // ---------- 상단 탭: 홈페이지 / 블로그 / 상담신청 / 특이사항 (화면 내용이 바뀜) ----------
+  [].forEach.call($('board').children, function (e) {
+    if (e.hasAttribute('data-tab')) return;
+    var has = function (sel) { return e.querySelector && e.querySelector(sel); };
+    var t = e.id === 'blogCard' ? 'blog'
+      : (e.id === 'consultCard' || has('#funnel')) ? 'consult'
+      : (e.id === 'cmpCard' || e.id === 'worldBox' || (e.tagName === 'DETAILS' && has('dl'))) ? 'issues' : 'home';
+    e.setAttribute('data-tab', t);
+  });
+  function goTab(k) {
+    $('board').setAttribute('data-tab', k);
+    [].forEach.call($('tabs').querySelectorAll('button'), function (b) { b.setAttribute('aria-selected', b.getAttribute('data-go') === k ? 'true' : 'false'); });
+    window.scrollTo(0, 0);
+    if (k === 'home') window.dispatchEvent(new Event('resize'));   // 숨겨져 있던 그래프를 화면 폭에 맞게 다시 그림
+  }
+  $('tabs').addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button[data-go]') : null; if (b) goTab(b.getAttribute('data-go')); });
+  function badge(id, n) { var b = $(id); b.hidden = !n; b.textContent = n || ''; }
 
   // 로딩 화면: 실제로 진행 중인 단계를 보여 줌
   var LD = ['ga', 'own', 'cmp', 'pick'];
@@ -1092,7 +1126,8 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     if (ls(INTERNAL) === null) ls(INTERNAL, '1');   // 관리자 기기는 자체 집계에서 자동 제외
     internalUi();
     render(last);
-    if (last.status === 'ok') anomalies(last); else $('cmpCard').hidden = true;
+    if (last.status === 'ok') anomalies(last); else { $('cmpCard').hidden = true; badge('bdIssues', 0); }
+    badge('bdConsult', last.consults && last.consults.status ? (last.consults.status['new'] || 0) : 0);
     if (window.hfConsultSummary) window.hfConsultSummary(last.consults || null);
   }
 

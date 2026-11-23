@@ -277,63 +277,60 @@ async function track(request, env) {
 
 // 방문 현황 페이지가 그대로 그릴 수 있게, GA4에서 받던 것과 같은 모양으로 돌려줘요.
 // 기본은 한국에서 접속한 방문만 세고, 전체·나라별 숫자는 all에 따로 담아요.
+// 질의가 수십 개라 하나씩 보내면 10초 넘게 걸려서, 한 묶음(batch)으로 한 번에 보내요.
 async function stats(env, days) {
   const t = now();
   const dayAt = i => kstDay(t - i * 86400);
   const c0 = dayAt(days - 1), c1 = dayAt(0), p0 = dayAt(days * 2 - 1), p1 = dayAt(days);
   const KR = "country='KR'";
-  const q = async (sql, ...b) => (await env.DB.prepare(sql).bind(...b).all()).results;
   const MS = "SUM(CASE WHEN type='eng' THEN ms ELSE 0 END)";
   const SM = "src || ' / ' || medium";
-
-  const totals = async (a, b, extra = "") => {
-    const w = `${KR} AND day BETWEEN ? AND ?${extra}`;
-    const [r] = await q(`SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s, SUM(type='pv') pv, ${MS} ms FROM hits WHERE ${w}`, a, b);
-    const [n] = await q(`SELECT COUNT(*) n FROM (SELECT vid, MIN(day) d FROM hits WHERE ${KR} GROUP BY vid) WHERE d BETWEEN ? AND ?`, a, b);
-    const [e] = await q(`SELECT COUNT(*) n FROM (SELECT sid FROM hits WHERE ${w} GROUP BY sid HAVING SUM(type='pv')>=2 OR SUM(type='ev')>=1 OR ${MS}>=10000)`, a, b);
-    const s = r.s || 0, ms = r.ms || 0;
-    return { activeUsers: r.u || 0, newUsers: n.n || 0, sessions: s, screenPageViews: r.pv || 0,
-      engagementRate: s ? e.n / s : 0, averageSessionDuration: s ? ms / 1000 / s : 0, userEngagementDuration: ms / 1000 };
-  };
-  const events = async (a, b) => {
-    const ev = {}, eu = {};
-    for (const r of await q(`SELECT name, COUNT(*) c, COUNT(DISTINCT vid) u FROM hits WHERE type='ev' AND ${KR} AND day BETWEEN ? AND ? GROUP BY name`, a, b)) { ev[r.name] = r.c; eu[r.name] = r.u; }
-    // 스크롤: 페이지를 90% 넘게 내려 본 경우 (GA4의 scroll과 같은 기준)
-    const [sc] = await q(`SELECT COUNT(DISTINCT sid || path) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${KR} AND day BETWEEN ? AND ?`, a, b);
-    if (sc.c) { ev.scroll = sc.c; eu.scroll = sc.u; }
-    return [ev, eu];
-  };
-  const [evC, euC] = await events(c0, c1), [evP, euP] = await events(p0, p1);
-
   const W = `${KR} AND day BETWEEN ? AND ?`;
-  const byDay = {};
-  for (const r of await q(`SELECT day, COUNT(DISTINCT vid) u FROM hits WHERE ${W} GROUP BY day`, c0, c1)) byDay[r.day] = r.u;
-  const daily = [];
-  for (let i = days - 1; i >= 0; i--) daily.push({ date: dayAt(i), activeUsers: byDay[dayAt(i)] || 0 });
-  const dailyEvents = {};
-  for (const r of await q(`SELECT day, name, COUNT(*) c FROM hits WHERE type='ev' AND ${W} GROUP BY day, name`, c0, c1)) (dailyEvents[r.day] ||= {})[r.name] = r.c;
 
-  const param = async key => (await q(
-    `SELECT name, json_extract(params, '$.${key}') v, COUNT(*) c FROM hits WHERE type='ev' AND ${W} AND json_extract(params, '$.${key}') IS NOT NULL GROUP BY name, v`, c0, c1
-  )).map(r => ({ eventName: r.name, ["customEvent:" + key]: String(r.v), eventCount: r.c }));
+  const jobs = [];
+  const Q = (sql, ...b) => jobs.push(env.DB.prepare(sql).bind(...b)) - 1;   // 묶음에 넣고 결과 자리 번호를 돌려줌
 
-  const pageEvents = (await q(`SELECT path, name, COUNT(*) c, COUNT(DISTINCT vid) u FROM hits WHERE type='ev' AND ${W} GROUP BY path, name`, c0, c1))
-    .concat((await q(`SELECT path, COUNT(DISTINCT sid) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${W} GROUP BY path`, c0, c1)).map(r => ({ ...r, name: "scroll" })))
-    .map(r => ({ pagePath: r.path, eventName: r.name, eventCount: r.c, totalUsers: r.u }));
+  const totalsQ = (a, b, extra = "") => {
+    const w = `${KR} AND day BETWEEN ? AND ?${extra}`;
+    return [
+      Q(`SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s, SUM(type='pv') pv, ${MS} ms FROM hits WHERE ${w}`, a, b),
+      Q(`SELECT COUNT(*) n FROM (SELECT vid, MIN(day) d FROM hits WHERE ${KR} GROUP BY vid) WHERE d BETWEEN ? AND ?`, a, b),
+      Q(`SELECT COUNT(*) n FROM (SELECT sid FROM hits WHERE ${w} GROUP BY sid HAVING SUM(type='pv')>=2 OR SUM(type='ev')>=1 OR ${MS}>=10000)`, a, b),
+    ];
+  };
+  const eventsQ = (a, b) => [
+    Q(`SELECT name, COUNT(*) c, COUNT(DISTINCT vid) u FROM hits WHERE type='ev' AND ${KR} AND day BETWEEN ? AND ? GROUP BY name`, a, b),
+    // 스크롤: 페이지를 90% 넘게 내려 본 경우 (GA4의 scroll과 같은 기준)
+    Q(`SELECT COUNT(DISTINCT sid || path) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${KR} AND day BETWEEN ? AND ?`, a, b),
+  ];
+  const paramQ = key => Q(
+    `SELECT name, json_extract(params, '$.${key}') v, COUNT(*) c FROM hits WHERE type='ev' AND ${W} AND json_extract(params, '$.${key}') IS NOT NULL GROUP BY name, v`, c0, c1);
 
-  // 신청 요약 + 최근 신청자 이름·날짜 (연락처·질문 내용은 주지 않아요. 자세한 내용은 관리 페이지에서)
-  const consults = { total: 0, total28: 0, status: {}, who: {}, grade: {}, topics: {}, list: [] };
-  try {
-    for (const r of await q("SELECT name, status, who, grade, topics, created_at FROM consults ORDER BY id DESC")) {
-      consults.total++;
-      if (consults.list.length < 30) consults.list.push({ name: r.name, status: r.status, created_at: r.created_at });
-      if (r.created_at >= t - days * 86400) consults.total28++;
-      consults.status[r.status] = (consults.status[r.status] || 0) + 1;
-      consults.who[r.who] = (consults.who[r.who] || 0) + 1;
-      consults.grade[r.grade] = (consults.grade[r.grade] || 0) + 1;
-      for (const tp of String(r.topics || "").split(",").map(x => x.trim()).filter(Boolean)) consults.topics[tp] = (consults.topics[tp] || 0) + 1;
-    }
-  } catch (e) { console.error("consults", e); }
+  const BLOGX = " AND path LIKE '/blog/%'";
+  const J = {
+    tCur: totalsQ(c0, c1), tPrev: totalsQ(p0, p1), bCur: totalsQ(c0, c1, BLOGX), bPrev: totalsQ(p0, p1, BLOGX),
+    eCur: eventsQ(c0, c1), ePrev: eventsQ(p0, p1),
+    daily: Q(`SELECT day, COUNT(DISTINCT vid) u FROM hits WHERE ${W} GROUP BY day`, c0, c1),
+    dailyEv: Q(`SELECT day, name, COUNT(*) c FROM hits WHERE type='ev' AND ${W} GROUP BY day, name`, c0, c1),
+    channels: Q(`SELECT ${SM} sm, COUNT(DISTINCT sid) s FROM hits WHERE ${W} GROUP BY sm ORDER BY s DESC LIMIT 10`, c0, c1),
+    channelEv: Q(`SELECT ${SM} sm, name, COUNT(*) c FROM hits WHERE type='ev' AND ${W} GROUP BY sm, name`, c0, c1),
+    devices: Q(`SELECT device, COUNT(DISTINCT vid) u FROM hits WHERE ${W} GROUP BY device ORDER BY u DESC`, c0, c1),
+    pages: Q(`SELECT path, MAX(title) title, SUM(type='pv') pv, COUNT(DISTINCT vid) u, ${MS} ms FROM hits WHERE ${W} GROUP BY path ORDER BY pv DESC LIMIT 200`, c0, c1),
+    pageEv: Q(`SELECT path, name, COUNT(*) c, COUNT(DISTINCT vid) u FROM hits WHERE type='ev' AND ${W} GROUP BY path, name`, c0, c1),
+    pageScroll: Q(`SELECT path, COUNT(DISTINCT sid) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${W} GROUP BY path`, c0, c1),
+    blogLanding: Q(`SELECT ${SM} sm, COUNT(DISTINCT sid) s FROM hits WHERE ${W} AND landing LIKE '/blog/%' GROUP BY sm ORDER BY s DESC LIMIT 8`, c0, c1),
+    // 신청 완료 직전에 보던 페이지 (블로그 글에서 넘어온 신청인지 알 수 있어요)
+    consultSrc: Q(`SELECT COALESCE(prev, '') pv, COUNT(*) c FROM hits WHERE type='ev' AND name='consult_submit' AND ${W} GROUP BY pv`, c0, c1),
+    // 검색해서 들어온 방문의 검색어 (네이버·다음처럼 검색어를 넘겨주는 곳만 잡혀요)
+    search: Q(`SELECT kw, src, COUNT(DISTINCT sid) s FROM hits WHERE kw<>'' AND ${W} GROUP BY kw, src ORDER BY s DESC LIMIT 30`, c0, c1),
+    searchVisits: Q(`SELECT src, COUNT(DISTINCT sid) s FROM hits WHERE medium='organic' AND ${W} GROUP BY src ORDER BY s DESC`, c0, c1),
+    hours: Q(`SELECT CAST(strftime('%H', ts + 32400, 'unixepoch') AS INTEGER) h, COUNT(DISTINCT sid) s FROM hits WHERE ${W} GROUP BY h`, c0, c1),
+    params: { cta_location: paramQ("cta_location"), audience: paramQ("audience"), stage: paramQ("stage"), place: paramQ("place") },
+    first: Q("SELECT MIN(day) d, COUNT(*) n FROM hits"),
+    allT: Q("SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ?", c0, c1),
+    countries: Q("SELECT country, COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ? GROUP BY country ORDER BY u DESC LIMIT 12", c0, c1),
+    periods: {},
+  };
 
   // 랜딩페이지·블로그 방문을 오늘/어제/이번 주/이번 달/저번 달로 (한국 시간 기준)
   const kd0 = new Date((t + 32400) * 1000);
@@ -345,50 +342,85 @@ async function stats(env, days) {
     week: [at(Y, Mo, Da - ((kd0.getUTCDay() + 6) % 7)), at(Y, Mo, Da)],   // 이번 주 월요일부터
     month: [at(Y, Mo, 1), at(Y, Mo, Da)], last_month: [at(Y, Mo - 1, 1), at(Y, Mo, 0)],
   };
+  const GROUPS = [["home", "path IN ('/', '/index.html')"], ["blog", "path LIKE '/blog/%'"]];
+  for (const [k, [a, b]] of Object.entries(spans)) for (const [g, cond] of GROUPS)
+    J.periods[g + "|" + k] = Q(`SELECT COUNT(DISTINCT vid) u, SUM(type='pv') pv FROM hits WHERE ${KR} AND day BETWEEN ? AND ? AND ${cond}`, ymd(a), ymd(b));
+
+  // 신청 요약 + 최근 신청자 이름·날짜 (연락처·질문 내용은 주지 않아요. 자세한 내용은 관리 페이지에서)
+  const consultsP = env.DB.prepare("SELECT name, status, who, grade, topics, created_at FROM consults ORDER BY id DESC").all()
+    .then(r => r.results, e => { console.error("consults", e); return []; });
+
+  const [batch, consultRows] = await Promise.all([env.DB.batch(jobs), consultsP]);
+  const R = i => batch[i].results || [];
+  const one = i => R(i)[0] || {};
+
+  const totals = ([a, b, c]) => {
+    const r = one(a), s = r.s || 0, ms = r.ms || 0;
+    return { activeUsers: r.u || 0, newUsers: one(b).n || 0, sessions: s, screenPageViews: r.pv || 0,
+      engagementRate: s ? (one(c).n || 0) / s : 0, averageSessionDuration: s ? ms / 1000 / s : 0, userEngagementDuration: ms / 1000 };
+  };
+  const events = ([a, b]) => {
+    const ev = {}, eu = {};
+    for (const r of R(a)) { ev[r.name] = r.c; eu[r.name] = r.u; }
+    const sc = one(b);
+    if (sc.c) { ev.scroll = sc.c; eu.scroll = sc.u; }
+    return [ev, eu];
+  };
+  const [evC, euC] = events(J.eCur), [evP, euP] = events(J.ePrev);
+
+  const byDay = {};
+  for (const r of R(J.daily)) byDay[r.day] = r.u;
+  const daily = [];
+  for (let i = days - 1; i >= 0; i--) daily.push({ date: dayAt(i), activeUsers: byDay[dayAt(i)] || 0 });
+  const dailyEvents = {};
+  for (const r of R(J.dailyEv)) (dailyEvents[r.day] ||= {})[r.name] = r.c;
+
+  const param = key => R(J.params[key]).map(r => ({ eventName: r.name, ["customEvent:" + key]: String(r.v), eventCount: r.c }));
+  const sm = i => R(i).map(r => ({ sessionSourceMedium: r.sm, sessions: r.s }));
+
   const periods = { ranges: {}, home: {}, blog: {} };
   for (const [k, [a, b]] of Object.entries(spans)) {
     periods.ranges[k] = [ymd(a), ymd(b)];
-    for (const [g, cond] of [["home", "path IN ('/', '/index.html')"], ["blog", "path LIKE '/blog/%'"]]) {
-      const [r] = await q(`SELECT COUNT(DISTINCT vid) u, SUM(type='pv') pv FROM hits WHERE ${KR} AND day BETWEEN ? AND ? AND ${cond}`, ymd(a), ymd(b));
-      periods[g][k] = { users: r.u || 0, views: r.pv || 0 };
-    }
+    for (const [g] of GROUPS) { const r = one(J.periods[g + "|" + k]); periods[g][k] = { users: r.u || 0, views: r.pv || 0 }; }
   }
 
-  const [first] = await q("SELECT MIN(day) d, COUNT(*) n FROM hits");
-  const [allT] = await q("SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ?", c0, c1);
-  const kd = new Date((t + 32400) * 1000).toISOString();
+  const consults = { total: 0, total28: 0, status: {}, who: {}, grade: {}, topics: {}, list: [] };
+  for (const r of consultRows) {
+    consults.total++;
+    if (consults.list.length < 30) consults.list.push({ name: r.name, status: r.status, created_at: r.created_at });
+    if (r.created_at >= t - days * 86400) consults.total28++;
+    consults.status[r.status] = (consults.status[r.status] || 0) + 1;
+    consults.who[r.who] = (consults.who[r.who] || 0) + 1;
+    consults.grade[r.grade] = (consults.grade[r.grade] || 0) + 1;
+    for (const tp of String(r.topics || "").split(",").map(x => x.trim()).filter(Boolean)) consults.topics[tp] = (consults.topics[tp] || 0) + 1;
+  }
 
+  const kd = kd0.toISOString();
   return {
     status: "ok", source: "own", scope: "KR",
     updated_at: kd.slice(0, 10) + " " + kd.slice(11, 16),
-    first_day: first.d || null,
-    periods,
-    consults,
+    first_day: one(J.first).d || null,
+    periods, consults,
     period: { cur: [c0, c1] },
-    totals: { cur: await totals(c0, c1), prev: await totals(p0, p1) },
+    totals: { cur: totals(J.tCur), prev: totals(J.tPrev) },
     events: { cur: evC, prev: evP },
     event_users: { cur: euC, prev: euP },
     daily, daily_events: dailyEvents,
-    channels: (await q(`SELECT ${SM} sm, COUNT(DISTINCT sid) s FROM hits WHERE ${W} GROUP BY sm ORDER BY s DESC LIMIT 10`, c0, c1)).map(r => ({ sessionSourceMedium: r.sm, sessions: r.s })),
-    channel_events: (await q(`SELECT ${SM} sm, name, COUNT(*) c FROM hits WHERE type='ev' AND ${W} GROUP BY sm, name`, c0, c1)).map(r => ({ sessionSourceMedium: r.sm, eventName: r.name, eventCount: r.c })),
-    devices: (await q(`SELECT device, COUNT(DISTINCT vid) u FROM hits WHERE ${W} GROUP BY device ORDER BY u DESC`, c0, c1)).map(r => ({ deviceCategory: r.device, activeUsers: r.u })),
-    pages: (await q(`SELECT path, MAX(title) title, SUM(type='pv') pv, COUNT(DISTINCT vid) u, ${MS} ms FROM hits WHERE ${W} GROUP BY path ORDER BY pv DESC LIMIT 200`, c0, c1))
-      .map(r => ({ pagePath: r.path, pageTitle: r.title || "", screenPageViews: r.pv || 0, activeUsers: r.u, userEngagementDuration: (r.ms || 0) / 1000 })),
-    page_events: pageEvents,
-    blog: {
-      totals: { cur: await totals(c0, c1, " AND path LIKE '/blog/%'"), prev: await totals(p0, p1, " AND path LIKE '/blog/%'") },
-      landing_channels: (await q(`SELECT ${SM} sm, COUNT(DISTINCT sid) s FROM hits WHERE ${W} AND landing LIKE '/blog/%' GROUP BY sm ORDER BY s DESC LIMIT 8`, c0, c1)).map(r => ({ sessionSourceMedium: r.sm, sessions: r.s })),
-    },
-    // 신청 완료 직전에 보던 페이지 (블로그 글에서 넘어온 신청인지 알 수 있어요)
-    consult_sources: (await q(`SELECT COALESCE(prev, '') pv, COUNT(*) c FROM hits WHERE type='ev' AND name='consult_submit' AND ${W} GROUP BY pv`, c0, c1)).map(r => ({ pageReferrer: r.pv, eventCount: r.c })),
-    // 검색해서 들어온 방문의 검색어 (네이버·다음처럼 검색어를 넘겨주는 곳만 잡혀요)
-    search: { status: "ok", source: "referrer", rows: (await q(`SELECT kw, src, COUNT(DISTINCT sid) s FROM hits WHERE kw<>'' AND ${W} GROUP BY kw, src ORDER BY s DESC LIMIT 30`, c0, c1)).map(r => ({ query: r.kw, engine: r.src, clicks: r.s })) },
-    search_visits: (await q(`SELECT src, COUNT(DISTINCT sid) s FROM hits WHERE medium='organic' AND ${W} GROUP BY src ORDER BY s DESC`, c0, c1)).map(r => ({ engine: r.src, sessions: r.s })),
-    hours: (await q(`SELECT CAST(strftime('%H', ts + 32400, 'unixepoch') AS INTEGER) h, COUNT(DISTINCT sid) s FROM hits WHERE ${W} GROUP BY h`, c0, c1)).map(r => ({ hour: r.h, sessions: r.s })),
-    params: { cta_location: await param("cta_location"), audience: await param("audience"), stage: await param("stage"), place: await param("place") },
+    channels: sm(J.channels),
+    channel_events: R(J.channelEv).map(r => ({ sessionSourceMedium: r.sm, eventName: r.name, eventCount: r.c })),
+    devices: R(J.devices).map(r => ({ deviceCategory: r.device, activeUsers: r.u })),
+    pages: R(J.pages).map(r => ({ pagePath: r.path, pageTitle: r.title || "", screenPageViews: r.pv || 0, activeUsers: r.u, userEngagementDuration: (r.ms || 0) / 1000 })),
+    page_events: R(J.pageEv).concat(R(J.pageScroll).map(r => ({ ...r, name: "scroll" })))
+      .map(r => ({ pagePath: r.path, eventName: r.name, eventCount: r.c, totalUsers: r.u })),
+    blog: { totals: { cur: totals(J.bCur), prev: totals(J.bPrev) }, landing_channels: sm(J.blogLanding) },
+    consult_sources: R(J.consultSrc).map(r => ({ pageReferrer: r.pv, eventCount: r.c })),
+    search: { status: "ok", source: "referrer", rows: R(J.search).map(r => ({ query: r.kw, engine: r.src, clicks: r.s })) },
+    search_visits: R(J.searchVisits).map(r => ({ engine: r.src, sessions: r.s })),
+    hours: R(J.hours).map(r => ({ hour: r.h, sessions: r.s })),
+    params: { cta_location: param("cta_location"), audience: param("audience"), stage: param("stage"), place: param("place") },
     all: {
-      totals: { activeUsers: allT.u || 0, sessions: allT.s || 0 },
-      countries: (await q("SELECT country, COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ? GROUP BY country ORDER BY u DESC LIMIT 12", c0, c1)).map(r => ({ country: r.country || "(알 수 없음)", activeUsers: r.u, sessions: r.s })),
+      totals: { activeUsers: one(J.allT).u || 0, sessions: one(J.allT).s || 0 },
+      countries: R(J.countries).map(r => ({ country: r.country || "(알 수 없음)", activeUsers: r.u, sessions: r.s })),
     },
   };
 }
