@@ -5,11 +5,13 @@
 //   POST /api/like      {post}          공감 (같은 방문자는 글마다 1번)
 //   POST /api/comments  {post,nick,body,website}  댓글 등록 → 승인 대기
 //   POST /api/consult   상담 신청 (개인정보 동의 필수)
+//   POST /api/t         자체 방문 집계 (assets/hf-track.js가 보냄 · IP 주소는 저장 안 함)
 // 관리자 API (헤더 Authorization: Bearer <ADMIN_TOKEN>)
 //   GET  /api/admin/comments?status=pending|approved|rejected
 //   POST /api/admin/comments/<id>  {action: approve|reject|delete|reply, reply}
 //   GET  /api/admin/consults?status=new|contacted|done
 //   POST /api/admin/consults/<id>  {action: new|contacted|done|memo|delete, memo}
+//   GET  /api/admin/stats?days=28   자체 방문 집계 요약 (방문 현황 페이지용)
 //
 // 환경 변수: ADMIN_TOKEN(비밀), SALT(비밀), ALLOWED_ORIGINS(쉼표 구분), RETENTION_DAYS(선택, 기본 180)
 
@@ -43,6 +45,12 @@ export default {
 async function route(request, env, url) {
   const p = url.pathname;
   const m = request.method;
+
+  if (m === "POST" && p === "/api/t") {
+    // 집계가 실패해도 방문자 화면에는 아무 영향이 없도록 항상 204로 답해요.
+    try { await track(request, env); } catch (e) { console.error("track", e); }
+    return new Response(null, { status: 204 });
+  }
 
   if (m === "GET" && p === "/api/post") {
     const post = slug(url.searchParams.get("post"));
@@ -138,6 +146,11 @@ async function route(request, env, url) {
       } else throw err(400, "bad_action");
       return json({ ok: true });
     }
+    if (m === "GET" && p === "/api/admin/stats") {
+      const days = Math.max(1, Math.min(90, Number(url.searchParams.get("days")) || 28));
+      try { return json(await stats(env, days)); }
+      catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; await ensureHits(env); return json(await stats(env, days)); }
+    }
     if (m === "GET" && p === "/api/admin/comments") {
       const status = url.searchParams.get("status") || "pending";
       if (!["pending", "approved", "rejected"].includes(status)) throw err(400, "bad_status");
@@ -169,6 +182,177 @@ async function route(request, env, url) {
 async function purgeOld(env) {
   const days = Number(env.RETENTION_DAYS || 180);
   await env.DB.prepare("DELETE FROM consults WHERE created_at < ?").bind(now() - days * 86400).run();
+  // 방문 기록은 400일(HITS_RETENTION_DAYS)까지만 보관해요.
+  try { await env.DB.prepare("DELETE FROM hits WHERE ts < ?").bind(now() - Number(env.HITS_RETENTION_DAYS || 400) * 86400).run(); } catch (e) {}
+}
+
+// ---------- 자체 방문 집계 ----------
+// hits 표는 처음 기록이 들어올 때 자동으로 만들어져요 (schema.sql에도 같은 내용이 있어요).
+const HITS_SQL = [
+  `CREATE TABLE IF NOT EXISTS hits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts INTEGER NOT NULL, day TEXT NOT NULL,
+    vid TEXT NOT NULL, sid TEXT NOT NULL,
+    type TEXT NOT NULL, path TEXT NOT NULL, title TEXT, prev TEXT,
+    name TEXT, params TEXT,
+    src TEXT, medium TEXT, campaign TEXT, kw TEXT, landing TEXT,
+    device TEXT, country TEXT, ms INTEGER, scroll INTEGER)`,
+  "CREATE INDEX IF NOT EXISTS idx_hits_day ON hits (day, type)",
+  "CREATE INDEX IF NOT EXISTS idx_hits_vid ON hits (vid, day)",
+];
+async function ensureHits(env) { await env.DB.batch(HITS_SQL.map(q => env.DB.prepare(q))); }
+
+const BOT_RE = /bot|crawl|spider|slurp|facebookexternalhit|headless|lighthouse|pagespeed|preview|monitor|curl|wget|python|scrapy|yeti|ahrefs|semrush|gptbot/i;
+const ID_RE = /^[a-f0-9]{16,32}$/;
+const EVENT_RE = /^[a-z0-9_]{1,40}$/;
+function kstDay(t) { const d = new Date((t + 32400) * 1000); return d.toISOString().slice(0, 10).replace(/-/g, ""); }
+
+// 어디서 들어왔는지: utm → 이전 페이지 주소 → 앱 안 브라우저 순서로 판단해요.
+function sourceOf(ref, us, um, uc, ua) {
+  if (us) return { src: us.toLowerCase(), medium: (um || "utm").toLowerCase(), campaign: uc || "", kw: "" };
+  let host = "", sp = null;
+  try { const u = new URL(ref); host = u.hostname.replace(/^(www|m)\./, ""); sp = u.searchParams; } catch {}
+  if (/(^|\.)hakjongfighter\.com$/.test(host)) host = "";
+  const o = (src, medium, kw = "") => ({ src, medium, campaign: "", kw: clean(kw, 60) });
+  if (!host) {
+    if (/Instagram/i.test(ua)) return o("instagram", "app");
+    if (/KAKAOTALK/i.test(ua)) return o("kakaotalk", "app");
+    if (/FBAN|FBAV|FB_IAB/i.test(ua)) return o("facebook", "app");
+    if (/Barcelona/i.test(ua)) return o("threads", "app");
+    if (/NAVER\(inapp/i.test(ua)) return o("naver", "app");
+    return o("(direct)", "(none)");
+  }
+  const kw = k => (sp && sp.get(k)) || "";
+  if (/(^|\.)blog\.naver\.com$/.test(host)) return o("blog.naver.com", "referral");
+  if (/(^|\.)cafe\.naver\.com$/.test(host)) return o("cafe.naver.com", "referral");
+  if (/(^|\.)naver\.com$/.test(host)) return o("naver", "organic", kw("query"));
+  if (/(^|\.)google\./.test(host)) return o("google", "organic", kw("q"));
+  if (/(^|\.)daum\.net$/.test(host)) return o("daum", "organic", kw("q"));
+  if (/(^|\.)bing\.com$/.test(host)) return o("bing", "organic", kw("q"));
+  if (/instagram\.com$/.test(host)) return o("instagram", "social");
+  if (/facebook\.com$/.test(host)) return o("facebook", "social");
+  if (/threads\.(net|com)$/.test(host)) return o("threads", "social");
+  if (/(youtube\.com|youtu\.be)$/.test(host)) return o("youtube", "social");
+  if (/kakao\.com$/.test(host)) return o("kakao", "social");
+  if (/^(t\.co|x\.com|twitter\.com)$/.test(host)) return o("x", "social");
+  return o(host.slice(0, 60), "referral");
+}
+
+async function track(request, env) {
+  const origin = request.headers.get("Origin") || "";
+  const allowed = (env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
+  if (!allowed.includes(origin)) return;                       // 우리 사이트에서 온 기록만 받음
+  const ua = request.headers.get("User-Agent") || "";
+  if (BOT_RE.test(ua)) return;
+  const d = await body(request);
+  const type = ["pv", "ev", "eng"].includes(d.t) ? d.t : "";
+  if (!type || !ID_RE.test(d.v || "") || !ID_RE.test(d.s || "")) return;
+  const path = clean(d.p, 200);
+  if (!path.startsWith("/") || /^\/(stats|blog\/admin)(\/|$)/.test(path)) return;
+  const name = type === "ev" ? String(d.n || "") : null;
+  if (type === "ev" && !EVENT_RE.test(name)) return;
+  let params = null;
+  if (type === "ev" && d.pr && typeof d.pr === "object") {
+    const keep = {};
+    for (const [k, v] of Object.entries(d.pr).slice(0, 6)) if (/^[a-z_]{1,30}$/.test(k)) keep[k] = clean(String(v), 80);
+    params = JSON.stringify(keep);
+  }
+  const s = sourceOf(clean(d.r, 300), clean(d.us, 60), clean(d.um, 60), clean(d.uc, 80), ua);
+  const device = /iPad|Tablet/i.test(ua) ? "tablet" : /Mobi|Android|iPhone/i.test(ua) ? "mobile" : "desktop";
+  const country = (request.cf && request.cf.country) || "";
+  const t = now();
+  const row = [t, kstDay(t), d.v, d.s, type, path, type === "pv" ? clean(d.ti, 120) : null, clean(d.pp, 200) || null, name, params,
+    s.src, s.medium, s.campaign, s.kw, clean(d.l, 200) || path, device, country,
+    type === "eng" ? Math.max(0, Math.min(1800000, Math.round(Number(d.ms) || 0))) : null,
+    type === "eng" ? Math.max(0, Math.min(100, Math.round(Number(d.sc) || 0))) : null];
+  const ins = () => env.DB.prepare(
+    "INSERT INTO hits (ts, day, vid, sid, type, path, title, prev, name, params, src, medium, campaign, kw, landing, device, country, ms, scroll) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  ).bind(...row).run();
+  try { await ins(); }
+  catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; await ensureHits(env); await ins(); }
+}
+
+// 방문 현황 페이지가 그대로 그릴 수 있게, GA4에서 받던 것과 같은 모양으로 돌려줘요.
+// 기본은 한국에서 접속한 방문만 세고, 전체·나라별 숫자는 all에 따로 담아요.
+async function stats(env, days) {
+  const t = now();
+  const dayAt = i => kstDay(t - i * 86400);
+  const c0 = dayAt(days - 1), c1 = dayAt(0), p0 = dayAt(days * 2 - 1), p1 = dayAt(days);
+  const KR = "country='KR'";
+  const q = async (sql, ...b) => (await env.DB.prepare(sql).bind(...b).all()).results;
+  const MS = "SUM(CASE WHEN type='eng' THEN ms ELSE 0 END)";
+  const SM = "src || ' / ' || medium";
+
+  const totals = async (a, b, extra = "") => {
+    const w = `${KR} AND day BETWEEN ? AND ?${extra}`;
+    const [r] = await q(`SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s, SUM(type='pv') pv, ${MS} ms FROM hits WHERE ${w}`, a, b);
+    const [n] = await q(`SELECT COUNT(*) n FROM (SELECT vid, MIN(day) d FROM hits WHERE ${KR} GROUP BY vid) WHERE d BETWEEN ? AND ?`, a, b);
+    const [e] = await q(`SELECT COUNT(*) n FROM (SELECT sid FROM hits WHERE ${w} GROUP BY sid HAVING SUM(type='pv')>=2 OR SUM(type='ev')>=1 OR ${MS}>=10000)`, a, b);
+    const s = r.s || 0, ms = r.ms || 0;
+    return { activeUsers: r.u || 0, newUsers: n.n || 0, sessions: s, screenPageViews: r.pv || 0,
+      engagementRate: s ? e.n / s : 0, averageSessionDuration: s ? ms / 1000 / s : 0, userEngagementDuration: ms / 1000 };
+  };
+  const events = async (a, b) => {
+    const ev = {}, eu = {};
+    for (const r of await q(`SELECT name, COUNT(*) c, COUNT(DISTINCT vid) u FROM hits WHERE type='ev' AND ${KR} AND day BETWEEN ? AND ? GROUP BY name`, a, b)) { ev[r.name] = r.c; eu[r.name] = r.u; }
+    // 스크롤: 페이지를 90% 넘게 내려 본 경우 (GA4의 scroll과 같은 기준)
+    const [sc] = await q(`SELECT COUNT(DISTINCT sid || path) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${KR} AND day BETWEEN ? AND ?`, a, b);
+    if (sc.c) { ev.scroll = sc.c; eu.scroll = sc.u; }
+    return [ev, eu];
+  };
+  const [evC, euC] = await events(c0, c1), [evP, euP] = await events(p0, p1);
+
+  const W = `${KR} AND day BETWEEN ? AND ?`;
+  const byDay = {};
+  for (const r of await q(`SELECT day, COUNT(DISTINCT vid) u FROM hits WHERE ${W} GROUP BY day`, c0, c1)) byDay[r.day] = r.u;
+  const daily = [];
+  for (let i = days - 1; i >= 0; i--) daily.push({ date: dayAt(i), activeUsers: byDay[dayAt(i)] || 0 });
+  const dailyEvents = {};
+  for (const r of await q(`SELECT day, name, COUNT(*) c FROM hits WHERE type='ev' AND ${W} GROUP BY day, name`, c0, c1)) (dailyEvents[r.day] ||= {})[r.name] = r.c;
+
+  const param = async key => (await q(
+    `SELECT name, json_extract(params, '$.${key}') v, COUNT(*) c FROM hits WHERE type='ev' AND ${W} AND json_extract(params, '$.${key}') IS NOT NULL GROUP BY name, v`, c0, c1
+  )).map(r => ({ eventName: r.name, ["customEvent:" + key]: String(r.v), eventCount: r.c }));
+
+  const pageEvents = (await q(`SELECT path, name, COUNT(*) c, COUNT(DISTINCT vid) u FROM hits WHERE type='ev' AND ${W} GROUP BY path, name`, c0, c1))
+    .concat((await q(`SELECT path, COUNT(DISTINCT sid) c, COUNT(DISTINCT vid) u FROM hits WHERE type='eng' AND scroll>=90 AND ${W} GROUP BY path`, c0, c1)).map(r => ({ ...r, name: "scroll" })))
+    .map(r => ({ pagePath: r.path, eventName: r.name, eventCount: r.c, totalUsers: r.u }));
+
+  const [first] = await q("SELECT MIN(day) d, COUNT(*) n FROM hits");
+  const [allT] = await q("SELECT COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ?", c0, c1);
+  const kd = new Date((t + 32400) * 1000).toISOString();
+
+  return {
+    status: "ok", source: "own", scope: "KR",
+    updated_at: kd.slice(0, 10) + " " + kd.slice(11, 16),
+    first_day: first.d || null,
+    period: { cur: [c0, c1] },
+    totals: { cur: await totals(c0, c1), prev: await totals(p0, p1) },
+    events: { cur: evC, prev: evP },
+    event_users: { cur: euC, prev: euP },
+    daily, daily_events: dailyEvents,
+    channels: (await q(`SELECT ${SM} sm, COUNT(DISTINCT sid) s FROM hits WHERE ${W} GROUP BY sm ORDER BY s DESC LIMIT 10`, c0, c1)).map(r => ({ sessionSourceMedium: r.sm, sessions: r.s })),
+    channel_events: (await q(`SELECT ${SM} sm, name, COUNT(*) c FROM hits WHERE type='ev' AND ${W} GROUP BY sm, name`, c0, c1)).map(r => ({ sessionSourceMedium: r.sm, eventName: r.name, eventCount: r.c })),
+    devices: (await q(`SELECT device, COUNT(DISTINCT vid) u FROM hits WHERE ${W} GROUP BY device ORDER BY u DESC`, c0, c1)).map(r => ({ deviceCategory: r.device, activeUsers: r.u })),
+    pages: (await q(`SELECT path, MAX(title) title, SUM(type='pv') pv, COUNT(DISTINCT vid) u, ${MS} ms FROM hits WHERE ${W} GROUP BY path ORDER BY pv DESC LIMIT 200`, c0, c1))
+      .map(r => ({ pagePath: r.path, pageTitle: r.title || "", screenPageViews: r.pv || 0, activeUsers: r.u, userEngagementDuration: (r.ms || 0) / 1000 })),
+    page_events: pageEvents,
+    blog: {
+      totals: { cur: await totals(c0, c1, " AND path LIKE '/blog/%'"), prev: await totals(p0, p1, " AND path LIKE '/blog/%'") },
+      landing_channels: (await q(`SELECT ${SM} sm, COUNT(DISTINCT sid) s FROM hits WHERE ${W} AND landing LIKE '/blog/%' GROUP BY sm ORDER BY s DESC LIMIT 8`, c0, c1)).map(r => ({ sessionSourceMedium: r.sm, sessions: r.s })),
+    },
+    // 신청 완료 직전에 보던 페이지 (블로그 글에서 넘어온 신청인지 알 수 있어요)
+    consult_sources: (await q(`SELECT COALESCE(prev, '') pv, COUNT(*) c FROM hits WHERE type='ev' AND name='consult_submit' AND ${W} GROUP BY pv`, c0, c1)).map(r => ({ pageReferrer: r.pv, eventCount: r.c })),
+    // 검색해서 들어온 방문의 검색어 (네이버·다음처럼 검색어를 넘겨주는 곳만 잡혀요)
+    search: { status: "ok", source: "referrer", rows: (await q(`SELECT kw, src, COUNT(DISTINCT sid) s FROM hits WHERE kw<>'' AND ${W} GROUP BY kw, src ORDER BY s DESC LIMIT 30`, c0, c1)).map(r => ({ query: r.kw, engine: r.src, clicks: r.s })) },
+    search_visits: (await q(`SELECT src, COUNT(DISTINCT sid) s FROM hits WHERE medium='organic' AND ${W} GROUP BY src ORDER BY s DESC`, c0, c1)).map(r => ({ engine: r.src, sessions: r.s })),
+    hours: (await q(`SELECT CAST(strftime('%H', ts + 32400, 'unixepoch') AS INTEGER) h, COUNT(DISTINCT sid) s FROM hits WHERE ${W} GROUP BY h`, c0, c1)).map(r => ({ hour: r.h, sessions: r.s })),
+    params: { cta_location: await param("cta_location"), audience: await param("audience"), stage: await param("stage"), place: await param("place") },
+    all: {
+      totals: { activeUsers: allT.u || 0, sessions: allT.s || 0 },
+      countries: (await q("SELECT country, COUNT(DISTINCT vid) u, COUNT(DISTINCT sid) s FROM hits WHERE day BETWEEN ? AND ? GROUP BY country ORDER BY u DESC LIMIT 12", c0, c1)).map(r => ({ country: r.country || "(알 수 없음)", activeUsers: r.u, sessions: r.s })),
+    },
+  };
 }
 
 // ---------- 도우미 ----------

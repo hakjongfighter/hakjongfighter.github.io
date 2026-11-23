@@ -102,6 +102,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   gtag('config', 'G-4G2NGCPVXG');
   window.hfTrack = function (name, params) {{ gtag('event', name, params || {{}}); }};
 </script>
+<!-- 자체 방문 집계 (GA4와 별개 · 쿠키와 IP 저장 없음) -->
+<script defer src="/assets/hf-track.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>

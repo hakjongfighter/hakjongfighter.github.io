@@ -42,3 +42,31 @@ CREATE TABLE IF NOT EXISTS consults (
 );
 CREATE INDEX IF NOT EXISTS idx_consults_status ON consults (status, id);
 CREATE INDEX IF NOT EXISTS idx_consults_ip     ON consults (ip_hash, created_at);
+
+-- 자체 방문 집계 (assets/hf-track.js → POST /api/t)
+-- 이 표는 첫 방문 기록이 들어올 때 서버가 자동으로 만들어요. 직접 실행하지 않아도 돼요.
+-- IP 주소는 저장하지 않고, 브라우저에 둔 무작위 번호(vid)와 접속 국가만 남겨요.
+CREATE TABLE IF NOT EXISTS hits (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts       INTEGER NOT NULL,
+  day      TEXT    NOT NULL,   -- 한국 시간 YYYYMMDD
+  vid      TEXT    NOT NULL,   -- 방문자 (무작위 번호)
+  sid      TEXT    NOT NULL,   -- 방문(세션)
+  type     TEXT    NOT NULL,   -- pv(페이지 열람) / ev(버튼 등 행동) / eng(머문 시간·스크롤)
+  path     TEXT    NOT NULL,
+  title    TEXT,
+  prev     TEXT,               -- 사이트 안에서 바로 전에 보던 페이지
+  name     TEXT,               -- 행동 이름 (ev)
+  params   TEXT,               -- 행동 부가 정보 (JSON)
+  src      TEXT,               -- 들어온 곳 (naver, instagram, (direct) …)
+  medium   TEXT,
+  campaign TEXT,
+  kw       TEXT,               -- 검색어 (검색엔진이 넘겨준 경우만)
+  landing  TEXT,               -- 이번 방문에서 처음 연 페이지
+  device   TEXT,
+  country  TEXT,
+  ms       INTEGER,            -- 머문 시간 (eng)
+  scroll   INTEGER             -- 가장 깊이 내려간 위치 % (eng)
+);
+CREATE INDEX IF NOT EXISTS idx_hits_day ON hits (day, type);
+CREATE INDEX IF NOT EXISTS idx_hits_vid ON hits (vid, day);

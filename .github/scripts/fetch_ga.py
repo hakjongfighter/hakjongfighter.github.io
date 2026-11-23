@@ -51,19 +51,39 @@ def main():
 
     from google.analytics.data_v1beta import BetaAnalyticsDataClient
     from google.analytics.data_v1beta.types import (
-        DateRange, Dimension, Metric, OrderBy, RunReportRequest,
+        DateRange, Dimension, Filter, FilterExpression, FilterExpressionList,
+        Metric, OrderBy, RunReportRequest,
     )
     from google.oauth2 import service_account
 
+    sa_info = json.loads(key)
     creds = service_account.Credentials.from_service_account_info(
-        json.loads(key), scopes=["https://www.googleapis.com/auth/analytics.readonly"]
+        sa_info, scopes=["https://www.googleapis.com/auth/analytics.readonly"]
     )
     client = BetaAnalyticsDataClient(credentials=creds)
     prop = f"properties/{PROPERTY_ID}"
     cur = DateRange(start_date="27daysAgo", end_date="today", name="cur")
     prev = DateRange(start_date="55daysAgo", end_date="28daysAgo", name="prev")
 
-    def run(dims, mets, ranges=(cur,), order=None, limit=50):
+    def eq(field, value):
+        return FilterExpression(filter=Filter(
+            field_name=field, string_filter=Filter.StringFilter(value=value)))
+
+    def begins(field, value):
+        return FilterExpression(filter=Filter(
+            field_name=field, string_filter=Filter.StringFilter(
+                value=value, match_type=Filter.StringFilter.MatchType.BEGINS_WITH)))
+
+    def both(*exprs):
+        return FilterExpression(and_group=FilterExpressionList(expressions=list(exprs)))
+
+    # 해외 데이터센터에서 오는 자동 수집 프로그램(봇)이 방문자 수를 부풀려서,
+    # 모든 숫자는 한국에서 접속한 방문만 셉니다. 전체 숫자는 payload["all"]에 따로 둡니다.
+    KR = eq("countryId", "KR")
+    BLOG = both(KR, begins("pagePath", "/blog/"))
+    ALL = "all"
+
+    def run(dims, mets, ranges=(cur,), order=None, limit=50, flt=KR):
         req = RunReportRequest(
             property=prop,
             dimensions=[Dimension(name=d) for d in dims],
@@ -71,6 +91,8 @@ def main():
             date_ranges=list(ranges),
             limit=limit,
         )
+        if flt is not None and flt != ALL:
+            req.dimension_filter = flt
         if order:
             req.order_bys = [OrderBy(metric=OrderBy.MetricOrderBy(metric_name=order), desc=True)]
         res = client.run_report(req)
@@ -126,9 +148,86 @@ def main():
         rows = run(["eventName", f"customEvent:{name}"], ["eventCount"], limit=200)
         return [r for r in rows if r.get(f"customEvent:{name}") not in ("", "(not set)", None)]
 
+    def by_range(rows):
+        out = {"cur": {}, "prev": {}}
+        for r in rows:
+            out[r.pop("dateRange", "cur")] = r
+        return out
+
+    def everyone():
+        """필터 없는 전체 숫자와 나라별 방문 (얼마나 걸러 냈는지 보여 주기 위함)."""
+        t = run([], ["activeUsers", "sessions"], flt=ALL)
+        return {
+            "totals": t[0] if t else {},
+            "countries": run(["country"], ["activeUsers", "sessions", "engagedSessions"],
+                             order="activeUsers", limit=12, flt=ALL),
+        }
+
+    def blog():
+        """블로그(/blog/…)만 본 숫자."""
+        return {
+            "totals": by_range(run([], ["activeUsers", "screenPageViews", "userEngagementDuration"],
+                                   ranges=(cur, prev), flt=BLOG)),
+            # 블로그 글로 바로 들어온 방문이 어디서 왔는지
+            "landing_channels": run(["sessionSourceMedium"], ["sessions"], order="sessions", limit=8,
+                                    flt=both(KR, begins("landingPage", "/blog/"))),
+        }
+
+    PAGE_EVENTS = {"scroll", "form_start", "consult_click", "blog_consult_click", "consult_submit",
+                   "blog_like", "blog_comment", "blog_follow", "blog_dm"}
+
+    def page_events():
+        rows = run(["pagePath", "eventName"], ["eventCount", "totalUsers"], limit=5000)
+        return [r for r in rows if r["eventName"] in PAGE_EVENTS]
+
+    def consult_sources():
+        """신청 완료(consult_submit)가 어느 페이지에서 넘어와 일어났는지."""
+        return run(["pageReferrer"], ["eventCount"], limit=100,
+                   flt=both(KR, eq("eventName", "consult_submit")))
+
+    def search_queries():
+        """구글 검색어 (Google Search Console). GA4는 검색어를 주지 않아 따로 받습니다.
+
+        Search Console에 사이트를 등록하고, 설정 → 사용자 및 권한에 서비스 계정 이메일을
+        추가해야 채워집니다. 권한이 없으면 not_connected로 남기고 넘어갑니다.
+        """
+        from urllib.parse import quote
+        from google.auth.transport.requests import AuthorizedSession
+        sc = service_account.Credentials.from_service_account_info(
+            sa_info, scopes=["https://www.googleapis.com/auth/webmasters.readonly"])
+        session = AuthorizedSession(sc)
+        today = datetime.now(KST).date()
+        body = {"startDate": str(today - timedelta(days=27)), "endDate": str(today),
+                "dimensions": ["query"], "rowLimit": 25}
+        last = ""
+        for site in (os.environ.get("GSC_SITE", "").strip(), "sc-domain:hakjongfighter.com",
+                     "https://hakjongfighter.com/"):
+            if not site:
+                continue
+            res = session.post(
+                "https://www.googleapis.com/webmasters/v3/sites/%s/searchAnalytics/query" % quote(site, safe=""),
+                json=body, timeout=30)
+            if res.status_code == 200:
+                rows = [{"query": r["keys"][0], "clicks": r.get("clicks", 0),
+                         "impressions": r.get("impressions", 0), "position": r.get("position", 0)}
+                        for r in res.json().get("rows", [])]
+                return {"status": "ok", "site": site, "rows": rows}
+            last = "%s %s" % (res.status_code, res.text[:80])
+        print("검색어 건너뜀:", last, file=sys.stderr)
+        return {"status": "not_connected", "account": sa_info.get("client_email", "")}
+
     payload = {
         "status": "ok",
         "updated_at": now,
+        "scope": "KR",
+        "search": optional(search_queries),
+        "all": optional(everyone),
+        "blog": optional(blog),
+        "pages": optional(lambda: run(["pagePath", "pageTitle"],
+                                      ["screenPageViews", "activeUsers", "userEngagementDuration"],
+                                      order="screenPageViews", limit=200)),
+        "page_events": optional(page_events),
+        "consult_sources": optional(consult_sources),
         "period": {
             "cur": [(datetime.now(KST) - timedelta(days=27)).strftime("%Y-%m-%d"), datetime.now(KST).strftime("%Y-%m-%d")],
         },

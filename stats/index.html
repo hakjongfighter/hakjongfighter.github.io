@@ -107,6 +107,30 @@ footer{font-size:12px;color:var(--muted);text-align:center;padding-bottom:max(24
 a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
 @media (min-width:600px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi.main{grid-column:1/-1}}
 
+.seg{display:flex;background:#E6EBF7;border-radius:999px;padding:4px;gap:4px;align-self:flex-start}
+.seg button{font:inherit;font-size:13.5px;font-weight:700;border:0;background:none;color:var(--muted);border-radius:999px;padding:8px 16px;min-height:40px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--navy);color:#fff}
+.scope{background:#EAF7F3;border:1px solid #BFE6DC;border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.6}
+.scope[hidden]{display:none}
+.scope b{font-weight:900}
+.card h3{margin:18px 0 4px;font-size:14.5px;font-weight:900}
+.card .kpis{margin-bottom:4px}
+.card .kpi{background:var(--bg);border-color:var(--bg)}
+.card .kpi .v{font-size:22px}
+.hours{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;align-items:end;height:120px}
+.hours div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hours i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:var(--bar2);min-height:2px}
+.hours .top i{background:var(--navy)}
+.hours b{font-size:12px;color:var(--navy)}
+.cmp{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.cmp th,.cmp td{padding:9px 4px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+.cmp thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:500}
+.cmp th:first-child,.cmp td:first-child{text-align:left;white-space:normal;font-weight:700}
+.cmp td.fin{font-weight:900}
+.cmp td.fin small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
+.cmp .chk{color:var(--down);font-weight:700}
+.cmp .ok{color:var(--up)}
+.mini{font:inherit;font-size:12.5px;font-weight:700;color:var(--navy);background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer;margin-left:6px}
 #consultCard .cs-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(28,42,94,.1);font-size:15px}
 #consultCard .cs-row:first-child{border-top:0}
 #consultCard .cs-row b{font-weight:700}
@@ -125,7 +149,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
 <header>
   <div class="wrap">
     <img src="../images/character.jpg" alt="">
-    <h1>방문 현황<small>학종파이터 · 최근 28일</small></h1>
+    <h1>방문 현황<small>학종파이터 · 최근 28일 · 한국 방문 기준</small></h1>
     <div class="acts">
       <a class="site" href="../" target="_blank" rel="noopener">사이트 보기</a>
       <button type="button" class="site" id="logout" hidden>잠그기</button>
@@ -138,8 +162,8 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     <form class="lock" id="lock" hidden>
       <img src="../images/character.jpg" alt="" width="88" height="88">
       <h2>관리자 전용 페이지예요</h2>
-      <p>방문 현황을 보려면 비밀번호를 입력해 주세요.</p>
-      <label for="pw">비밀번호</label>
+      <p id="lockMsg">관리자 토큰을 넣으면 자체 집계와 상담 신청이 함께 열려요. 예전 비밀번호를 넣으면 GA4 숫자가 열려요.</p>
+      <label for="pw">관리자 토큰 또는 비밀번호</label>
       <input id="pw" name="pw" type="password" autocomplete="current-password" required>
       <label class="remember" for="remember"><input id="remember" type="checkbox"> 이 기기에서 기억하기</label>
       <button type="submit" id="unlockBtn">숫자 보기</button>
@@ -147,10 +171,15 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     </form>
 
     <div class="board" id="board" hidden>
+    <div class="seg" id="srcSeg" role="group" aria-label="숫자를 가져올 곳">
+      <button type="button" data-src="own" aria-pressed="false">자체 집계</button>
+      <button type="button" data-src="ga" aria-pressed="false">GA4</button>
+    </div>
     <p class="lead" id="lead">숫자를 불러오는 중이에요…</p>
     <div class="when" id="when"></div>
 
     <div id="notice" hidden></div>
+    <div class="scope" id="scope" hidden></div>
 
     <section class="days" id="days" aria-label="오늘과 어제 방문자"></section>
     <section class="kpis" id="kpis" aria-label="핵심 숫자"></section>
@@ -162,21 +191,50 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       <div id="insights"></div>
     </section>
 
+    <section class="card" id="cmpCard" hidden>
+      <h2>자체 집계 × GA4 대조</h2>
+      <p class="d">두 집계를 나란히 놓고 최종값을 정해요. 자체 집계가 28일을 다 채우면 자체 집계를, 그 전에는 GA4를 최종값으로 써요. 신청 완료는 실제 신청 목록 건수가 최종값이에요.</p>
+      <div id="cmp"></div>
+    </section>
+
     <section class="card" id="consultCard">
       <h2>상담 신청</h2>
       <p class="d">상담 신청 폼으로 들어온 신청이에요. 날짜와 이름만 보여요. 연락처 등 자세한 내용은 관리 페이지에서 확인하세요.</p>
+      <div id="consultSum"></div>
       <div id="consultList"><div class="empty">불러오는 중이에요…</div></div>
       <div class="cs-tok" id="consultTok" hidden>
         <input id="consultTokIn" type="password" placeholder="관리자 토큰 (ADMIN_TOKEN)" autocomplete="off">
         <button type="button" id="consultTokBtn">불러오기</button>
       </div>
+      <h3>신청 직전에 보던 페이지</h3>
+      <p class="d">신청서를 낸 사람이 바로 전에 어디에 있었는지예요. 블로그 글에서 넘어온 신청이 여기서 구분돼요.</p>
+      <div id="consultSrc"></div>
       <a class="cs-link" href="../blog/admin/consult/" target="_blank" rel="noopener">상담 신청 관리 페이지 열기 →</a>
     </section>
 
     <section class="card">
       <h2>상담까지 이어진 흐름</h2>
-      <p class="d">상담 신청 버튼은 홈페이지 맨 아래 ‘3단계 로드맵 요약’과 블로그 글 하단·사이드바에 있어요. 버튼을 누르면 상담 신청 페이지로 가고, 신청서를 내면 ‘상담 신청 완료’로 세요. 사람 수 기준이고, 오른쪽 %는 방문자 대비예요.</p>
+      <p class="d">상담 신청 버튼은 홈페이지 맨 아래 ‘3단계 로드맵 요약’과 블로그 글 하단·사이드바에 있어요. 버튼 → 신청 페이지 → 신청서 쓰기 시작 → 완료 순서로, 어느 단계에서 멈추는지 보여 줘요. 사람 수 기준이고, 오른쪽 %는 방문자 대비예요.</p>
       <div id="funnel"></div>
+    </section>
+
+    <section class="card" id="blogCard">
+      <h2>블로그 반응</h2>
+      <p class="d">블로그(/blog/)만 따로 본 숫자예요. 어떤 글이 읽히고, 어떤 글이 상담으로 이어지는지 볼 수 있어요.</p>
+      <section class="kpis" id="blogKpis" aria-label="블로그 핵심 숫자"></section>
+      <h3>블로그에서 상담까지</h3>
+      <div id="blogFunnel"></div>
+      <h3>글별 반응</h3>
+      <p class="d">읽은 횟수 순서예요. 아래 줄에 읽은 사람, 평균 읽은 시간, 끝까지 읽은 사람, 상담 버튼·공감 횟수가 함께 나와요.</p>
+      <div id="blogPosts"></div>
+      <h3>블로그 글로 바로 들어온 경로</h3>
+      <div id="blogLanding"></div>
+    </section>
+
+    <section class="card" id="searchCard">
+      <h2>무엇을 검색해서 들어왔나</h2>
+      <p class="d" id="searchDesc">검색해서 들어온 방문의 검색어예요.</p>
+      <div id="search"></div>
     </section>
 
     <section class="card">
@@ -214,16 +272,34 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       <div id="devices"></div>
     </section>
 
+    <section class="card" id="hoursCard" hidden>
+      <h2>몇 시에 많이 오나</h2>
+      <p class="d">한국 시간 기준 방문 수예요. 인스타 게시물이나 뉴스레터를 올릴 시간을 정할 때 참고하세요.</p>
+      <div class="hours" id="hours"></div>
+    </section>
+
     <details>
       <summary>버튼별 누른 횟수 전체</summary>
       <div id="buttons"></div>
     </details>
 
+    <details id="worldBox" hidden>
+      <summary>집계에서 뺀 해외 접속</summary>
+      <p class="d" style="font-size:13px;color:var(--muted);margin:0 0 12px">나라별 접속자 수예요. 한국 밖 접속은 대부분 데이터센터에서 도는 자동 수집 프로그램이라 위 숫자에서는 모두 뺐어요.</p>
+      <div id="world"></div>
+    </details>
+
     <details>
       <summary>숫자 읽는 법</summary>
       <dl>
+        <dt>자체 집계와 GA4</dt><dd>‘자체 집계’는 우리 서버에 직접 쌓는 방문 기록이에요. 열 때마다 바로 계산돼 늦지 않고, 네이버 검색어·인스타 앱 방문·블로그 글별 반응까지 나와요. ‘GA4’는 구글 애널리틱스 숫자로, 자체 집계를 심기 전 기간을 볼 때 쓰세요. 두 숫자는 세는 방식이 달라 조금 다를 수 있어요.</dd>
+        <dt>대조와 최종값</dt><dd>자체 집계와 GA4는 방문자를 서로 다른 번호로 세어서 사람 단위로 합칠 수는 없고, 합계끼리 비교해요. 두 값이 30% 넘게(3 이상) 벌어지면 ‘확인 필요’로 표시해요. 광고 차단 프로그램은 GA4를 더 자주 막기 때문에 자체 집계가 조금 더 많이 나오는 것이 보통이에요.</dd>
+        <dt>한국 방문 기준</dt><dd>해외 데이터센터에서 오는 자동 수집 프로그램이 방문자 수를 크게 부풀려서, 모든 숫자는 한국에서 접속한 방문만 세요. 뺀 접속은 맨 아래 ‘집계에서 뺀 해외 접속’에서 볼 수 있어요.</dd>
+        <dt>내 방문 빼기</dt><dd>이 페이지를 연 기기는 자체 집계에서 자동으로 빠져요. <span id="internalState"></span><button type="button" class="mini" id="internalBtn"></button></dd>
+        <dt>검색어</dt><dd>자체 집계는 네이버·다음처럼 검색어를 넘겨주는 검색엔진만 잡을 수 있어요. 구글 검색어는 Google Search Console에 사이트를 등록하고 서비스 계정에 권한을 주면 GA4 탭에 나타나요.</dd>
         <dt>방문자</dt><dd>기간 안에 사이트를 한 번 이상 연 사람 수예요. 같은 사람이 여러 번 와도 한 명이에요.</dd>
-        <dt>상담 영역까지 내려옴</dt><dd>페이지의 90% 넘게 스크롤한 사람이에요(GA4 자동 ‘스크롤’ 기록). 이 지점부터 상담 안내와 버튼이 보여요.</dd>
+        <dt>상담 영역까지 내려옴</dt><dd>홈페이지를 90% 넘게 스크롤한 사람이에요. 이 지점부터 상담 안내와 버튼이 보여요. 블로그 글의 스크롤은 ‘끝까지 읽음’으로 따로 세요.</dd>
+        <dt>신청 페이지 열림 · 쓰기 시작</dt><dd>상담 신청 페이지(/consult/)를 연 사람과, 신청서 칸에 처음 입력을 시작한 사람이에요. 주소로 바로 들어온 사람도 있어서 버튼 누른 수보다 많을 수 있어요.</dd>
         <dt>상담 신청 버튼 누름</dt><dd>홈페이지나 블로그에서 ‘전문 상담 신청’ 버튼을 눌러 신청 페이지로 간 사람이에요. 예전 ‘DM으로 [설계도] 보내기’ 버튼 기록도 함께 세요.</dd>
         <dt>상담 신청 완료</dt><dd>신청서를 끝까지 내서 접수된 사람이에요. 실제 신청 목록은 위 ‘상담 신청’ 카드와 관리 페이지에서 볼 수 있어요.</dd>
         <dt>처음 온 방문자</dt><dd>GA4는 같은 사람이 인스타 앱 안과 크롬처럼 다른 브라우저로 들어오면 ‘처음 방문’을 두 번 세요. 그래서 원래 숫자가 방문자보다 클 수 있어, 이 페이지에서는 방문자 수를 넘지 않게 맞춰 보여 줘요.</dd>
@@ -231,7 +307,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         <dt>제대로 본 방문 비율</dt><dd>10초 넘게 머물렀거나, 버튼을 눌렀거나, 두 페이지 이상 본 방문의 비율이에요(GA4 참여율).</dd>
         <dt>누가, 어느 학년을 많이 봤나</dt><dd>GA4 관리 → 맞춤 정의에 이벤트 범위 측정기준 audience(학생/학부모), stage(타임라인 학년), cta_location(누른 위치)을 등록하면 다음 갱신부터 나타나요.</dd>
         <dt>오늘 · 어제</dt><dd>한국 시간 기준 그날 사이트를 연 사람 수예요. 오늘 숫자는 GA4 집계가 늦어 몇 시간 전까지만 반영돼요.</dd>
-        <dt>업데이트 주기</dt><dd>1시간마다 GA4에서 새로 받아 와요. GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
+        <dt>업데이트 주기</dt><dd>자체 집계는 페이지를 열 때마다 바로 계산해요. GA4는 1시간마다 새로 받아 오고, GA4 자체도 집계에 몇 시간~하루가 걸려요.</dd>
       </dl>
     </details>
     </div>
@@ -356,17 +432,28 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     blog_like: '블로그 공감', blog_comment: '블로그 댓글 남기기', blog_follow: '블로그 → instagram',
     dm_sheet_open: '(예전) DM으로 [설계도] 보내기', dm_copy: '‘설계도’ 복사 (자동 포함)', dm_instagram_open: '안내 창 → 인스타그램 열기',
     dm_direct_open: '안내 창 → 메시지 창 바로 열기', instagram_click: '그 밖의 인스타그램 링크', timeline_click: '학년 타임라인',
-    selfcheck_toggle: '자가 진단 체크', audience_switch: '학생 / 학부모 전환', scroll: '페이지 끝까지 스크롤'
+    selfcheck_toggle: '자가 진단 체크', audience_switch: '학생 / 학부모 전환', scroll: '페이지 끝까지 스크롤',
+    form_start: '신청서 쓰기 시작', nav_blog_click: '홈페이지 → 블로그', nav_tab_click: '상단 메뉴 이동', timeline_link_click: '타임라인 → 관련 글 보기',
+    chat_step_click: '상담 미리보기 대화 눌러 봄', blog_dm: '블로그 → 인스타 DM'
   };
+  var ENGINE = { naver: '네이버', google: '구글', daum: '다음', bing: '빙' };
+  var norm = function (p) { p = String(p || ''); try { if (/^https?:/.test(p)) p = new URL(p).pathname; } catch (e) {} return p.replace(/index\.html$/, '').split('?')[0]; };
+  var isBlog = function (p) { return /^\/blog\//.test(p) && !/^\/blog\/admin/.test(p); };
+  var shortTitle = function (t, p) { t = String(t || '').replace(/\s*\|\s*학종파이터.*$/, '').trim(); return t || p; };
+  var regionName = function (c) { try { if (/^[A-Z]{2}$/.test(c)) return new Intl.DisplayNames(['ko'], { type: 'region' }).of(c); } catch (e) {} return c === 'South Korea' ? '대한민국' : c; };
   var DEV = { mobile: '휴대폰', desktop: 'PC', tablet: '태블릿', smart_tv: 'TV' };
   var LOC = { header: '상단 바 인스타 아이콘', top: '첫 화면 @hakjong_fighter', cta: '상담 영역 ‘인스타그램 둘러보기’', footer: '맨 아래 @hakjong_fighter' };
   var AUD = { student: '고등학생이에요', parent: '학부모예요' };
 
   function channelName(sm) {
     var s = String(sm || '').toLowerCase(), src = s.split(' / ')[0];
-    if (/instagram|^ig$|^ig\b/.test(src)) return '인스타그램';
-    if (src === '(direct)') return '직접 방문·앱 안';
-    if (/naver/.test(src)) return '네이버';
+    if (/instagram|^ig$|^ig\b/.test(src)) return /app/.test(s) ? '인스타그램 앱 안' : '인스타그램';
+    if (src === '(direct)') return '직접 방문 (주소 입력·즐겨찾기 등)';
+    if (/blog\.naver/.test(src)) return '네이버 블로그';
+    if (/cafe\.naver/.test(src)) return '네이버 카페';
+    if (/naver/.test(src)) return /organic/.test(s) ? '네이버 검색' : '네이버';
+    if (/google/.test(src) && /organic/.test(s)) return '구글 검색';
+    if (/kakaotalk/.test(src)) return '카카오톡';
     if (/google/.test(src)) return '구글';
     if (/kakao|daum/.test(src)) return '카카오·다음';
     if (/youtube/.test(src)) return '유튜브';
@@ -382,8 +469,9 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     lastFunnel = f;
     if (!f.users) { empty('funnel'); return; }
     var steps = [{ label: '방문자', v: f.users, why: '사이트를 연 사람' }];
-    if (f.hasScroll) steps.push({ label: '상담 영역까지 내려옴', v: f.reach, why: '홈페이지 맨 아래 ‘3단계 로드맵 요약’과 상담 버튼이 보이는 곳' });
     steps.push({ label: '상담 신청 버튼 누름', v: f.open, why: '홈페이지·블로그의 ‘전문 상담 신청’ 버튼 (예전 DM 버튼 포함)' });
+    if (f.hasPages) steps.push({ label: '신청 페이지 열림', v: f.view, why: '상담 신청 페이지를 실제로 연 사람 (주소로 바로 온 사람 포함)' });
+    if (f.hasStart) steps.push({ label: '신청서 쓰기 시작', v: f.start, why: '신청서 칸에 입력을 시작한 사람' });
     steps.push({ label: '상담 신청 완료', v: f.done, why: '신청서를 끝까지 내서 접수됨' });
     bars('funnel', steps.map(function (s, i) {
       var prev = i ? steps[i - 1].v : 0;
@@ -392,9 +480,23 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     }), { unit: f.unit, max: f.users, cls: function (i) { return i === 0 ? '' : 'y'; } });
   }
 
+  function kpiBox(id, items) {
+    var kbox = $(id); kbox.replaceChildren();
+    items.forEach(function (x) {
+      var c = el('div', 'kpi' + (x.main ? ' main' : ''));
+      c.append(el('span', 'k', x.k), el('span', 'v', x.v));
+      if (x.sub) c.appendChild(el('span', 'sub', x.sub));
+      if (x.c) c.appendChild(el('span', 'c ' + x.c.cls, x.c.text));
+      kbox.appendChild(c);
+    });
+  }
+
   function render(d) {
-    $('when').textContent = d.updated_at ? '마지막 업데이트 ' + d.updated_at + ' (1시간마다 갱신)' : '';
-    var all = ['insights', 'funnel', 'sections', 'igpaths', 'daily', 'channels', 'devices', 'buttons'];
+    var isOwn = d.source === 'own';
+    $('when').textContent = d.updated_at ? (isOwn ? '자체 집계 · ' + d.updated_at + ' 기준 (열 때마다 새로 계산)' : 'GA4 · 마지막 업데이트 ' + d.updated_at + ' (1시간마다 갱신)') : '';
+    var all = ['insights', 'funnel', 'sections', 'igpaths', 'daily', 'channels', 'devices', 'buttons', 'blogFunnel', 'blogPosts', 'blogLanding', 'search', 'consultSrc'];
+    $('notice').hidden = true; $('scope').hidden = true; $('hoursCard').hidden = true; $('worldBox').hidden = true;
+    $('blogKpis').replaceChildren(); $('days').replaceChildren(); $('kpis').replaceChildren();
     if (d.status !== 'ok') {
       var n = $('notice'); n.hidden = false; n.className = 'notice';
       n.replaceChildren();
@@ -420,14 +522,48 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var OPEN = ['consult_click', 'blog_consult_click', 'dm_sheet_open'];
     var sumOf = function (obj, keys) { return keys.reduce(function (a, k) { return a + Math.round(+(obj || {})[k] || 0); }, 0); };
     var dmCount = sumOf(ev, OPEN);
+    // 페이지별 숫자 (새 형식에만 있음)
+    var pages = (d.pages || []).map(function (r) { return { path: norm(r.pagePath), title: r.pageTitle, pv: +r.screenPageViews || 0, u: +r.activeUsers || 0, sec: +r.userEngagementDuration || 0 }; });
+    var pageOf = function (p) { return pages.filter(function (r) { return r.path === p; }).reduce(function (a, r) { return { pv: a.pv + r.pv, u: Math.max(a.u, r.u), sec: a.sec + r.sec, title: a.title || r.title }; }, { pv: 0, u: 0, sec: 0, title: '' }); };
+    var PE = d.page_events || null;
+    var pe = function (p, name, key) { return (PE || []).filter(function (r) { return norm(r.pagePath) === p && r.eventName === name; }).reduce(function (a, r) { return a + Math.round(+r[key || 'totalUsers'] || 0); }, 0); };
+    var home = pageOf('/'), consultPage = pageOf('/consult/');
     var f = {
       users: users,
-      hasScroll: ('scroll' in EU) || ('scroll' in ev),
-      reach: cap(eu('scroll')),
+      hasScroll: PE ? true : (('scroll' in EU) || ('scroll' in ev)),
+      // 상담 영역 도달은 홈페이지 스크롤만 (블로그 글 스크롤이 섞이지 않게)
+      reach: PE ? Math.min(pe('/', 'scroll'), home.u || users) : cap(eu('scroll')),
+      reachBase: PE && home.u ? home.u : users,
       open: cap(sumOf(EU, OPEN)),
+      hasPages: !!d.pages, view: cap(consultPage.u),
+      hasStart: !!PE, start: cap(pe('/consult/', 'form_start')),
       done: cap(eu('consult_submit')),
       unit: hasUsers ? '명' : '번'
     };
+
+    // 무엇을 세고 무엇을 뺐는지
+    var sc = $('scope'); sc.replaceChildren();
+    var allUsers = d.all && d.all.totals ? Math.round(+d.all.totals.activeUsers || 0) : 0;
+    if (d.scope === 'KR' && allUsers > users) {
+      sc.hidden = false;
+      sc.append('전체 접속 ', el('b', null, nf.format(allUsers) + '명'), ' 가운데 한국에서 온 ', el('b', null, nf.format(users) + '명'), '만 셌어요. 해외 접속 ' + nf.format(allUsers - users) + '명은 대부분 자동 수집 프로그램이라 뺐어요.');
+    } else if (!d.scope) {
+      sc.hidden = false;
+      sc.append(el('b', null, '아직 해외 자동 접속이 섞인 숫자예요. '), '다음 갱신(1시간 안)부터 한국 방문만 세도록 바뀌어요.');
+    }
+    var firstDay = d.first_day || ((d.daily || []).filter(function (r) { return +r.activeUsers > 0; })[0] || {}).date;
+    var collected = 28;
+    if (firstDay && d.updated_at) {
+      var fd = new Date(firstDay.slice(0, 4) + '-' + firstDay.slice(4, 6) + '-' + firstDay.slice(6, 8) + 'T00:00:00Z');
+      collected = Math.round((new Date(d.updated_at.slice(0, 10) + 'T00:00:00Z') - fd) / 86400000) + 1;
+    }
+    if (isOwn && !firstDay) {
+      var nt = $('notice'); nt.hidden = false; nt.className = 'notice'; nt.replaceChildren();
+      nt.append(el('b', null, '자체 집계가 아직 비어 있어요. '), '집계 코드가 사이트에 올라간 뒤 첫 방문부터 쌓여요. 그 전 숫자는 위에서 ‘GA4’를 눌러 보세요.');
+    } else if (collected < 28) {
+      var nt2 = $('notice'); nt2.hidden = false; nt2.className = 'notice'; nt2.replaceChildren();
+      nt2.append(el('b', null, (isOwn ? '자체 집계' : '집계') + '를 시작한 지 ' + collected + '일째예요. '), '28일이 차기 전에는 ▲▼ 비교가 ‘새로 생김’으로만 나와요.' + (isOwn ? ' 그 전 숫자는 ‘GA4’에서 볼 수 있어요.' : ''));
+    }
 
     // 오늘·어제 방문자 (한국 시간, 업데이트 시각 기준)
     var ymd = function (dt) { return dt.toISOString().slice(0, 10).replace(/-/g, ''); };
@@ -459,16 +595,95 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       { k: '평균 머문 시간', v: dur(cur.averageSessionDuration), c: change(cur.averageSessionDuration, prev.averageSessionDuration) },
       { k: '제대로 본 방문', v: pct(cur.engagementRate), c: change(cur.engagementRate, prev.engagementRate, true) }
     ];
-    var kbox = $('kpis'); kbox.replaceChildren();
-    kp.forEach(function (x) {
-      var c = el('div', 'kpi' + (x.main ? ' main' : ''));
-      c.append(el('span', 'k', x.k), el('span', 'v', x.v));
-      if (x.sub) c.appendChild(el('span', 'sub', x.sub));
-      c.appendChild(el('span', 'c ' + x.c.cls, x.c.text));
-      kbox.appendChild(c);
-    });
+    kpiBox('kpis', kp);
 
     funnel(f);
+
+    // ---------- 블로그 ----------
+    var blogPages = pages.filter(function (r) { return isBlog(r.path); });
+    var posts = blogPages.filter(function (r) { return r.path !== '/blog/'; });
+    var B = (d.blog && d.blog.totals) || null, bc = B ? (B.cur || {}) : {}, bp = B ? (B.prev || {}) : {};
+    var blogUsers = Math.round(+bc.activeUsers || 0);
+    var postViews = posts.reduce(function (a, r) { return a + r.pv; }, 0), postSec = posts.reduce(function (a, r) { return a + r.sec; }, 0);
+    var blogOpen = cap(eu('blog_consult_click'));
+    var srcRows = (d.consult_sources || []).map(function (r) { return { path: norm(r.pageReferrer), v: Math.round(+r.eventCount || 0) }; }).filter(function (r) { return r.v; });
+    var blogDone = srcRows.filter(function (r) { return isBlog(r.path); }).reduce(function (a, r) { return a + r.v; }, 0);
+    var blogInfo = { has: !!d.pages, users: blogUsers, posts: posts, open: blogOpen, done: blogDone, listing: pageOf('/blog/') };
+    if (!d.pages) {
+      ['blogFunnel', 'blogPosts', 'blogLanding'].forEach(function (id) { empty(id, '블로그 숫자는 다음 갱신(1시간 안)부터 나타나요.'); });
+    } else {
+      kpiBox('blogKpis', [
+        { k: '블로그 방문자', v: nf.format(blogUsers) + '명', c: change(blogUsers, bp.activeUsers) },
+        { k: '글 읽은 횟수', v: nf.format(postViews) + '번' },
+        { k: '글 하나당 읽은 시간', v: dur(ratio(postSec, postViews)) },
+        { k: '블로그 → 상담 버튼', v: nf.format(blogOpen) + (hasUsers ? '명' : '번'), c: change(blogOpen, EUP.blog_consult_click) }
+      ]);
+      if (!blogUsers) empty('blogFunnel', '아직 블로그 방문이 없어요.');
+      else bars('blogFunnel', [
+        { label: '블로그 방문자', v: blogUsers, extra: '', why: '블로그 목록이나 글을 연 사람' },
+        { label: '블로그에서 상담 버튼 누름', v: Math.min(blogOpen, blogUsers), extra: pct(ratio(blogOpen, blogUsers)), why: '글 하단·사이드바의 ‘전문 상담 신청’ 버튼' },
+        { label: '블로그에서 넘어와 신청 완료', v: Math.min(blogDone, blogUsers), extra: pct(ratio(blogDone, blogUsers)), why: '신청 직전에 블로그 글을 보고 있던 신청' }
+      ], { unit: '명', max: blogUsers, cls: function (i) { return i ? 'y' : ''; } });
+      if (!posts.length) empty('blogPosts', '아직 읽힌 글이 없어요.');
+      else bars('blogPosts', posts.sort(function (a, b) { return b.pv - a.pv; }).slice(0, 15).map(function (r) {
+        var bits = ['읽은 사람 ' + nf.format(r.u) + '명', '평균 ' + dur(ratio(r.sec, r.pv))];
+        if (PE) {
+          bits.push('끝까지 읽음 ' + nf.format(pe(r.path, 'scroll')) + '명');
+          bits.push('상담 버튼 ' + nf.format(pe(r.path, 'blog_consult_click', 'eventCount')) + '번');
+          bits.push('공감 ' + nf.format(pe(r.path, 'blog_like', 'eventCount')) + '번');
+        }
+        return { label: shortTitle(r.title, r.path), v: r.pv, why: bits.join(' · ') };
+      }), { unit: '번', cls: function (i) { return i ? 'alt' : ''; } });
+      var bl = ((d.blog && d.blog.landing_channels) || []).map(function (r) { var nm = channelName(r.sessionSourceMedium); return { label: nm, sub: nm !== r.sessionSourceMedium ? r.sessionSourceMedium : '', v: +r.sessions || 0 }; }).filter(function (r) { return r.v; });
+      if (!bl.length) empty('blogLanding', '아직 블로그 글로 바로 들어온 방문이 없어요. 인스타 게시물에 글 주소를 직접 걸면 여기에 잡혀요.');
+      else bars('blogLanding', bl, { unit: '회', share: true, cls: function (i) { return i ? 'alt' : ''; } });
+    }
+
+    // 신청 직전에 보던 페이지
+    if (!d.consult_sources) empty('consultSrc', '다음 갱신(1시간 안)부터 나타나요.');
+    else if (!srcRows.length) empty('consultSrc', '아직 집계된 신청 완료가 없어요.');
+    else bars('consultSrc', srcRows.sort(function (a, b) { return b.v - a.v; }).map(function (r) {
+      var label = r.path === '/' ? '홈페이지' : isBlog(r.path) ? '블로그 · ' + shortTitle(pageOf(r.path).title, r.path) : (!r.path || r.path === '/consult/') ? '신청 페이지로 바로 옴' : r.path;
+      return { label: label, v: r.v };
+    }), { unit: '건', share: true, cls: function (i) { return i ? 'alt' : 'y'; } });
+
+    // ---------- 검색어 ----------
+    var S = d.search || null, sd = $('searchDesc');
+    var sv = (d.search_visits || []).map(function (r) { return (ENGINE[r.engine] || r.engine) + ' ' + nf.format(r.sessions) + '회'; }).join(' · ');
+    if (S && S.status === 'ok' && S.rows && S.rows.length) {
+      var gsc = S.source !== 'referrer';
+      sd.textContent = gsc ? '구글 검색 결과에서 우리 사이트가 눌린 검색어예요 (Google Search Console).' : '검색해서 들어온 방문의 검색어예요. 네이버·다음처럼 검색어를 넘겨주는 곳만 잡혀요.' + (sv ? ' 검색 방문 전체: ' + sv : '');
+      bars('search', S.rows.slice(0, 20).map(function (r) {
+        return { label: r.query, sub: gsc ? '' : (ENGINE[r.engine] || r.engine), v: Math.round(+r.clicks || 0),
+          extra: gsc ? '노출 ' + nf.format(Math.round(+r.impressions || 0)) + '번 · 평균 ' + (Math.round((+r.position || 0) * 10) / 10) + '위' : null };
+      }), { unit: '회', cls: function (i) { return i ? 'alt' : ''; } });
+    } else if (isOwn) {
+      sd.textContent = '검색해서 들어온 방문의 검색어예요.';
+      empty('search', sv ? '검색 방문은 있었지만(' + sv + ') 검색어는 넘어오지 않았어요. 구글은 검색어를 넘겨주지 않아요.' : '아직 검색으로 들어온 방문이 없어요. 네이버 서치어드바이저와 Google Search Console에 사이트를 등록하면 검색에 더 잘 잡혀요.');
+    } else {
+      sd.textContent = 'GA4는 검색어를 알려 주지 않아요.';
+      empty('search', S && S.status === 'not_connected'
+        ? '구글 검색어를 보려면 Google Search Console에 hakjongfighter.com을 등록하고, 설정 → 사용자 및 권한에 ' + (S.account || '서비스 계정 이메일') + ' 을 추가해 주세요. 네이버 검색어는 ‘자체 집계’에서 볼 수 있어요.'
+        : '네이버 검색어는 ‘자체 집계’에서, 구글 검색어는 Google Search Console 연결 후 볼 수 있어요.');
+    }
+
+    // ---------- 시간대 (자체 집계만) ----------
+    var hrs = d.hours || [];
+    if (hrs.length) {
+      var buckets = [0, 0, 0, 0, 0, 0, 0, 0];
+      hrs.forEach(function (r) { buckets[Math.floor((+r.hour || 0) / 3)] += +r.sessions || 0; });
+      var hmax = Math.max.apply(null, buckets) || 1, hb = $('hours'); hb.replaceChildren();
+      buckets.forEach(function (v, i) {
+        var c = el('div', v === hmax ? 'top' : ''); var bar = el('i'); bar.style.height = Math.round(v / hmax * 70) + '%';
+        c.append(el('b', null, v ? nf.format(v) : ''), bar, el('span', null, (i * 3) + '시'));
+        hb.appendChild(c);
+      });
+      $('hoursCard').hidden = false;
+    }
+
+    // ---------- 뺀 해외 접속 ----------
+    var world = ((d.all && d.all.countries) || []).map(function (r) { return { label: regionName(r.country), v: Math.round(+r.activeUsers || 0), extra: '방문 ' + nf.format(Math.round(+r.sessions || 0)) + '회' }; }).filter(function (r) { return r.v; });
+    if (world.length > 1) { $('worldBox').hidden = false; bars('world', world, { unit: '명', cls: function (i) { return i ? 'alt' : ''; } }); }
 
     // 구간별 반응 (랜딩 순서)
     if (!users) empty('sections');
@@ -480,7 +695,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         { label: '상담 영역까지 내려옴', k: 'scroll', skip: !f.hasScroll },
         { label: '상담 신청 버튼 누름', keys: OPEN }
       ].filter(function (s) { return !s.skip; });
-      bars('sections', secs.map(function (s) { var v = cap(s.keys ? sumOf(EU, s.keys) : eu(s.k)); return { label: s.label, v: v, extra: pct(ratio(v, users)) }; }),
+      bars('sections', secs.map(function (s) { var v = cap(s.keys ? sumOf(EU, s.keys) : (s.k === 'scroll' ? f.reach : eu(s.k))); return { label: s.label, v: v, extra: pct(ratio(v, users)) }; }),
         { unit: hasUsers ? '명' : '번', max: users, cls: function () { return 'alt'; } });
     }
 
@@ -528,7 +743,8 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var btn = Object.keys(NAMES).filter(function (k) { return ev[k]; }).map(function (k) { return { label: NAMES[k], v: Math.round(+ev[k]) }; }).sort(function (a, b) { return b.v - a.v; });
     if (!btn.length) empty('buttons', '아직 눌린 기록이 없어요.'); else bars('buttons', btn, { unit: '번', cls: function (i) { return i ? 'alt' : ''; } });
 
-    insights(f, { users: users, chRows: chRows, chDm: chDm, devRows: devRows, openPrev: openPrev, selfcheck: cap(eu('selfcheck_toggle')), hasUsers: hasUsers });
+    insights(f, { users: users, chRows: chRows, chDm: chDm, devRows: devRows, openPrev: openPrev, selfcheck: cap(eu('selfcheck_toggle')), hasUsers: hasUsers,
+      sessions: Math.round(+cur.sessions || 0), blog: blogInfo, pe: PE ? pe : null, isOwn: isOwn, collected: collected });
   }
 
   function insights(f, x) {
@@ -536,10 +752,38 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     if (!f.users) return empty('insights', '방문이 생기면 여기에 살펴볼 점이 나타나요.');
     var list = [];
     var add = function (tone, tag, head, act) { list.push({ tone: tone, tag: tag, head: head, act: act }); };
-    var reachR = ratio(f.reach, f.users), openR = ratio(f.open, f.reach || f.users), doneR = ratio(f.done, f.open);
+    var reachR = ratio(f.reach, f.reachBase || f.users), openR = ratio(f.open, f.reach || f.users), doneR = ratio(f.done, f.open);
+
+    // 같은 사람이 아주 여러 번 들어온 경우: 운영자 본인 접속이 섞였을 가능성
+    if (!x.isOwn && x.sessions >= 10 && ratio(x.sessions, f.users) >= 2.5) {
+      add('warn', '점검', '방문자 한 명이 평균 ' + (Math.round(ratio(x.sessions, f.users) * 10) / 10) + '번씩 들어왔어요. 운영자 본인 접속이 섞였을 가능성이 커요.',
+        '‘자체 집계’는 이 기기의 방문을 자동으로 빼요. GA4에서도 빼려면 관리 → 데이터 스트림 → 태그 설정에서 내부 트래픽(사무실 IP)을 등록하세요.');
+    }
+    // 블로그
+    var bg = x.blog || {};
+    if (bg.has && bg.users >= 5 && bg.open === 0) {
+      add('warn', '점검', '블로그 방문자 ' + nf.format(bg.users) + '명 중 상담 버튼을 누른 사람이 아직 없어요.',
+        '글 끝의 상담 안내가 글 내용과 이어지는지 확인해 보세요. “이 글의 방법을 내 생기부에 적용하면?”처럼 글 주제를 받아 주는 한 줄이 효과적이에요.');
+    } else if (bg.has && bg.open >= 2 && ratio(bg.open, bg.users) >= ratio(f.open, f.users) * 1.3 && pct(ratio(bg.open, bg.users)) !== pct(ratio(f.open, f.users))) {
+      add('good', '좋아요', '블로그 방문자가 상담 버튼을 누르는 비율(' + pct(ratio(bg.open, bg.users)) + ')이 사이트 전체(' + pct(ratio(f.open, f.users)) + ')보다 높아요.', '글을 읽고 온 사람이 상담에 더 가까워요. 인스타 게시물에서 홈 대신 관련 블로그 글로 바로 연결해 보세요.');
+    }
+    if (bg.has && bg.listing && bg.listing.u >= 5 && bg.posts.length) {
+      var readers = Math.max.apply(null, bg.posts.map(function (r) { return r.u; }));
+      if (ratio(readers, bg.listing.u) < 0.5) add('warn', '점검', '블로그 목록을 본 ' + nf.format(bg.listing.u) + '명 중 글을 열어 본 사람은 많아야 ' + nf.format(readers) + '명이에요.', '목록에서 멈추는 사람이 많아요. 글 제목과 썸네일이 “내 얘기”로 보이는지, 맨 위 글이 가장 궁금해할 주제인지 확인해 보세요.');
+    }
+    if (bg.has && x.pe && bg.posts.length) {
+      var top = bg.posts.slice().sort(function (a, b) { return b.pv - a.pv; })[0];
+      if (top && top.u >= 5) {
+        var fin = x.pe(top.path, 'scroll');
+        if (ratio(fin, top.u) < 0.3) add('info', '참고', '가장 많이 읽힌 글 ‘' + shortTitle(top.title, top.path) + '’을 끝까지 읽은 사람은 ' + pct(ratio(fin, top.u)) + '예요.', '상담 버튼이 글 끝에 있어 대부분 보지 못해요. 글 중간에도 한 번 넣어 볼 만해요.');
+      }
+    }
+    if (f.hasStart && f.view >= 3 && ratio(f.start, f.view) < 0.5) {
+      add('warn', '점검', '신청 페이지를 연 ' + nf.format(f.view) + '명 중 ' + pct(ratio(f.start, f.view)) + '만 신청서를 쓰기 시작했어요.', '신청서를 보기만 하고 나간 사람이 많아요. 첫 화면에 “무엇을 받는지, 얼마나 걸리는지”가 바로 보이는지 확인해 보세요.');
+    }
 
     if (f.hasScroll && reachR < 0.5) {
-      add('warn', '점검', '방문자 ' + nf.format(f.users) + '명 중 ' + pct(reachR) + '만 상담 영역까지 내려왔어요. 나머지 ' + pct(1 - reachR) + '는 상담 안내를 보지 못하고 나갔어요.',
+      add('warn', '점검', '홈페이지 방문자 ' + nf.format(f.reachBase || f.users) + '명 중 ' + pct(reachR) + '만 상담 영역까지 내려왔어요. 나머지 ' + pct(1 - reachR) + '는 상담 안내를 보지 못하고 나갔어요.',
         '상담 버튼이 맨 아래 한 곳에만 있어요. 자가 진단 결과 바로 아래나 화면 하단 고정 버튼으로 하나 더 두면 더 많은 사람이 볼 수 있어요.');
     } else if (!f.hasScroll) {
       add('info', '참고', '스크롤 기록이 없어 상담 영역까지 내려온 사람 수를 알 수 없어요.', 'GA4 관리 → 데이터 스트림 → 향상된 측정에서 ‘스크롤’이 켜져 있는지 확인해 주세요.');
@@ -578,7 +822,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var order = { warn: 0, good: 1, info: 2 };
     list.sort(function (a, b) { return order[a.tone] - order[b.tone]; });
     var ul = el('ul', 'tips');
-    list.slice(0, 5).forEach(function (t) {
+    list.slice(0, 6).forEach(function (t) {
       var li = el('li'); li.appendChild(el('span', 'tag ' + t.tone, t.tag));
       var body = el('span'); body.appendChild(el('b', null, t.head)); if (t.act) body.appendChild(el('span', 'act', t.act));
       li.appendChild(body); ul.appendChild(li);
@@ -586,7 +830,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     box.replaceChildren(ul);
   }
 
-  var last = null, rt, locked = null;
+  var last = null, rt;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
     rt = setTimeout(function () {
@@ -596,8 +840,15 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     }, 150);
   });
 
+  // ---------- 숫자를 가져오는 곳: 자체 집계(우리 서버) / GA4(data.json) ----------
+  var API = 'https://hakjongfighter-blog-api.avecvalse.workers.dev';
+  var PW_KEY = 'hf-stats-pw', TOK_S = 'hf_admin', TOK_L = 'hf_admin_stats', INTERNAL = 'hf_internal';
+  var st = { src: null, own: null, ga: null, gaRaw: null, want: 'own' };
+  var ls = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; };
+  var ss = function (k, v) { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} return null; };
+  var getTok = function () { return ss(TOK_S) || ls(TOK_L) || ''; };
+
   // 비밀번호로 암호화된 data.json 풀기 (AES-256-GCM, PBKDF2-SHA256)
-  var KEY = 'hf-stats-pw';
   var b64 = function (s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
   function decrypt(d, pw) {
     var enc = new TextEncoder();
@@ -606,48 +857,219 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
       .then(function (key) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(d.iv) }, key, b64(d.ct)); })
       .then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); });
   }
-  function show(d) { $('lock').hidden = true; $('board').hidden = false; last = d; render(d); }
-  function unlock(pw, remember) {
-    return decrypt(locked, pw).then(function (d) {
-      try { if (remember) localStorage.setItem(KEY, pw); else localStorage.removeItem(KEY); } catch (e) {}
-      $('logout').hidden = false;
-      show(d);
+  function fetchOwn(tok) {
+    return fetch(API + '/api/admin/stats?days=28', { headers: { Authorization: 'Bearer ' + tok }, cache: 'no-store' })
+      .then(function (r) { if (r.status === 401) throw new Error('auth'); if (!r.ok) throw new Error('unavailable'); return r.json(); })
+      .then(function (d) { if (!d || d.status !== 'ok') throw new Error('unavailable'); return d; });
+  }
+  var gaReady = fetch('data.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('data.json ' + r.status); return r.json(); })
+    .catch(function () { return { status: 'error', message: '잠시 뒤 새로고침해 주세요.' }; })
+    .then(function (d) { st.gaRaw = d; if (d.status !== 'locked') st.ga = d; return d; });
+
+  function internalUi() {
+    var on = ls(INTERNAL) === '1';
+    $('internalState').textContent = on ? '지금 이 기기는 빠져 있어요.' : '지금 이 기기도 방문자로 세고 있어요.';
+    $('internalBtn').textContent = on ? '이 기기도 세기' : '이 기기 빼기';
+  }
+  $('internalBtn').addEventListener('click', function () { ls(INTERNAL, ls(INTERNAL) === '1' ? '0' : '1'); internalUi(); });
+
+  // ---------- 자체 집계 × GA4 대조 ----------
+  function daysOf(d) {
+    var fd = d.first_day || ((d.daily || []).filter(function (r) { return +r.activeUsers > 0; })[0] || {}).date;
+    if (!fd || !d.updated_at) return { first: fd || null, n: fd ? 28 : 0 };
+    var a = new Date(fd.slice(0, 4) + '-' + fd.slice(4, 6) + '-' + fd.slice(6, 8) + 'T00:00:00Z');
+    return { first: fd, n: Math.round((new Date(d.updated_at.slice(0, 10) + 'T00:00:00Z') - a) / 86400000) + 1 };
+  }
+  function compare() {
+    var card = $('cmpCard'), box = $('cmp'), o = st.own, g = st.ga;
+    if (!o || o.status !== 'ok') { card.hidden = true; return; }
+    card.hidden = false; box.replaceChildren();
+    if (!g || g.status !== 'ok') {
+      var e = el('div', 'empty', 'GA4 숫자가 열려 있어야 대조할 수 있어요. ');
+      var b = el('button', 'mini', 'GA4 열기'); b.type = 'button';
+      b.addEventListener('click', function () { $('srcSeg').querySelector('[data-src=ga]').click(); });
+      e.appendChild(b); box.appendChild(e); return;
+    }
+    var od = daysOf(o), ownFull = od.n >= 28;
+    var OPEN = ['consult_click', 'blog_consult_click', 'dm_sheet_open'];
+    var val = function (d, f) { try { return Math.round(+f(d) || 0); } catch (x) { return 0; } };
+    var people = function (d, keys) { var eu = (d.event_users && d.event_users.cur) || (d.events && d.events.cur) || {}; return keys.reduce(function (a, k) { return a + Math.round(+eu[k] || 0); }, 0); };
+    var far = function (a, b) { return Math.abs(a - b) >= 3 && Math.abs(a - b) / Math.max(a, b, 1) >= 0.3; };
+    var db = typeof window.hfConsultCount === 'number' ? window.hfConsultCount : null;
+    var rows = [
+      { k: '방문자', f: function (d) { return d.totals.cur.activeUsers; }, u: '명' },
+      { k: '방문 수', f: function (d) { return d.totals.cur.sessions; }, u: '회' },
+      { k: '페이지 열람', f: function (d) { return d.totals.cur.screenPageViews; }, u: '번' },
+      { k: '블로그 방문자', f: function (d) { return d.blog.totals.cur.activeUsers; }, u: '명' },
+      { k: '상담 버튼 누른 사람', f: function (d) { return people(d, OPEN); }, u: '명' },
+      { k: '신청 완료', f: function (d) { return people(d, ['consult_submit']); }, u: '건', db: true }
+    ];
+    var t = el('table', 'cmp'), th = el('thead'), hr = el('tr');
+    ['최근 28일', '자체', 'GA4', '최종값'].forEach(function (x) { hr.appendChild(el('th', null, x)); });
+    th.appendChild(hr); t.appendChild(th);
+    var tb = el('tbody'), flagged = 0;
+    rows.forEach(function (r) {
+      var a = val(o, r.f), b = val(g, r.f), tr = el('tr');
+      var fin, from;
+      if (r.db && db !== null) { fin = db; from = '신청 목록'; }
+      else if (ownFull) { fin = a; from = '자체 집계'; }
+      else { fin = b; from = 'GA4'; }
+      // 자체 집계가 28일을 다 채운 뒤에만 합계끼리 어긋남을 따져요 (그 전에는 기간이 달라 당연히 달라요)
+      var bad = r.db && db !== null ? (far(db, a) && ownFull) || far(db, b) : ownFull && far(a, b);
+      if (bad) flagged++;
+      tr.append(el('td', null, r.k), el('td', null, nf.format(a)), el('td', null, nf.format(b)));
+      var td = el('td', 'fin', nf.format(fin) + r.u); td.appendChild(el('small', bad ? 'chk' : null, bad ? '확인 필요 · ' + from : from));
+      tr.appendChild(td); tb.appendChild(tr);
+    });
+    t.appendChild(tb); box.appendChild(t);
+
+    // 겹치는 날짜끼리 날짜별 방문자 비교
+    var gd = {}; (g.daily || []).forEach(function (r) { gd[r.date] = +r.activeUsers || 0; });
+    var today = (o.daily || []).length ? o.daily[o.daily.length - 1].date : '';
+    var both = (o.daily || []).filter(function (r) { return od.first && r.date >= od.first && r.date !== today && (r.date in gd); });
+    var sa = 0, sb = 0, off = [];
+    both.forEach(function (r) { var a = +r.activeUsers || 0, b = gd[r.date]; sa += a; sb += b; if (far(a, b)) off.push((+r.date.slice(4, 6)) + '/' + (+r.date.slice(6, 8)) + ' (자체 ' + a + ' · GA4 ' + b + ')'); });
+    var note = el('p', 'foot');
+    if (!both.length) note.textContent = '자체 집계는 ' + (od.first ? (+od.first.slice(4, 6)) + '/' + (+od.first.slice(6, 8)) + '부터 쌓였어요. ' : '아직 비어 있어요. ') + '하루가 지나면 겹치는 날짜부터 날짜별로 비교해 드려요. 그 전까지 최종값은 GA4예요.';
+    else {
+      note.append('겹치는 ' + both.length + '일 동안 날짜별 방문자 합은 자체 ' + nf.format(sa) + ' · GA4 ' + nf.format(sb) + '로 ');
+      note.appendChild(el('b', far(sa, sb) ? 'chk' : 'ok', far(sa, sb) ? '차이가 커요.' : '서로 잘 맞아요.'));
+      if (off.length) note.append(' 크게 어긋난 날: ' + off.slice(0, 6).join(', ') + (off.length > 6 ? ' 외 ' + (off.length - 6) + '일' : '') + '.');
+      if (!ownFull) note.append(' 자체 집계가 ' + od.n + '일째라, 28일이 찰 때까지 합계의 최종값은 GA4를 써요.');
+    }
+    box.appendChild(note);
+    if (!g.scope) box.appendChild(el('p', 'foot', 'GA4 숫자에 아직 해외 자동 접속이 섞여 있어 GA4 쪽이 크게 나와요. 다음 갱신 뒤부터 정확히 비교돼요.'));
+  }
+  window.hfCompare = compare;
+  // 대조에 쓸 GA4 숫자를 조용히 불러 둠 (저장된 비밀번호가 있을 때만)
+  function warmGa() {
+    gaReady.then(function (raw) {
+      if (st.ga) return compare();
+      var saved = raw.status === 'locked' ? ls(PW_KEY) : null;
+      if (saved) decrypt(raw, saved).then(function (d) { st.ga = d; compare(); }).catch(function () {});
     });
   }
+
+  function use(src) {
+    st.src = src; last = st[src];
+    [].forEach.call($('srcSeg').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-src') === src ? 'true' : 'false'); });
+    $('lock').hidden = true; $('board').hidden = false; $('logout').hidden = false;
+    if (ls(INTERNAL) === null) ls(INTERNAL, '1');   // 관리자 기기는 자체 집계에서 자동 제외
+    internalUi();
+    render(last);
+    compare();
+    if (!st.ga) warmGa();
+  }
+  function askLock(want, msg) {
+    st.want = want;
+    $('lockMsg').textContent = msg || (want === 'ga' ? 'GA4 숫자는 방문 현황 비밀번호(STATS_PASSWORD)로 열려요.' : '관리자 토큰(ADMIN_TOKEN)을 넣으면 자체 집계와 상담 신청이 함께 열려요.');
+    $('board').hidden = true; $('lock').hidden = false; $('lockErr').textContent = ''; $('pw').value = ''; $('pw').focus();
+  }
+  function openOwn(tok, remember) {
+    return fetchOwn(tok).then(function (d) {
+      ss(TOK_S, tok); if (remember) ls(TOK_L, tok);
+      st.own = d;
+      if (window.hfConsultLoad) window.hfConsultLoad(tok);
+      return 'own';
+    });
+  }
+  function openGa(pw, remember) {
+    return gaReady.then(function (raw) {
+      if (raw.status !== 'locked') { if (st.ga) return 'ga'; throw new Error('nolock'); }
+      return decrypt(raw, pw).then(function (d) { if (remember) ls(PW_KEY, pw); st.ga = d; return 'ga'; });
+    });
+  }
+
   $('lock').addEventListener('submit', function (e) {
     e.preventDefault();
-    var btn = $('unlockBtn'); btn.disabled = true; btn.textContent = '확인 중…'; $('lockErr').textContent = '';
-    unlock($('pw').value, $('remember').checked)
-      .catch(function () { $('lockErr').textContent = '비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
+    var btn = $('unlockBtn'), v = $('pw').value.trim(), rem = $('remember').checked;
+    btn.disabled = true; btn.textContent = '확인 중…'; $('lockErr').textContent = '';
+    var first = st.want === 'ga' ? openGa : openOwn, second = st.want === 'ga' ? openOwn : openGa;
+    first(v, rem).catch(function () { return second(v, rem); })
+      .then(use)
+      .catch(function () { $('lockErr').textContent = '토큰이나 비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
       .then(function () { btn.disabled = false; btn.textContent = '숫자 보기'; });
   });
-  $('logout').addEventListener('click', function () {
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    location.reload();
-  });
+  $('logout').addEventListener('click', function () { ls(PW_KEY, null); ls(TOK_L, null); ss(TOK_S, null); location.reload(); });
 
-  fetch('data.json?t=' + Date.now(), { cache: 'no-store' })
-    .then(function (r) { if (!r.ok) throw new Error('data.json ' + r.status); return r.json(); })
-    .then(function (d) {
-      if (d.status !== 'locked') return show(d);
-      locked = d;
-      var saved = null; try { saved = localStorage.getItem(KEY); } catch (e) {}
-      if (saved) return unlock(saved, true).catch(function () { try { localStorage.removeItem(KEY); } catch (e) {} $('lock').hidden = false; });
-      $('lock').hidden = false; $('pw').focus();
-    })
-    .catch(function () { show({ status: 'error', message: '잠시 뒤 새로고침해 주세요.' }); });
+  $('srcSeg').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-src]') : null; if (!b) return;
+    var src = b.getAttribute('data-src');
+    if (src === st.src) return;
+    if (src === 'own') {
+      var tok = getTok();
+      if (!tok) return askLock('own');
+      b.disabled = true;
+      return fetchOwn(tok).then(function (d) { st.own = d; use('own'); })
+        .catch(function (er) { if (er.message === 'auth') askLock('own'); else ownDown(); })
+        .then(function () { b.disabled = false; });
+    }
+    gaReady.then(function (raw) {
+      if (st.ga) return use('ga');
+      var saved = ls(PW_KEY);
+      if (saved) return decrypt(raw, saved).then(function (d) { st.ga = d; use('ga'); }).catch(function () { ls(PW_KEY, null); askLock('ga'); });
+      askLock('ga');
+    });
+  });
+  function ownDown() {
+    var n = $('notice'); n.hidden = false; n.className = 'notice'; n.replaceChildren();
+    n.append(el('b', null, '자체 집계 서버가 아직 준비되지 않았어요. '), 'Cloudflare Worker에 새 코드(worker/src/index.js)를 올리면 열려요. 그때까지는 GA4 숫자를 보여 드려요.');
+  }
+
+  // 처음 열 때: 자체 집계(토큰 저장돼 있으면) → 비어 있거나 안 되면 GA4 → 둘 다 안 되면 잠금 화면
+  function gaFallback(note) {
+    return gaReady.then(function (raw) {
+      if (st.ga) { use('ga'); if (note) note(); return true; }
+      var saved = raw.status === 'locked' ? ls(PW_KEY) : null;
+      if (!saved) return false;
+      return decrypt(raw, saved).then(function (d) { st.ga = d; use('ga'); if (note) note(); return true; }).catch(function () { ls(PW_KEY, null); return false; });
+    });
+  }
+  var tok0 = getTok();
+  (tok0 ? fetchOwn(tok0).then(function (d) {
+    st.own = d;
+    if (daysOf(d).n >= 28) return use('own');
+    // 자체 집계가 28일을 채우기 전에는 최종값인 GA4를 먼저 보여 줌 (GA4를 열 수 없으면 자체 집계)
+    return gaFallback().then(function (ok) { if (!ok) use('own'); });
+  }, function (er) {
+    if (er.message === 'auth') { ls(TOK_L, null); ss(TOK_S, null); }
+    return gaFallback(er.message === 'auth' ? null : ownDown).then(function (ok) { if (!ok) askLock('own'); });
+  }) : gaFallback().then(function (ok) { if (!ok) askLock('own'); }));
 })();
 </script>
 
 <script>
 (function () {
-  // 상담 신청: 날짜와 이름만 (관리자 토큰 필요)
+  // 상담 신청: 날짜와 이름만 (관리자 토큰 필요) + 신청자 구성 요약
   var API = 'https://hakjongfighter-blog-api.avecvalse.workers.dev';
-  var list = document.getElementById('consultList'), tokBox = document.getElementById('consultTok');
+  var list = document.getElementById('consultList'), tokBox = document.getElementById('consultTok'), sum = document.getElementById('consultSum');
   var tokIn = document.getElementById('consultTokIn'), tokBtn = document.getElementById('consultTokBtn');
   var LBL = { 'new': '새 신청', contacted: '연락함', done: '완료' };
   function getTok() { try { return sessionStorage.getItem('hf_admin') || localStorage.getItem('hf_admin_stats') || ''; } catch (e) { return ''; } }
-  function msg(t) { list.innerHTML = ''; var d = document.createElement('div'); d.className = 'empty'; d.textContent = t; list.appendChild(d); }
+  function msg(t) { list.innerHTML = ''; sum.innerHTML = ''; var d = document.createElement('div'); d.className = 'empty'; d.textContent = t; list.appendChild(d); }
+  function tally(cs, key, split) {
+    var m = {};
+    cs.forEach(function (c) { String(c[key] || '').split(split || /$^/).forEach(function (v) { v = v.trim(); if (v) m[v] = (m[v] || 0) + 1; }); });
+    return Object.keys(m).sort(function (a, b) { return m[b] - m[a]; }).map(function (k) { return k + ' ' + m[k]; }).join(' · ');
+  }
+  function summary(cs) {
+    sum.innerHTML = '';
+    var since = Date.now() / 1000 - 28 * 86400, recent = cs.filter(function (c) { return c.created_at >= since; });
+    var rows = [
+      ['최근 28일 신청', recent.length + '건 (전체 ' + cs.length + '건)'],
+      ['처리 상태', ['new', 'contacted', 'done'].map(function (k) { return LBL[k] + ' ' + cs.filter(function (c) { return c._s === k; }).length; }).join(' · ')],
+      ['신청한 사람', tally(cs, 'who')], ['학년', tally(cs, 'grade')], ['궁금한 주제', tally(cs, 'topics', ',')]
+    ];
+    rows.forEach(function (r) {
+      if (!r[1]) return;
+      var row = document.createElement('div'); row.className = 'cs-row';
+      var b = document.createElement('b'); b.textContent = r[0];
+      var v = document.createElement('span'); v.textContent = r[1]; v.style.whiteSpace = 'normal'; v.style.textAlign = 'right';
+      row.appendChild(b); row.appendChild(v); sum.appendChild(row);
+    });
+    var gap = document.createElement('div'); gap.style.height = '10px'; sum.appendChild(gap);
+  }
   function load(tok) {
     if (!tok) { msg('관리자 토큰을 넣으면 신청 목록이 보여요.'); tokBox.hidden = false; return; }
     msg('불러오는 중이에요…');
@@ -657,11 +1079,16 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         if (r.status === 401) throw new Error('auth'); return r.json();
       }).then(function (d) { return (d.consults || []).map(function (c) { c._s = st; return c; }); });
     })).then(function (all) {
-      try { sessionStorage.setItem('hf_admin', tok); localStorage.setItem('hf_admin_stats', tok); } catch (e) {}
+      try { sessionStorage.setItem('hf_admin', tok); } catch (e) {}
       tokBox.hidden = true;
-      var cs = [].concat.apply([], all).sort(function (a, b) { return b.created_at - a.created_at; }).slice(0, 30);
+      var every = [].concat.apply([], all).sort(function (a, b) { return b.created_at - a.created_at; });
+      var cs = every.slice(0, 30);
+      var since28 = Date.now() / 1000 - 28 * 86400;
+      window.hfConsultCount = every.filter(function (c) { return c.created_at >= since28; }).length;
+      if (window.hfCompare) window.hfCompare();
       if (!cs.length) return msg('아직 들어온 상담 신청이 없어요.');
       list.innerHTML = '';
+      summary(every);
       cs.forEach(function (c) {
         var d = new Date(c.created_at * 1000);
         var row = document.createElement('div'); row.className = 'cs-row';
@@ -673,12 +1100,13 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         row.appendChild(left); row.appendChild(when); list.appendChild(row);
       });
     }).catch(function (e) {
-      if (e.message === 'auth') { try { localStorage.removeItem('hf_admin_stats'); } catch (x) {} msg('토큰이 맞지 않아요. 다시 넣어 주세요.'); tokBox.hidden = false; }
+      if (e.message === 'auth') { msg('토큰이 맞지 않아요. 다시 넣어 주세요.'); tokBox.hidden = false; }
       else msg('신청 목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.');
     });
   }
-  tokBtn.addEventListener('click', function () { load(tokIn.value.trim()); });
-  tokIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') load(tokIn.value.trim()); });
+  window.hfConsultLoad = load;
+  tokBtn.addEventListener('click', function () { var t = tokIn.value.trim(); try { localStorage.setItem('hf_admin_stats', t); } catch (e) {} load(t); });
+  tokIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') tokBtn.click(); });
   load(getTok());
 })();
 </script>

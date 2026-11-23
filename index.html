@@ -18,6 +18,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   // 사이트 안 행동 이벤트를 GA4로 보냄
   window.hfTrack = function (name, params) { gtag('event', name, params || {}); };
 </script>
+<!-- 자체 방문 집계 (GA4와 별개 · 쿠키와 IP 저장 없음) -->
+<script defer src="/assets/hf-track.js"></script>
 <!-- End Google Analytics -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
