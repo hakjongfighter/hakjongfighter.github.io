@@ -981,7 +981,11 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
         var asTok = function () { return /^[\x21-\x7e]+$/.test(value) ? fetchOwn(value).then(function (d) { ss(TOK_S, value); if (window.hfConsultLoad) window.hfConsultLoad(value); return d; }) : Promise.reject(new Error('auth')); };
         return asPw.catch(function (er) { return er.message === 'auth' ? asTok() : Promise.reject(er); })
           .then(function (d) { st.own = d; st.ownErr = null; return true; }, function (er) { st.own = null; st.ownErr = er.message; return false; })
-          .then(function (ownOk) { if (!pwOk && !ownOk) throw new Error('auth'); });
+          .then(function (ownOk) {
+            if (!pwOk && !ownOk) throw new Error('auth');
+            // 관리자 토큰만으로는 GA4 숫자를 풀 수 없어 자체 집계만 보이게 됨 → 비밀번호를 받도록 함
+            if (!pwOk && raw.status === 'locked') throw new Error('needpw');
+          });
       });
     });
   }
@@ -991,13 +995,14 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{o
     var btn = $('unlockBtn'), v = $('pw').value, rem = $('remember').checked;
     btn.disabled = true; btn.textContent = '확인 중…'; $('lockErr').textContent = '';
     open(v).then(function () { ss(PW_KEY, v); if (rem) ls(PW_KEY, v); show(); })
-      .catch(function () { $('lockErr').textContent = '비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
+      .catch(function (er) { $('lockErr').textContent = er && er.message === 'needpw' ? '관리자 토큰이 아니라 방문 현황 비밀번호를 넣어 주세요.' : '비밀번호가 맞지 않아요. 다시 입력해 주세요.'; $('pw').select(); })
       .then(function () { btn.disabled = false; btn.textContent = '숫자 보기'; });
   });
   $('logout').addEventListener('click', function () { ls(PW_KEY, null); ss(PW_KEY, null); ls(TOK_L, null); ss(TOK_S, null); location.reload(); });
 
   // 처음 열 때: 저장된 비밀번호(또는 토큰)로 바로 열고, 없거나 틀리면 잠금 화면
-  var saved = ss(PW_KEY) || ls(PW_KEY) || ss(TOK_S) || ls(TOK_L);
+  // (관리자 토큰은 상담 신청 이름 목록에만 쓰고, 이 화면은 방문 현황 비밀번호로만 열어요.)
+  var saved = ss(PW_KEY) || ls(PW_KEY);
   var lockUp = function () { $('board').hidden = true; $('lock').hidden = false; $('pw').focus(); };
   if (saved) open(saved).then(show, function () { ls(PW_KEY, null); ss(PW_KEY, null); lockUp(); });
   else gaReady.then(function (raw) { if (raw.status === 'locked') return lockUp(); st.ga = raw; show(); });
