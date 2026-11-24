@@ -7,3 +7,5 @@ __pycache__/
 !/blog/README.md
 /.thumb_tmp.html
 /consult/
+/images/blog/*.webp
+/llms.txt

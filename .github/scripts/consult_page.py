@@ -203,7 +203,7 @@ footer .copy{margin-top:12px;font-size:13px;color:#7F8BB3}
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP2WRX3L" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header class="hdr">
  <nav class="wrap" aria-label="사이트">
-  <a class="logo" href="/"><img src="/images/character.jpg" alt=""><span><b>학종파이터</b><small>1:1 전문 상담</small></span></a>
+  <a class="logo" href="/"><img src="/images/logo.webp" alt="학종파이터 로고" width="36" height="36"><span><b>학종파이터</b><small>1:1 전문 상담</small></span></a>
   <div class="hdr-r">
    <a class="hdr-link" href="/" aria-label="학종파이터 홈"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg><span class="t">홈</span></a>
    <a class="hdr-link" href="/blog/" aria-label="블로그"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span class="t">blog</span></a>
@@ -221,7 +221,7 @@ footer .copy{margin-top:12px;font-size:13px;color:#7F8BB3}
    <p class="lead">학교도, 과목도, 지금까지의 기록도 학생마다 달라요. 학종 전문 선생님이 지금 위치에서 할 수 있는 것부터 1:1로 정리해 드려요.</p>
    <p class="form-hint">신청서는 상담 안내 바로 아래에 있어요.</p>
   </div>
-  <img class="pic" src="/images/characters/salute.png" alt="" width="420" height="420">
+  <img class="pic" src="/images/characters/salute.webp" alt="경례하는 연필 캐릭터 학종파이터" width="360" height="360" fetchpriority="high">
  </div>
 </section>
 
@@ -229,9 +229,9 @@ footer .copy{margin-top:12px;font-size:13px;color:#7F8BB3}
  <div class="cs-info">
   <h2 class="cs-h">이런 상담을 해 드려요</h2>
   <ol class="cs-cards">
-   <li class="cs-card"><img src="/images/characters/blueprint.png" alt="" loading="lazy"><div><b>과목 선택 · 수행평가</b><span>희망 계열에 맞는 과목을 고르고, 수행평가 하나하나가 세특으로 이어지도록 설계해요. 목표는 지금보다 1~2단계 높은 대학이에요.</span></div></li>
-   <li class="cs-card"><img src="/images/characters/boxing.png" alt="" loading="lazy"><div><b>내신 공부 방법</b><span>지금 성적에서 바로 시작할 수 있게, 과목별 공부 순서와 시험 전 루틴을 함께 잡아요.</span></div></li>
-   <li class="cs-card"><img src="/images/characters/present-book.png" alt="" loading="lazy"><div><b>면접 대비</b><span>내 생기부에서 나올 질문을 미리 뽑고, 활동의 이유와 배운 점을 내 말로 답하는 연습을 해요.</span></div></li>
+   <li class="cs-card"><img src="/images/characters/blueprint.webp" alt="설계도를 펼쳐 든 연필 캐릭터" width="360" height="360" loading="lazy"><div><b>과목 선택 · 수행평가</b><span>희망 계열에 맞는 과목을 고르고, 수행평가 하나하나가 세특으로 이어지도록 설계해요. 목표는 지금보다 1~2단계 높은 대학이에요.</span></div></li>
+   <li class="cs-card"><img src="/images/characters/boxing.webp" alt="복싱 글러브를 끼고 힘을 내는 연필 캐릭터" width="360" height="360" loading="lazy"><div><b>내신 공부 방법</b><span>지금 성적에서 바로 시작할 수 있게, 과목별 공부 순서와 시험 전 루틴을 함께 잡아요.</span></div></li>
+   <li class="cs-card"><img src="/images/characters/present-book.webp" alt="책을 펼쳐 들고 설명하는 연필 캐릭터" width="360" height="360" loading="lazy"><div><b>면접 대비</b><span>내 생기부에서 나올 질문을 미리 뽑고, 활동의 이유와 배운 점을 내 말로 답하는 연습을 해요.</span></div></li>
   </ol>
   <h2 class="cs-h">상담은 이렇게 진행돼요</h2>
   <ol class="cs-steps">
@@ -325,7 +325,7 @@ footer .copy{margin-top:12px;font-size:13px;color:#7F8BB3}
 <footer>
  <div class="wrap">
   <div class="top">
-   <a class="logo" href="/" style="color:#fff"><img src="/images/character.jpg" alt=""><span><b>학종파이터</b><small>고등학생을 위한 학생부종합전형 로드맵</small></span></a>
+   <a class="logo" href="/" style="color:#fff"><img src="/images/logo.webp" alt="학종파이터 로고" width="36" height="36" loading="lazy"><span><b>학종파이터</b><small>고등학생을 위한 학생부종합전형 로드맵</small></span></a>
    <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">@hakjong_fighter</a>
   </div>
   <address>
@@ -395,7 +395,7 @@ footer .copy{margin-top:12px;font-size:13px;color:#7F8BB3}
    .then(function(x){ if(!x.ok){ var er=new Error(x.j.error||''); er.status=x.status; throw er; }
      track('consult_submit',{who:d.who,grade:d.grade,dup:x.j.duplicate?1:0});
      var box=document.getElementById('csBox');
-     box.innerHTML='<div class="cs-done" tabindex="-1"><img src="/images/characters/cheer.png" alt=""><h2>'+(x.j.duplicate?'이미 신청이 접수돼 있어요':'신청이 접수됐어요')+'</h2><p>담당 선생님이 남겨 주신 연락처로 직접 연락드릴게요.<br>조금만 기다려 주세요.</p><p style="margin-top:14px;font-size:14px">급하시면 <a href="tel:024594945">{{TEL}}</a></p></div>';
+     box.innerHTML='<div class="cs-done" tabindex="-1"><img src="/images/characters/cheer.webp" alt="신청 접수를 축하하는 연필 캐릭터" width="360" height="360"><h2>'+(x.j.duplicate?'이미 신청이 접수돼 있어요':'신청이 접수됐어요')+'</h2><p>담당 선생님이 남겨 주신 연락처로 직접 연락드릴게요.<br>조금만 기다려 주세요.</p><p style="margin-top:14px;font-size:14px">급하시면 <a href="tel:024594945">{{TEL}}</a></p></div>';
      box.scrollIntoView({behavior:'smooth',block:'start'}); try{box.firstChild.focus({preventScroll:true})}catch(_){} })
    .catch(function(er){
      track('consult_submit_fail',{status:er.status||0});

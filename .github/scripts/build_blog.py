@@ -3,7 +3,9 @@
 만드는 파일
   blog/index.html          글 목록 (메인)
   blog/<slug>/index.html   글 상세
-  sitemap.xml              랜딩 + 블로그 글 주소
+  sitemap.xml              랜딩 + 블로그 글 + 상담 페이지 주소
+  blog/rss.xml             블로그 RSS 피드 (네이버 서치어드바이저·구독 앱용)
+  llms.txt                 AI 검색(ChatGPT·Perplexity 등)용 사이트 안내
 
 GitHub Actions 배포 때 자동 실행됩니다. 직접 미리 보려면:
   pip install markdown
@@ -31,7 +33,9 @@ BLOG_API = os.environ.get("BLOG_API", "").strip()
 CONSULT = "/consult/" if BLOG_API else IG
 
 # 카테고리 순서 (글의 category 값은 이 중 하나로 쓰세요)
-LANDING_LASTMOD = "2026-11-20"  # 랜딩페이지(index.html)를 고치면 날짜를 바꿔 주세요
+LANDING_LASTMOD = "2026-11-23"  # 랜딩페이지(index.html)를 고치면 날짜를 바꿔 주세요
+CONSULT_LASTMOD = "2026-11-23"  # 상담 페이지(consult_page.py)를 고치면 날짜를 바꿔 주세요
+RSS_URL = f"{SITE}/blog/rss.xml"
 CATEGORIES = ["진로·과목 선택", "수행평가·세특", "심화탐구", "내신 공부법", "대학·전형 정보", "학부모 가이드", "4컷 만화"]
 
 
@@ -116,6 +120,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:image" content="{esc(image)}">
 <meta property="og:url" content="{esc(url)}">
 <link rel="canonical" href="{esc(url)}">
+<link rel="alternate" type="application/rss+xml" title="학종파이터 블로그" href="{RSS_URL}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#FBFAF7">
 <link rel="icon" type="image/png" href="/images/favicon.png">
@@ -127,7 +132,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP2WRX3L" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header><div class="wrap">
- <a class="brand" href="/blog/"><img src="/images/character.jpg" alt="">학종파이터 <i>블로그</i></a>
+ <a class="brand" href="/blog/"><img src="/images/logo.webp" alt="학종파이터 로고" width="32" height="32">학종파이터 <i>블로그</i></a>
  <nav class="hnav"><a class="hide" href="/blog/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>전체 글</a><a class="hide" href="/"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>학종파이터 홈</a><a class="sub" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'header'}})"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>instagram</a></nav>
 </div></header>
 """
@@ -139,9 +144,44 @@ FOOT = """<footer><div class="wrap"><span>© {y} 강남에듀플랜 · 학종파
 """
 
 
+def webp_of(src):
+    """images/blog/x.jpg 옆에 만들어 둔 가벼운 webp 주소 (없으면 빈 문자열)"""
+    if not src.startswith("/") or not re.search(r"\.(jpe?g|png)$", src, re.I):
+        return ""
+    w = re.sub(r"\.(jpe?g|png)$", ".webp", src, flags=re.I)
+    return w if os.path.exists(os.path.join(ROOT, w.lstrip("/"))) else ""
+
+
+def pic(src, alt, attrs=""):
+    """webp가 있으면 <picture>로 감싸 가볍게, 없으면 원본 이미지"""
+    img = f'<img src="{esc(src)}" alt="{esc(alt)}" {attrs}>'.replace(" >", ">")
+    w = webp_of(src)
+    return f'<picture><source type="image/webp" srcset="{esc(w)}">{img}</picture>' if w else img
+
+
+def make_webps(posts):
+    """글 썸네일마다 1200px webp를 만들어요 (배포 때 자동, 원본 jpg는 그대로)"""
+    try:
+        from PIL import Image
+    except ImportError:
+        print("Pillow가 없어 webp 썸네일을 건너뛰어요.")
+        return
+    for p in posts:
+        src = p["thumbnail"]
+        if not src.startswith("/") or not re.search(r"\.(jpe?g|png)$", src, re.I):
+            continue
+        a = os.path.join(ROOT, src.lstrip("/"))
+        b = re.sub(r"\.(jpe?g|png)$", ".webp", a, flags=re.I)
+        if os.path.exists(a) and (not os.path.exists(b) or os.path.getmtime(b) < os.path.getmtime(a)):
+            im = Image.open(a).convert("RGB")
+            if im.width > 1200:
+                im = im.resize((1200, round(im.height * 1200 / im.width)), Image.LANCZOS)
+            im.save(b, "WEBP", quality=78, method=6)
+
+
 def thumb(p, cls=""):
     if p["thumbnail"]:
-        return f'<img src="{esc(p["thumbnail"])}" alt="" loading="lazy">'
+        return pic(p["thumbnail"], p["caption"] or p["title"], 'loading="lazy"')
     return '<div class="t">✏️</div>'
 
 
@@ -189,7 +229,7 @@ def build_index(posts):
 """)
     out.append('   <p class="empty" hidden>이 카테고리에는 아직 글이 없어요.</p>\n  </div>\n')
     out.append(f"""  <aside>
-   <div class="who"><img src="/images/character.jpg" alt=""><b>학종파이터</b><p>고등학생과 학부모를 위한 학생부종합전형 기록. 3년의 활동이 한 방향으로 이어지도록 돕습니다.</p></div>
+   <div class="who"><img src="/images/logo.webp" alt="학종파이터 로고" width="48" height="48" loading="lazy"><b>학종파이터</b><p>고등학생과 학부모를 위한 학생부종합전형 기록. 3년의 활동이 한 방향으로 이어지도록 돕습니다.</p></div>
    <div><div class="st">추천 글</div><ol class="pop">{''.join(f'<li><a href="/blog/{p["slug"]}/">{esc(p["title"])}</a></li>' for p in picks)}</ol></div>
    <div class="letter"><h4 class="serif">새 글 소식 받기</h4><p>새 글이 올라오면 인스타그램에서 가장 먼저 알려 드려요.</p><a class="b" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'sidebar'}})">instagram</a></div>
    {dm_box('index')}
@@ -231,10 +271,10 @@ def build_post(p, posts):
  <div class="crumb"><a href="/blog/">블로그</a> › <b>{esc(p['category'])}</b></div>
  <h1 class="serif">{esc(p['title'])}</h1>
  {f'<p class="sumline">{esc(p["summary"])}</p>' if p['summary'] else ''}
- <div class="by"><img src="/images/character.jpg" alt=""><div><b>학종파이터</b>{fmt_date(p['date'], True)} · {p['minutes']}분 읽기</div><div class="sh"><span role="button" tabindex="0" title="링크 복사" onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href);this.textContent='✓'">🔗</span></div></div>
+ <div class="by"><img src="/images/logo.webp" alt="글쓴이 학종파이터" width="40" height="40"><div><b>학종파이터</b>{fmt_date(p['date'], True)} · {p['minutes']}분 읽기</div><div class="sh"><span role="button" tabindex="0" title="링크 복사" onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href);this.textContent='✓'">🔗</span></div></div>
 """)
     if p["thumbnail"]:
-        out.append(f' <img class="hero-img" src="{esc(p["thumbnail"])}" alt="">\n')
+        out.append(" " + pic(p["thumbnail"], p["caption"] or p["title"], 'class="hero-img" fetchpriority="high"') + "\n")
         if p["caption"]:
             out.append(f' <div class="cap">{esc(p["caption"])}</div>\n')
     if len(p["toc"]) >= 2:
@@ -244,7 +284,7 @@ def build_post(p, posts):
         out.append(' <div class="tags2">' + "".join(f"<span>#{esc(t)}</span>" for t in p["tags"]) + "</div>\n")
     if BLOG_API:
         out.append(social_box(p))
-    out.append(f""" <div class="end"><img src="/images/character.jpg" alt=""><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>학종 전문 선생님이 지금 학생부를 함께 보고, 다음 학기에 무엇을 할지 1:1로 정리해 드려요.</p><div class="acts"><a class="d" href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'post_end'}})">전문 상담 신청</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">instagram</a></div></div></div>
+    out.append(f""" <div class="end"><img src="/images/logo.webp" alt="학종파이터 로고" width="64" height="64" loading="lazy"><div><h4 class="serif">내 생기부는 어떻게 이어 갈까?</h4><p>학종 전문 선생님이 지금 학생부를 함께 보고, 다음 학기에 무엇을 할지 1:1로 정리해 드려요.</p><div class="acts"><a class="d" href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'post_end'}})">전문 상담 신청</a><a href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'post_end'}})">instagram</a></div></div></div>
 """)
     if newer or older:
         out.append(' <div class="pn">')
@@ -260,14 +300,103 @@ def build_post(p, posts):
     return "".join(out)
 
 
+def rfc822(d):
+    """RSS 날짜 형식 (한국 시간 오전 9시 게시로 표시)"""
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    return f"{days[d.weekday()]}, {d.day:02d} {months[d.month - 1]} {d.year} 09:00:00 +0900"
+
+
+def build_rss(posts):
+    """RSS 2.0 피드. 네이버 서치어드바이저 'RSS 제출'에 쓰는 주소: /blog/rss.xml"""
+    from xml.sax.saxutils import escape as x
+
+    def cdata(s):
+        return "<![CDATA[" + s.replace("]]>", "]]]]><![CDATA[>") + "]]>"
+
+    def abs_urls(h):
+        return re.sub(r'(src|href)="/(?!/)', rf'\1="{SITE}/', h)
+
+    items = []
+    for p in posts[:30]:
+        url = f"{SITE}/blog/{p['slug']}/"
+        img = ""
+        if p["thumbnail"]:
+            src = p["thumbnail"] if p["thumbnail"].startswith("http") else SITE + "/" + p["thumbnail"].lstrip("/")
+            img = f'<p><img src="{html.escape(src, quote=True)}" alt="{html.escape(p["title"], quote=True)}"></p>'
+        cats = "".join(f"\n      <category>{x(c)}</category>" for c in [p["category"]] + p["tags"])
+        items.append(f"""    <item>
+      <title>{x(p['title'])}</title>
+      <link>{url}</link>
+      <guid isPermaLink="true">{url}</guid>
+      <pubDate>{rfc822(p['date'])}</pubDate>
+      <dc:creator>학종파이터</dc:creator>{cats}
+      <description>{x(p['summary'] or p['title'])}</description>
+      <content:encoded>{cdata(img + abs_urls(p['html']))}</content:encoded>
+    </item>""")
+    last = rfc822(posts[0]["date"]) if posts else rfc822(date.today())
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>학종파이터 블로그</title>
+    <link>{SITE}/blog/</link>
+    <atom:link href="{RSS_URL}" rel="self" type="application/rss+xml"/>
+    <description>과목 선택부터 수행평가, 심화탐구까지. 고등학생과 학부모를 위한 학종파이터의 학생부 기록.</description>
+    <language>ko</language>
+    <lastBuildDate>{last}</lastBuildDate>
+    <image>
+      <url>{SITE}/images/favicon.png</url>
+      <title>학종파이터 블로그</title>
+      <link>{SITE}/blog/</link>
+    </image>
+{chr(10).join(items)}
+  </channel>
+</rss>
+"""
+
+
+def build_llms(posts):
+    """llms.txt: AI가 사이트를 빠르게 이해하도록 쓰는 안내 파일 (llmstxt.org 형식)"""
+    lines = [
+        "# 학종파이터",
+        "",
+        "> 고등학생과 학부모를 위한 학생부종합전형(학종) 정보 채널. 과목 선택부터 수행평가·심화탐구로 채우는 세특까지, "
+        "3년의 학생부 기록을 하나로 잇는 방법을 안내합니다. 운영: 강남에듀플랜(서울 강남구, 02-459-4945).",
+        "",
+        "학종파이터는 학생부를 '진로 방향 → 수행평가·독서활동 → 심화탐구보고서'의 3단계 로드맵으로 설명합니다. "
+        "글은 한국 고등학교 교육과정과 대학 학생부종합전형 평가(학업역량·진로역량·공동체역량)를 기준으로 씁니다.",
+        "",
+        "## 주요 페이지",
+        f"- [학종파이터 홈]({SITE}/): 학생부 1년 설계도 — 학년별 할 일, 3단계 로드맵, 자가 점검",
+        f"- [블로그]({SITE}/blog/): 세특·과목 선택·수행평가·대입 일정에 관한 글 모음",
+        f"- [1:1 전문 상담 신청]({SITE}/consult/): 과목 선택·수행평가, 내신 공부 방법, 면접 대비 상담",
+        "",
+        "## 블로그 글",
+    ]
+    for p in posts:
+        summ = re.sub(r"\s+", " ", p["summary"]).strip()
+        lines.append(f"- [{p['title']}]({SITE}/blog/{p['slug']}/): {summ}" if summ else f"- [{p['title']}]({SITE}/blog/{p['slug']}/)")
+    lines += [
+        "",
+        "## Optional",
+        f"- [RSS 피드]({RSS_URL}): 새 글 목록",
+        f"- [개인정보처리방침]({SITE}/privacy/)",
+        f"- [인스타그램 @hakjong_fighter]({IG})",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def json_str(s):
     import json
     return json.dumps(s, ensure_ascii=False)
 
 
-def build_sitemap(posts):
+def build_sitemap(posts, consult=False):
     today = date.today().isoformat()
     urls = [(f"{SITE}/", LANDING_LASTMOD), (f"{SITE}/blog/", posts[0]["date"].isoformat() if posts else today)]
+    if consult:
+        urls.append((f"{SITE}/consult/", CONSULT_LASTMOD))
     urls += [(f"{SITE}/blog/{p['slug']}/", p["date"].isoformat()) for p in posts]
     body = "".join(f"  <url>\n    <loc>{u}</loc>\n    <lastmod>{d}</lastmod>\n  </url>\n" for u, d in urls)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{body}</urlset>\n'
@@ -352,6 +481,7 @@ def main():
     if dup:
         raise ValueError(f"주소(slug)가 겹치는 글이 있어요: {', '.join(dup)}")
     posts.sort(key=lambda p: p["date"], reverse=True)
+    make_webps(posts)
     for p in posts:
         d = os.path.join(BLOG, p["slug"])
         os.makedirs(d, exist_ok=True)
@@ -366,7 +496,9 @@ def main():
         open(os.path.join(BLOG, "admin", "consult", "index.html"), "w", encoding="utf-8").write(cp.CONSULT_ADMIN.format(api=BLOG_API))
         os.makedirs(os.path.join(BLOG, "admin"), exist_ok=True)
         open(os.path.join(BLOG, "admin", "index.html"), "w", encoding="utf-8").write(ADMIN.format(api=BLOG_API))
-    open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(build_sitemap(posts))
+    open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(build_sitemap(posts, consult=bool(BLOG_API)))
+    open(os.path.join(BLOG, "rss.xml"), "w", encoding="utf-8").write(build_rss(posts))
+    open(os.path.join(ROOT, "llms.txt"), "w", encoding="utf-8").write(build_llms(posts))
     print(f"블로그 글 {len(posts)}개를 만들었어요.")
 
 

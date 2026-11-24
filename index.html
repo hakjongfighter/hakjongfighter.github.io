@@ -34,6 +34,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:image" content="https://hakjongfighter.com/images/og.jpg">
 <meta property="og:url" content="https://hakjongfighter.com/">
 <link rel="canonical" href="https://hakjongfighter.com/">
+<link rel="alternate" type="application/rss+xml" title="학종파이터 블로그" href="https://hakjongfighter.com/blog/rss.xml">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1C2A5E">
 <link rel="icon" type="image/png" href="images/favicon.png">
@@ -53,7 +54,8 @@ a{color:var(--navy)}
 .col-img{flex:1 1 320px;min-width:0;max-width:440px;width:100%;margin:0 auto}
 .pill{align-self:flex-start;display:inline-block;background:var(--navy);color:var(--yellow);font-weight:700;font-size:16px;padding:10px 20px;border-radius:999px}
 .pill.mint{background:var(--mint);color:var(--navy)}
-h1,h2,h3{margin:0;font-weight:900;letter-spacing:-1px}
+h1,h2,h3,.h1{margin:0;font-weight:900;letter-spacing:-1px}
+picture{display:contents}
 p{margin:0}
 .lead{font-size:19px;line-height:1.75;color:var(--muted2);max-width:540px}
 .btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;padding:16px 28px;min-height:60px;border-radius:16px;font-weight:900;font-size:18px;border:2px solid var(--navy);transition:transform .15s,box-shadow .15s}
@@ -105,7 +107,7 @@ section[id]{scroll-margin-top:60px}
 /* hero */
 .hero{background:linear-gradient(180deg,#B8F0E7 0%,#7FD6CF 100%);border-bottom:2px solid var(--navy)}
 .hero .row{padding-top:64px;padding-bottom:88px;gap:56px}
-.hero h1{font-size:clamp(42px,6vw,74px);line-height:1.12;letter-spacing:-1.5px}
+.hero h1,.hero .h1{font-size:clamp(42px,6vw,74px);line-height:1.12;letter-spacing:-1.5px}
 .seg{display:inline-flex;align-self:flex-start;border:2px solid var(--navy);border-radius:999px;padding:4px;gap:4px;background:var(--card)}
 .seg button{min-height:44px;padding:0 18px;border-radius:999px;border:0;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:transparent;color:var(--navy)}
 .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
@@ -292,7 +294,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
   .hero .row{flex-direction:column;align-items:stretch;padding-top:16px;padding-bottom:40px;gap:20px}
   .hero .col-text{flex:none !important;gap:16px !important}
   .hero [data-for]{gap:14px !important}
-  .hero h1{font-size:34px;letter-spacing:-1px}
+  .hero h1,.hero .h1{font-size:34px;letter-spacing:-1px}
   .hero-art{order:-1;flex:none;flex-direction:row;justify-content:space-between;align-items:center;gap:12px}
   .hero-art{justify-content:center}
   .hero-art img{width:min(72vw,300px);height:auto;max-width:none}
@@ -416,7 +418,7 @@ dialog.dm-sheet::backdrop{background:rgba(20,31,72,.55)}
   .hero-art .handle{display:none}
 }
 @media (max-width:360px){
-  .hero h1{font-size:34px}
+  .hero h1,.hero .h1{font-size:34px}
   .fields{grid-template-columns:1fr}
 }
 </style>
@@ -429,7 +431,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <header class="hdr">
   <nav class="wrap hdr-top" aria-label="사이트">
-    <a class="logo hdr-logo" href="#top"><img src="images/character.jpg" alt=""><span class="hdr-name"><b>학종파이터</b><small>학생부 1년 설계도</small></span></a>
+    <a class="logo hdr-logo" href="#top"><img src="images/logo.webp" alt="학종파이터 로고" width="40" height="40"><span class="hdr-name"><b>학종파이터</b><small>학생부 1년 설계도</small></span></a>
     <div class="hdr-right">
       <a class="hdr-link" href="/blog/" onclick="window.hfTrack&&hfTrack('nav_blog_click')"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>blog</span></a>
       <a class="hdr-link" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener" aria-label="인스타그램 @hakjong_fighter"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg><span>instagram</span></a>
@@ -451,13 +453,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p class="lead">과목 선택부터 수행평가·심화탐구·독서로 채우는 세특까지. 3년의 기록을 하나로 잇는 방법을 차근차근 알려 드려요.</p>
       </div>
       <div data-for="parent" hidden style="flex-direction:column;gap:26px">
-        <h1>아이의 생기부,<br>1년 설계도부터<br>함께 그려요</h1>
+        <p class="h1">아이의 생기부,<br>1년 설계도부터<br>함께 그려요</p>
         <p class="lead">학생부가 어떻게 만들어지는지, 고교학점제에서 무엇을 챙겨야 하는지. 부모님이 먼저 흐름을 알면 아이에게 더 정확한 방향을 보여줄 수 있어요.</p>
       </div>
       <p class="scroll-hint">천천히 내려 보세요 <span aria-hidden="true">↓</span></p>
     </div>
     <div class="hero-art">
-      <img src="images/character.jpg" alt="망토를 두르고 복싱 글러브를 낀 연필 캐릭터 학종파이터가 힘차게 날아오르는 모습" width="440" height="440">
+      <picture><source type="image/webp" srcset="images/character.webp"><img src="images/character.jpg" fetchpriority="high" alt="망토를 두르고 복싱 글러브를 낀 연필 캐릭터 학종파이터가 힘차게 날아오르는 모습" width="440" height="440"></picture>
       <a class="handle" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
         <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
         @hakjong_fighter
@@ -507,7 +509,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <h2>옆자리 친구도<br>똑같은 고민 중이에요</h2>
     <div class="chat" id="chat" aria-label="친구들의 고민과 학종파이터의 답장">
       <div class="chat-top">
-        <img src="images/character.jpg" alt="" width="40" height="40">
+        <img src="images/logo.webp" alt="학종파이터 프로필 사진" width="40" height="40">
         <span><b>hakjong_fighter</b><small>학종파이터</small></span>
       </div>
       <ol class="chat-log">
@@ -540,7 +542,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <section id="step1" class="step s1">
   <div class="wrap row">
-    <div class="col-img"><img class="shot" src="images/step1.jpg" alt="STEP 1. 출발점은 진로 방향! 이공계·인문사회·예체능·상경계 표지판을 가리키는 연필 캐릭터" loading="lazy" width="896" height="1200"></div>
+    <div class="col-img"><picture><source type="image/webp" srcset="images/step1-s.webp 478w, images/step1.webp 896w" sizes="(max-width: 480px) 92vw, 440px"><img class="shot" src="images/step1.jpg" alt="STEP 1. 출발점은 진로 방향! 이공계·인문사회·예체능·상경계 표지판을 가리키는 연필 캐릭터" loading="lazy" width="896" height="1200"></picture></div>
     <div class="col-text">
       <span class="pill">STEP 1 · 진로·과목 선택</span>
       <h3>출발점은 진로 방향!<br>계열별로 이런 과목을 골라요</h3>
@@ -570,13 +572,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </ol>
       <div class="tip"><b>TIP</b>세특은 선생님이 관찰한 내용으로 기록돼요. 탐구 과정을 발표나 보고서로 꼭 보여주세요.</div>
     </div>
-    <div class="col-img"><img class="shot" src="images/step2.jpg" alt="STEP 2. 나만의 특별한 수행평가서 작성 — 펼친 책 위의 연필 캐릭터와 전구, 플라스크" loading="lazy" width="896" height="1200"></div>
+    <div class="col-img"><picture><source type="image/webp" srcset="images/step2-s.webp 478w, images/step2.webp 896w" sizes="(max-width: 480px) 92vw, 440px"><img class="shot" src="images/step2.jpg" alt="STEP 2. 나만의 특별한 수행평가서 작성 — 펼친 책 위의 연필 캐릭터와 전구, 플라스크" loading="lazy" width="896" height="1200"></picture></div>
   </div>
 </section>
 
 <section id="step3" class="step s3">
   <div class="wrap row">
-    <div class="col-img"><img class="shot" src="images/step3.jpg" alt="STEP 3. 완성도 높은 심화탐구보고서 작성 — 빛나는 보고서를 든 연필 캐릭터와 메달" loading="lazy" width="896" height="1200"></div>
+    <div class="col-img"><picture><source type="image/webp" srcset="images/step3-s.webp 478w, images/step3.webp 896w" sizes="(max-width: 480px) 92vw, 440px"><img class="shot" src="images/step3.jpg" alt="STEP 3. 완성도 높은 심화탐구보고서 작성 — 빛나는 보고서를 든 연필 캐릭터와 메달" loading="lazy" width="896" height="1200"></picture></div>
     <div class="col-text">
       <span class="pill">STEP 3 · 심화탐구보고서</span>
       <h3>심화탐구보고서,<br>이 틀로 써요</h3>
@@ -595,7 +597,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <section id="cta" class="cta">
   <div class="wrap row">
-    <div class="col-img"><img class="shot" src="images/cta.jpg" alt="합격을 부르는 3단계 로드맵 완성! DM 휴대폰을 든 연필 캐릭터와 1·2·3단계 요약" loading="lazy" width="896" height="1200"></div>
+    <div class="col-img"><picture><source type="image/webp" srcset="images/cta-s.webp 478w, images/cta.webp 896w" sizes="(max-width: 480px) 92vw, 440px"><img class="shot" src="images/cta.jpg" alt="합격을 부르는 3단계 로드맵 완성! DM 휴대폰을 든 연필 캐릭터와 1·2·3단계 요약" loading="lazy" width="896" height="1200"></picture></div>
     <div class="col-text" style="gap:24px">
       <span class="pill mint">3단계 로드맵 요약</span>
       <h2>합격을 부르는<br>3단계 로드맵 완성!</h2>
@@ -630,7 +632,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <footer>
   <div class="wrap">
-    <div class="logo"><img src="images/character.jpg" alt=""><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵</small></div></div>
+    <div class="logo"><img src="images/logo.webp" alt="학종파이터 로고" width="40" height="40" loading="lazy"><div><strong>학종파이터</strong><small>고등학생을 위한 학생부종합전형 로드맵</small></div></div>
     <a class="h" href="https://www.instagram.com/hakjong_fighter/" target="_blank" rel="noopener">
       <svg class="i" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#FFC72C"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
       @hakjong_fighter
@@ -646,7 +648,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </dl>
     </address>
     <p class="links"><a href="/privacy/">개인정보처리방침</a></p>
-    <p class="copy">© 2026 강남에듀플랜 · 학종파이터 <span class="ver">v23</span></p>
+    <p class="copy">© 2026 강남에듀플랜 · 학종파이터 <span class="ver">v24</span></p>
   </div>
 </footer>
 
