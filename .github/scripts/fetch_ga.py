@@ -235,7 +235,11 @@ def main():
                          "impressions": r.get("impressions", 0), "position": r.get("position", 0)}
                         for r in res.json().get("rows", [])]
                 return {"status": "ok", "site": site, "rows": rows}
-            last = "%s %s" % (res.status_code, res.text[:80])
+            t = res.text
+            why = ("API 꺼짐(SERVICE_DISABLED)" if ("SERVICE_DISABLED" in t or "has not been used" in t)
+                   else "사이트 권한 없음" if "sufficient permission" in t
+                   else "알 수 없음")
+            last = "%s %s [%s]" % (res.status_code, why, site.replace("hakjongfighter", "h"))
         print("검색어 건너뜀:", last, file=sys.stderr)
         return {"status": "not_connected", "account": sa_info.get("client_email", "")}
 
