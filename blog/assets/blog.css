@@ -194,3 +194,14 @@ footer .wrap{padding-top:28px;padding-bottom:36px;display:flex;justify-content:s
 @media (max-width:820px){.cform .nick{max-width:none}.react{padding:20px}}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:50;max-width:min(92vw,520px);background:var(--ink);color:#fff;border-radius:12px;padding:14px 18px;font-size:14.5px;line-height:1.6;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .toast[hidden]{display:none}
+/* 글 속 셀프 점검 */
+.sc{margin:28px 0 36px;display:grid;gap:14px}
+.sc-sec{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.sc-sec h3{margin:0 0 10px;font-size:18px}
+.sc-sec label{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid #F1EEE6;font-size:15.5px;line-height:1.6;cursor:pointer}
+.sc-sec label:first-of-type{border-top:0}
+.sc-sec input{flex:none;width:18px;height:18px;margin-top:4px;accent-color:var(--accent)}
+.sc-res{margin:10px 0 0;font-size:14px;font-weight:700;min-height:1px}
+.sc-res.good{color:#1F6B4F}.sc-res.mid{color:#9A6B00}.sc-res.low{color:#A0522D}
+.sc-total{background:var(--ink);color:#fff;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:4px}
+.sc-total b{font-size:16px}.sc-total span{font-size:14px;color:#D5D6DC}
