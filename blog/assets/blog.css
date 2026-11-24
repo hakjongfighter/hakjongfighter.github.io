@@ -206,3 +206,21 @@ footer .wrap{padding-top:28px;padding-bottom:36px;display:flex;justify-content:s
 .sc-res.good{color:#1F6B4F}.sc-res.mid{color:#9A6B00}.sc-res.low{color:#A0522D}
 .sc-total{background:var(--ink);color:#fff;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:4px}
 .sc-total b{font-size:16px}.sc-total span{font-size:14px;color:#D5D6DC}
+/* 핵심 요약 · FAQ · 출처 */
+.keysum{margin:22px 0 4px;background:#FFF8E1;border:1px solid #F2DFA6;border-left:5px solid var(--accent);border-radius:12px;padding:16px 20px}
+.keysum p:first-child{margin:0 0 8px;font-size:15px;font-weight:800;letter-spacing:.02em}
+.keysum ul{margin:0;padding-left:20px}
+.keysum li{margin:4px 0;font-size:15.5px;line-height:1.65}
+.faq{display:grid;gap:10px;margin:16px 0 8px}
+.faq-i{background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 18px}
+.faq-i summary{cursor:pointer;list-style:none;padding:15px 26px 15px 0;font-weight:700;font-size:16px;line-height:1.55;position:relative}
+.faq-i summary::-webkit-details-marker{display:none}
+.faq-i summary::before{content:"Q";color:var(--accent);font-weight:900;margin-right:8px}
+.faq-i summary::after{content:"+";position:absolute;right:0;top:13px;font-size:20px;color:#8A8F98}
+.faq-i[open] summary::after{content:"−"}
+.faq-a{padding:0 0 14px;border-top:1px solid #F1EEE6}
+.faq-a p{margin:12px 0 0;font-size:15.5px}
+.srcs{background:#F7F7F5;border-radius:12px;padding:14px 20px;margin:12px 0 8px}
+.srcs ul{margin:0;padding-left:18px}
+.srcs li{margin:6px 0;font-size:14px;line-height:1.6;color:#555}
+.srcs a{color:inherit;text-decoration:underline;text-underline-offset:2px;word-break:break-all}

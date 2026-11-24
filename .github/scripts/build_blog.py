@@ -83,8 +83,48 @@ def parse_post(path):
         "html": markdown.markdown(body, extensions=["extra", "toc", "sane_lists"],
                                   extension_configs={"toc": {"slugify": slugify_unicode}}),
     }
+    post["keysum"], post["html"] = split_keysum(post["html"])
+    post["html"], post["faq"] = wrap_faq(post["html"])
+    post["html"] = wrap_sources(post["html"])
     post["toc"] = re.findall(r'<h2 id="[^"]+">(.*?)</h2>', post["html"])
     return post
+
+
+def split_keysum(html):
+    """본문 맨 위 '핵심 요약' 상자를 떼어 내 목차 위에 따로 놓는다."""
+    m = re.search(r'<div class="keysum">.*?</div>', html, re.S)
+    if not m:
+        return "", html
+    return m.group(0), html[:m.start()] + html[m.end():]
+
+
+def _plain(s):
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", s)).strip()
+
+
+def wrap_faq(html):
+    """'자주 묻는 질문' 섹션의 ### 질문을 접는 목록으로 바꾸고, 구조화 데이터용 질문·답을 돌려준다."""
+    m = re.search(r'(<h2 id="[^"]+">자주 묻는 질문</h2>)(.*?)(?=<h2 |\Z)', html, re.S)
+    if not m:
+        return html, []
+    parts = re.split(r"<h3[^>]*>(.*?)</h3>", m.group(2), flags=re.S)
+    intro, faq, items = parts[0], [], []
+    for i in range(1, len(parts) - 1, 2):
+        q, a = parts[i].strip(), parts[i + 1].strip()
+        q_plain = re.sub(r"^Q\.?\s*", "", _plain(q))
+        faq.append((q_plain, _plain(a)))
+        items.append(f'<details class="faq-i"{" open" if not items else ""}><summary>{q_plain}</summary><div class="faq-a">{a}</div></details>')
+    block = m.group(1) + intro + '<div class="faq">' + "".join(items) + "</div>\n"
+    return html[:m.start()] + block + html[m.end():], faq
+
+
+def wrap_sources(html):
+    """'출처' 섹션을 상자로 감싸고 링크는 새 탭에서 열리게 한다."""
+    m = re.search(r'(<h2 id="[^"]+">출처</h2>)(.*?)(?=<h2 |\Z)', html, re.S)
+    if not m:
+        return html
+    body = re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" target="_blank" rel="noopener"', m.group(2))
+    return html[:m.start()] + m.group(1) + '<div class="srcs">' + body + "</div>\n" + html[m.end():]
 
 
 def head(title, desc, url, image, extra=""):
@@ -265,6 +305,10 @@ def build_post(p, posts):
           f'"headline":{json_str(p["title"])},"datePublished":"{p["date"].isoformat()}",'
           f'"image":{json_str(img)},"author":{{"@type":"Organization","name":"학종파이터"}},'
           f'"mainEntityOfPage":{json_str(url)}}}</script>\n')
+    if p["faq"]:
+        ld += ('<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":['
+               + ",".join('{"@type":"Question","name":' + json_str(q) + ',"acceptedAnswer":{"@type":"Answer","text":' + json_str(a) + "}}"
+                          for q, a in p["faq"]) + "]}</script>\n")
     out = [head(f"{p['title']} | 학종파이터 블로그", p["summary"] or p["title"], url, img, ld)]
     out.append(f"""<div class="wrap">
 <article class="art">
@@ -277,6 +321,8 @@ def build_post(p, posts):
         out.append(" " + pic(p["thumbnail"], p["caption"] or p["title"], 'class="hero-img" fetchpriority="high"') + "\n")
         if p["caption"]:
             out.append(f' <div class="cap">{esc(p["caption"])}</div>\n')
+    if p["keysum"]:
+        out.append(" " + p["keysum"] + "\n")
     if len(p["toc"]) >= 2:
         out.append(' <div class="toc"><b>이 글의 순서</b><ol>' + "".join(f"<li>{t}</li>" for t in p["toc"]) + "</ol></div>\n")
     out.append(f' <div class="prose">\n{p["html"]}\n </div>\n')
