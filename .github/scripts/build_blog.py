@@ -234,11 +234,17 @@ def dm_box(place):
     return f"""<div class="dm"><div class="st">1:1 전문 상담</div>학종 전문 선생님이 지금 학생부를 함께 보고, 과목 선택·수행평가부터 내신 공부 방법, 면접 대비까지 1:1로 상담해 드려요.<br><a href="{CONSULT}" onclick="hfTrack('blog_consult_click',{{place:'{place}'}})">전문 상담 신청 →</a></div>"""
 
 
+FEATURE_TITLE_MAX = 41  # 맨 위 큰 칸에 올릴 글의 제목 길이 상한 (공백 포함)
+
+
 def build_index(posts):
-    # 맨 위는 가장 최근 글(front matter에 featured: true가 있으면 그 글로 고정).
+    # 맨 위는 '제목이 41자(공백 포함) 이하인 글 중 가장 최근 글'. 제목이 길면 맨 위 칸이 너무 길어져서요.
+    # 그런 글이 없으면 가장 최근 글, front matter에 featured: true가 있으면 그 글로 고정.
     # 오른쪽 '조회수 높은 글'은 페이지가 열릴 때 /api/popular 조회수 순으로 다시 그려요.
     # (조회수를 못 받으면, 또는 조회수가 같으면 최근 글 순서)
-    featured = next((p for p in posts if p["featured"]), posts[0] if posts else None)
+    featured = (next((p for p in posts if p["featured"]), None)
+                or next((p for p in posts if len(p["title"]) <= FEATURE_TITLE_MAX), None)
+                or (posts[0] if posts else None))
     rest = [p for p in posts if p is not featured]
     picks = posts[:3]
     used = [c for c in CATEGORIES if any(p["category"] == c for p in posts)]
