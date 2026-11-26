@@ -12,6 +12,7 @@ GitHub Actions 배포 때 자동 실행됩니다. 직접 미리 보려면:
   python .github/scripts/build_blog.py
 """
 import html
+import json
 import os
 import re
 import sys
@@ -234,11 +235,12 @@ def dm_box(place):
 
 
 def build_index(posts):
-    # 맨 위는 가장 최근 글(front matter에 featured: true가 있으면 그 글로 고정),
-    # 오른쪽 '추천 글'은 맨 위 글을 뺀 최근 글 3편.
+    # 맨 위는 가장 최근 글(front matter에 featured: true가 있으면 그 글로 고정).
+    # 오른쪽 '조회수 높은 글'은 페이지가 열릴 때 /api/popular 조회수 순으로 다시 그려요.
+    # (조회수를 못 받으면, 또는 조회수가 같으면 최근 글 순서)
     featured = next((p for p in posts if p["featured"]), posts[0] if posts else None)
     rest = [p for p in posts if p is not featured]
-    picks = rest[:3]
+    picks = posts[:3]
     used = [c for c in CATEGORIES if any(p["category"] == c for p in posts)]
     used += sorted({p["category"] for p in posts} - set(used))
     out = [head("학종파이터 블로그 | 생기부를 하나의 이야기로 잇는 기록",
@@ -259,7 +261,7 @@ def build_index(posts):
         out.append(f"""   <a class="pin" href="/blog/{p['slug']}/" data-cat="{esc(p['category'])}">
     {thumb(p)}
     <div>
-     <div class="lab">{esc(p['category'])} · 추천 글</div>
+     <div class="lab">{esc(p['category'])} · 최신 글</div>
      <h2 class="serif">{esc(p['title'])}</h2>
      <p>{esc(p['summary'])}</p>
      <div class="meta">{fmt_date(p['date'], True)} · {p['minutes']}분 읽기</div>
@@ -272,7 +274,7 @@ def build_index(posts):
     out.append('   <p class="empty" hidden>이 카테고리에는 아직 글이 없어요.</p>\n  </div>\n')
     out.append(f"""  <aside>
    <div class="who"><img src="/images/logo.webp" alt="학종파이터 로고" width="48" height="48" loading="lazy"><b>학종파이터</b><p>고등학생과 학부모를 위한 학생부종합전형 기록. 3년의 활동이 한 방향으로 이어지도록 돕습니다.</p></div>
-   <div><div class="st">추천 글</div><ol class="pop">{''.join(f'<li><a href="/blog/{p["slug"]}/">{esc(p["title"])}</a></li>' for p in picks)}</ol></div>
+   <div><div class="st">조회수 높은 글</div><ol class="pop" id="popList">{''.join(f'<li><a href="/blog/{p["slug"]}/">{esc(p["title"])}</a></li>' for p in picks)}</ol></div>
    <div class="letter"><h4 class="serif">새 글 소식 받기</h4><p>새 글이 올라오면 인스타그램에서 가장 먼저 알려 드려요.</p><a class="b" href="{IG}" target="_blank" rel="noopener" onclick="hfTrack('blog_follow',{{place:'sidebar'}})">instagram</a></div>
    {dm_box('index')}
   </aside>
@@ -288,6 +290,27 @@ def build_index(posts):
     empty.hidden=n>0;
   }}
   btns.forEach(function(b){{b.addEventListener('click',function(){{set(b.dataset.cat);}});}});
+}})();
+</script>
+""")
+    if BLOG_API:
+        # 글 목록(최근 글 순)을 넘겨 두고, 받은 조회수로 정렬해요. 조회수가 같으면 최근 글이 먼저.
+        all_posts = json.dumps([[p["slug"], p["title"]] for p in posts], ensure_ascii=False).replace("</", "<\\/")
+        out.append(f"""<script>
+(function(){{
+  var list=document.getElementById('popList');if(!list||!window.fetch)return;
+  var posts={all_posts};
+  fetch({json.dumps(BLOG_API.rstrip("/") + "/api/popular")}).then(function(r){{return r.ok?r.json():null;}}).then(function(d){{
+    if(!d||!d.posts)return;
+    var pv={{}};d.posts.forEach(function(x){{pv[x.post]=x.pv;}});
+    var order=posts.map(function(p,i){{return {{s:p[0],t:p[1],v:pv[p[0]]||0,i:i}};}});
+    order.sort(function(a,b){{return b.v-a.v||a.i-b.i;}});
+    list.innerHTML='';
+    order.slice(0,3).forEach(function(p){{
+      var li=document.createElement('li'),a=document.createElement('a');
+      a.href='/blog/'+p.s+'/';a.textContent=p.t;li.appendChild(a);list.appendChild(li);
+    }});
+  }}).catch(function(){{}});
 }})();
 </script>
 """)

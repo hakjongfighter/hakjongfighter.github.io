@@ -1,6 +1,7 @@
 // 학종파이터 블로그 공감·댓글 서버 (Cloudflare Worker + D1)
 //
 // 공개 API
+//   GET  /api/popular                   블로그 글별 조회수 (목록의 '조회수 높은 글')
 //   GET  /api/post?post=<slug>          공감 수, 내가 눌렀는지, 공개된 댓글 목록
 //   POST /api/like      {post}          공감 (같은 방문자는 글마다 1번)
 //   POST /api/comments  {post,nick,body,website}  댓글 등록 → 승인 대기
@@ -54,6 +55,24 @@ async function route(request, env, url) {
     // 집계가 실패해도 방문자 화면에는 아무 영향이 없도록 항상 204로 답해요.
     try { await track(request, env); } catch (e) { console.error("track", e); }
     return new Response(null, { status: 204 });
+  }
+
+  if (m === "GET" && p === "/api/popular") {
+    // 블로그 글별 조회수 (블로그 목록 '조회수 높은 글'용). 보관 기간(기본 180일) 안의 국내 열람만 세요.
+    let rows = [];
+    try {
+      rows = (await env.DB.prepare(
+        "SELECT path, SUM(type='pv') pv FROM hits WHERE type='pv' AND country='KR' AND path LIKE '/blog/%/' GROUP BY path ORDER BY pv DESC LIMIT 50"
+      ).all()).results;
+    } catch (e) { rows = []; } // 방문 기록 표가 아직 없으면 빈 목록
+    const posts = [];
+    for (const r of rows) {
+      const mm = /^\/blog\/([a-z0-9-]{1,80})\/$/.exec(r.path);
+      if (mm && mm[1] !== "admin" && mm[1] !== "category") posts.push({ post: mm[1], pv: r.pv || 0 });
+    }
+    const res = json({ posts });
+    res.headers.set("Cache-Control", "public, max-age=600");
+    return res;
   }
 
   if (m === "GET" && p === "/api/post") {
