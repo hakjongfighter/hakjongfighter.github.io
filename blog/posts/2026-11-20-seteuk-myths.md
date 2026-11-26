@@ -5,8 +5,6 @@ category: 수행평가·세특
 summary: "길게 써 주면 좋대", "대회 상 받으면 들어간대"… 복도에서 들은 세특 소문, 진짜일까요? 자주 듣는 오해 다섯 개를 하나씩 바로잡아 볼게요.
 thumbnail: /images/blog/seteuk-myths.jpg
 tags: 세특, 학생부, 오해, 학종, 고1
-featured: true
-pick: true
 ---
 
 <div class="keysum" markdown="1">

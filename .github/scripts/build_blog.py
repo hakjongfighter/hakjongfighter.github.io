@@ -234,9 +234,11 @@ def dm_box(place):
 
 
 def build_index(posts):
+    # 맨 위는 가장 최근 글(front matter에 featured: true가 있으면 그 글로 고정),
+    # 오른쪽 '추천 글'은 맨 위 글을 뺀 최근 글 3편.
     featured = next((p for p in posts if p["featured"]), posts[0] if posts else None)
     rest = [p for p in posts if p is not featured]
-    picks = [p for p in posts if p["pick"]][:5] or posts[:4]
+    picks = rest[:3]
     used = [c for c in CATEGORIES if any(p["category"] == c for p in posts)]
     used += sorted({p["category"] for p in posts} - set(used))
     out = [head("학종파이터 블로그 | 생기부를 하나의 이야기로 잇는 기록",
@@ -526,7 +528,7 @@ def main():
     dup = {s for s in slugs if slugs.count(s) > 1}
     if dup:
         raise ValueError(f"주소(slug)가 겹치는 글이 있어요: {', '.join(dup)}")
-    posts.sort(key=lambda p: p["date"], reverse=True)
+    posts.sort(key=lambda p: (p["date"], p["slug"]), reverse=True)
     make_webps(posts)
     for p in posts:
         d = os.path.join(BLOG, p["slug"])

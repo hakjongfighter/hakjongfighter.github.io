@@ -5,7 +5,6 @@ category: 수행평가·세특
 summary: 끝나면 바로 잊어버리는 수행평가, 그날 10분만 투자해 적어 두면 학기 말에 쓸 거리가 확 늘어나요. 칸 다섯 개짜리 복기 노트 양식과 과목별 예시, 모아 둔 노트를 쓰는 법까지 정리했어요.
 thumbnail: /images/blog/after-test-notes.jpg
 tags: 수행평가, 복기, 공부습관, 탐구주제, 세특
-pick: true
 ---
 
 <div class="keysum" markdown="1">

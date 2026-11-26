@@ -5,7 +5,6 @@ category: 수행평가·세특
 summary: 학기가 끝나기 전에 3분만 투자해 보세요. 18개 문장 중 지금 내 이야기인 것만 체크하면, 방향·수업 기록·학생부 흐름 중 어디가 비어 있는지 바로 보여요.
 thumbnail: /images/blog/record-self-check.jpg
 tags: 학종, 학생부점검, 세특, 체크리스트, 겨울방학
-pick: true
 ---
 
 <div class="keysum" markdown="1">
