@@ -1,6 +1,6 @@
 # 학종파이터 캐릭터 포즈 모음
 
-배경을 지운 PNG 19장이에요. 블로그 썸네일과 글 안 이미지에 골고루 돌려 써요.
+배경을 지운 PNG 59장이에요(기본 19종 + 추가 40종). 블로그 썸네일과 글 안 이미지에 골고루 돌려 써요.
 같은 포즈가 연달아 나오지 않게, 썸네일에 쓰면 아래 '사용한 글'에 적어 주세요.
 
 | 파일 | 포즈 | 어울리는 글 | 사용한 글 |
@@ -24,5 +24,52 @@
 | backpack.png | 가방 메고 걷기 | 새 학기, 학교생활 | last-semester-plan |
 | meditate.png | 명상 | 멘탈 관리, 시험 전 | |
 | sleep.png | 연필 베고 잠 | 휴식, 방학, 4컷 만화 | |
+
+## 추가 40종 (21~60)
+
+파일명 앞 번호는 세트 순서예요. 21~24는 같은 캐릭터를 여러 방향에서 본 기준 시트예요.
+
+| 파일 | 포즈 | 어울리는 글 | 사용한 글 |
+|---|---|---|---|
+| 21_front_neutral.png | 정면, 기본 표정 (기준 시트) | 캐릭터 소개, 기본 컷 | |
+| 22_side.png | 옆모습 (기준 시트) | 걸어가는 장면, 전환 컷 | |
+| 23_back_cape.png | 뒷모습, 망토 (기준 시트) | 떠나는 장면, 마무리, 각오 | |
+| 24_three_quarter.png | 비스듬한 앞모습 (기준 시트) | 캐릭터 소개, 기본 컷 | |
+| 25_big_smile.png | 두 팔 들고 활짝 웃음 | 좋은 소식, 축하 | |
+| 26_surprised.png | 깜짝 놀람 | 반전, 몰랐던 사실, 주의 | |
+| 27_flustered_sweat.png | 땀 흘리며 당황 | 실수, 마감 임박, 흔한 오해 | |
+| 28_worried.png | 걱정스러운 표정 | 고민 상담, 불안한 점 | |
+| 29_sad_tears.png | 눈물 닦기 | 불합격, 아쉬운 결과, 공감 | |
+| 30_determined_angry.png | 주먹 쥐고 결연한 표정 | 각오, 내신 대비, 도전 | |
+| 31_wink.png | 윙크 + 엄지척 | 꿀팁, 정리 | |
+| 32_touched_sparkle_eyes.png | 감동해서 반짝이는 눈 | 합격 후기, 감사 | |
+| 33_confused_dizzy.png | 어지러워 빙글빙글 | 복잡한 제도, 헷갈리는 용어 | |
+| 34_relief_sigh.png | 안도의 한숨 | 시험 끝, 해결, 안심 | |
+| 35_interview_answer.png | 의자에 앉아 답변 | 면접 준비, 면접 질문 | |
+| 36_tie_prep.png | 넥타이 매며 긴장 | 면접 전날, 준비물 | |
+| 37_grading_test.png | 시험지에 동그라미 채점 | 내신 결과, 오답 정리 | |
+| 38_report_card_shock.png | 성적표 보고 충격 | 성적 하락, 성적표 읽는 법 | |
+| 39_acceptance_cheer.png | 노트북 합격 화면에 환호 | 합격 발표, 합격 후기 | |
+| 40_comfort_pat.png | 풀 죽은 학생 어깨 토닥임 | 위로, 고민 상담 | |
+| 41_laptop_apply.png | 노트북으로 원서 작성 | 원서 접수, 온라인 지원 | |
+| 42_calendar_dday.png | 달력 D-day 가리킴 | 일정, 마감, 수시 일정 | |
+| 43_record_folder.png | 책(기록)을 펼쳐 봄 | 학생부 읽기, 기록 점검 | |
+| 44_magnifier_analysis.png | 돋보기로 문서 분석 | 학생부 분석, 모집요강 읽기 | |
+| 45_course_checklist.png | 클립보드 체크리스트 | 과목 선택, 수강 신청 | |
+| 46_writing_report.png | 책상에서 보고서 작성 | 탐구보고서, 세특, 수행평가 | |
+| 47_parent_consult.png | 학부모와 상담 | 학부모 안내, 상담 | |
+| 48_encourage_student.png | 학생 어깨에 손 얹고 엄지척 | 응원, 코칭, 상담 후기 | |
+| 49_whiteboard_explain.png | 화이트보드 가리키며 설명 | 개념 설명 (보드에 글 넣기) | |
+| 50_phone_chat.png | 휴대폰 들고 손 흔듦 | 상담 문의, DM, 카톡 안내 | |
+| 51_mic_seminar.png | 마이크 들고 발표 | 설명회, 발표, 라이브 | |
+| 52_wave_hello.png | 손 흔들며 인사 | 첫인사, 채널 소개 | |
+| 53_thumbs_up_cta.png | 엄지척 | 구독·팔로우 요청, 추천 | |
+| 54_listening.png | 귀에 손 대고 듣기 | 질문 받기, 댓글 이벤트 | |
+| 55_speech_bubble_blank.png | 빈 말풍선 옆 손짓 | 한마디 문구 (말풍선에 글 넣기) | |
+| 56_blank_sign.png | 빈 팻말 들기 | 제목·숫자 강조 (팻말에 글 넣기) | |
+| 57_point_down.png | 아래를 가리킴 | 아래 링크, 더보기, 설명란 안내 | |
+| 58_checklist_check.png | 체크리스트에 체크 | 점검표, 할 일 정리 | |
+| 59_megaphone.png | 확성기로 외침 | 공지, 중요 발표, 새 소식 | |
+| 60_map_guide.png | 지도 들고 길 안내 | 로드맵, 입시 길잡이 | |
 
 썸네일 만들기: `.github/scripts/make_thumb.py` (사용법은 파일 맨 위에 있어요)
